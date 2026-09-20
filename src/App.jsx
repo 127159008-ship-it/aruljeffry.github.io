@@ -1,5 +1,7 @@
 import './App.css'
 
+const base = import.meta.env.BASE_URL
+
 const skillGroups = [
   {
     title: 'Power Electronics',
@@ -33,14 +35,14 @@ const projects = [
     tag: 'MATLAB/Simulink',
     meta: 'Design Calculations Lead · Three-member team · SASTRA Deemed to be University · May 2026',
     desc: 'Designed a six-switch, five-inductor Single-Input Multiple-Output buck converter generating regulated 18.5V, 15V, 12V, 5V, and a newly added 3.3V output from a 48V DC input. Performed duty-cycle, inductance, and capacitance calculations for Continuous Conduction Mode with a 0.02% output-ripple target, then built the MATLAB/Simulink model with PI closed-loop control and NAND-based switching logic, verifying voltage, current, PWM, and ripple performance.',
-    report: '/SIMO_Buck_Converter_Report.pdf',
+    report: `${base}SIMO_Buck_Converter_Report.pdf`,
   },
   {
     title: 'Synchronous Buck Converter for TT Motor Drive — Embedded Firmware',
     tag: 'TI TMS320F28069 · Code Composer Studio',
     meta: 'SASTRA Deemed to be University · Nov 2025',
     desc: 'Designed and implemented an open-loop synchronous buck converter stepping a 12V DC input down to 5V to drive a DC motor. Developed firmware on a TI TMS320F28069 microcontroller generating complementary PWM signals with deadband through the ePWM module, driving two MOSFETs via an IR gate driver for accurate voltage and speed control.',
-    report: '/TT_Motor_Drive_C2000_Report.pdf',
+    report: `${base}TT_Motor_Drive_C2000_Report.pdf`,
   },
   {
     title: 'LAUNCHXL-F280049C — Four-Layer PCB Design',
@@ -85,7 +87,7 @@ function App() {
           </p>
           <div className="hero-actions">
             <a className="btn btn-primary" href="#projects">View projects</a>
-            <a className="btn btn-secondary" href="/Arul_Jeffry_A_Resume.pdf" target="_blank" rel="noreferrer">Download résumé</a>
+            <a className="btn btn-secondary" href={`${base}Arul_Jeffry_A_Resume.pdf`} target="_blank" rel="noreferrer">Download résumé</a>
           </div>
         </header>
 
