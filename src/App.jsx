@@ -12,6 +12,15 @@ import usePrefersReducedMotion from './usePrefersReducedMotion'
 
 const base = import.meta.env.BASE_URL
 
+const techLabels = [
+  { text: 'CIRCUITS', top: '7%', left: '6%' },
+  { text: 'EMBEDDED SYSTEMS', top: '13%', left: '74%' },
+  { text: 'PCB DESIGN', top: '38%', left: '87%' },
+  { text: 'SMART GRID', top: '60%', left: '78%' },
+  { text: 'POWER ELECTRONICS', top: '85%', left: '38%' },
+  { text: 'ELECTRIC VEHICLES', top: '91%', left: '62%' },
+]
+
 const skillGroups = [
   {
     title: 'Power Electronics',
@@ -131,42 +140,57 @@ function App() {
 
       <nav className="nav">
         <div className="nav-inner">
-          <a className="nav-name" href="#top">Arul<span className="dot">.</span>Jeffry</a>
+          <a className="nav-logo" href="#top">AJ</a>
           <ul className="nav-links">
+            <li><a href="#top">Home</a></li>
             <li><a href="#about">About</a></li>
-            <li><a href="#skills">Skills</a></li>
             <li><a href="#projects">Projects</a></li>
-            <li><a href="#experience">Experience</a></li>
+            <li><a href="#skills">Skills</a></li>
             <li><a href="#contact">Contact</a></li>
           </ul>
+          <MagneticButton as="a" className="btn btn-connect" href="#contact">Let&apos;s Connect ↗</MagneticButton>
         </div>
       </nav>
 
       <div className="site" id="top">
         <header className="hero">
+          {techLabels.map((label, i) => (
+            <motion.span
+              key={label.text}
+              className="tech-label"
+              style={{ top: label.top, left: label.left }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 0.9 + i * 0.12 }}
+            >
+              {label.text}
+            </motion.span>
+          ))}
           <motion.p
             className="hero-eyebrow-label"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            HELLO, I&apos;M
+            EEE STUDENT · ENGINEER · BUILDER
           </motion.p>
-          <SplitHeroName className="hero-name" text="Arul Jeffry" />
+          <h1 className="hero-name">
+            <SplitHeroName as="span" className="hero-name-plain" text="Arul " />
+            <SplitHeroName as="span" className="hero-name-accent" text="Jeffry" delayOffset={0.12} />
+          </h1>
           <motion.p
             className="hero-tagline"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.25 }}
+            transition={{ duration: 0.6, delay: 0.4 }}
           >
-            EEE student. Power electronics &amp; embedded systems builder.<br />
-            Turning circuits and code into working hardware.
+            Turning circuits and code into a smarter tomorrow.
           </motion.p>
           <motion.div
             className="hero-actions"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.35 }}
+            transition={{ duration: 0.6, delay: 0.55 }}
           >
             <span className="status-pill">
               <span className="pulse-dot" />
@@ -177,19 +201,43 @@ function App() {
             className="hero-actions"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.45 }}
+            transition={{ duration: 0.6, delay: 0.65 }}
           >
-            <MagneticButton className="btn btn-primary" href="#projects">See my work ↓</MagneticButton>
-            <MagneticButton className="btn btn-secondary" href={`${base}Arul_Jeffry_A_Resume.pdf`} target="_blank" rel="noreferrer">Download résumé</MagneticButton>
+            <MagneticButton className="btn btn-primary" href="#projects">See My Work →</MagneticButton>
+            <MagneticButton className="btn btn-secondary" href={`${base}Arul_Jeffry_A_Resume.pdf`} target="_blank" rel="noreferrer">Download Résumé ⬇</MagneticButton>
           </motion.div>
+
+          <motion.div
+            className="side-label side-label-right"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 1.1 }}
+          >
+            <span>CURIOSITY</span>
+            <span>BUILDS</span>
+            <span>DEEPER</span>
+            <span>WORLDS</span>
+          </motion.div>
+
+          <motion.div
+            className="side-label side-label-left"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 1, delay: 1.2 }}
+          >
+            <span>IDEAS</span>
+            <span>NEVER</span>
+            <span>STOP</span>
+          </motion.div>
+
           <motion.div
             className="scroll-indicator"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.8 }}
+            transition={{ duration: 0.6, delay: 0.9 }}
           >
-            <span className="scroll-line" />
-            SCROLL
+            <span className="scroll-ring" />
+            SCROLL —
           </motion.div>
         </header>
 

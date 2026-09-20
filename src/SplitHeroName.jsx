@@ -2,7 +2,7 @@ import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import usePrefersReducedMotion from './usePrefersReducedMotion'
 
-export default function SplitHeroName({ text, className }) {
+export default function SplitHeroName({ text, className, as: Tag = 'h1', delayOffset = 0 }) {
   const containerRef = useRef(null)
   const prefersReducedMotion = usePrefersReducedMotion()
 
@@ -22,19 +22,19 @@ export default function SplitHeroName({ text, className }) {
         filter: 'blur(0px)',
         duration: 0.7,
         stagger: 0.035,
-        delay: 0.15,
+        delay: 0.15 + delayOffset,
         ease: 'back.out(1.6)',
       }
     )
-  }, [prefersReducedMotion])
+  }, [prefersReducedMotion, delayOffset])
 
   return (
-    <h1 className={className} ref={containerRef} style={{ perspective: 600 }}>
+    <Tag className={className} ref={containerRef} style={{ perspective: 600 }}>
       {text.split('').map((ch, i) => (
         <span className="char" key={i} style={{ display: 'inline-block' }}>
           {ch === ' ' ? ' ' : ch}
         </span>
       ))}
-    </h1>
+    </Tag>
   )
 }

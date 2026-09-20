@@ -22,6 +22,29 @@ const CONFIG = {
   debrisDuration: [4.5, 7],
 }
 
+const BLACK_HOLE = {
+  x: 11.5,
+  y: 2.6,
+  z: -25,
+  horizonRadius: 1.6,
+  pullRadius: 9,
+  gravityStrength: 0.017,
+}
+
+function useScrollProgressRef() {
+  const ref = useRef(0)
+  useEffect(() => {
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      ref.current = max > 0 ? Math.min(window.scrollY / max, 1) : 0
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    return () => window.removeEventListener('scroll', onScroll)
+  }, [])
+  return ref
+}
+
 const GLOW_VERTEX_SHADER = `
   attribute float aSize;
   uniform float uScale;
@@ -109,6 +132,9 @@ function clusteredField(count, { zMin, zMax, spread, clusterCount = 5, clusterRa
       amp: 0.06 + Math.random() * 0.1,
       size: 0.55 + Math.random() * 0.9,
       flare: 0,
+      gx: 0,
+      gy: 0,
+      gz: 0,
     })
   }
   return points
@@ -185,11 +211,12 @@ function DustLayer({ count, glowTexture, reduced }) {
   )
 }
 
-function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactive, reduced, colorCore, colorLine, opacityLine }) {
+function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactive, reduced, colorCore, colorLine, opacityLine, gravity }) {
   const pointsRef = useRef()
   const lineRef = useRef()
   const { camera, size } = useThree()
   const mouse = useRef({ x: -9999, y: -9999 })
+  const scrollRef = useScrollProgressRef()
 
   const points = useMemo(
     () => clusteredField(count, { zMin, zMax, spread, clusterCount: 4, clusterRatio: 0.55 }),
@@ -231,9 +258,38 @@ function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactiv
       }
       let x = p.baseX + Math.sin(p.phase) * p.amp
       let y = p.baseY + Math.cos(p.phase * 0.8) * p.amp
+      let z = p.z
+
+      if (gravity && !reduced) {
+        x += p.gx
+        y += p.gy
+        z += p.gz
+
+        const dx = BLACK_HOLE.x - x
+        const dy = BLACK_HOLE.y - y
+        const dz = BLACK_HOLE.z - z
+        const dist = Math.sqrt(dx * dx + dy * dy + dz * dz)
+
+        if (dist < BLACK_HOLE.horizonRadius) {
+          p.baseX = (Math.random() - 0.5) * spread * 1.6
+          p.baseY = (Math.random() - 0.5) * spread * 1.1
+          p.gx = 0
+          p.gy = 0
+          p.gz = 0
+          x = p.baseX
+          y = p.baseY
+          z = zMin + Math.random() * (zMax - zMin)
+        } else if (dist < BLACK_HOLE.pullRadius) {
+          const intensity = 0.35 + scrollRef.current * 1.1
+          const pull = Math.pow(1 - dist / BLACK_HOLE.pullRadius, 2) * BLACK_HOLE.gravityStrength * intensity
+          p.gx += (dx / dist) * pull
+          p.gy += (dy / dist) * pull
+          p.gz += (dz / dist) * pull
+        }
+      }
 
       if (cursorReactive && !reduced && mouse.current.x > -999) {
-        const dist = camera.position.z - p.z
+        const dist = camera.position.z - z
         const halfH = Math.tan(fovRad / 2) * dist
         const halfW = halfH * (size.width / size.height)
         const worldMouseX = camera.position.x + mouse.current.x * halfW
@@ -250,10 +306,11 @@ function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactiv
 
       p.x = x
       p.y = y
+      p.z = z
       const tw = 0.75 + Math.sin(p.phase * 1.3) * 0.25 + p.flare * 1.6
       positions[i * 3] = x
       positions[i * 3 + 1] = y
-      positions[i * 3 + 2] = p.z
+      positions[i * 3 + 2] = z
       sizes[i] = p.size * tw
     }
 
@@ -366,6 +423,53 @@ function Debris({ enabled }) {
   )
 }
 
+function BlackHole({ glowTexture, reduced }) {
+  const diskRef = useRef()
+  const glowRef = useRef()
+  const rimRef = useRef()
+  const scrollRef = useScrollProgressRef()
+
+  useFrame((state, delta) => {
+    const t = scrollRef.current
+    if (!reduced && diskRef.current) diskRef.current.rotation.z += delta * 0.18
+    if (diskRef.current) {
+      diskRef.current.material.opacity = 0.5 + t * 0.35
+      diskRef.current.scale.setScalar(1 + t * 0.55)
+    }
+    if (glowRef.current) {
+      glowRef.current.material.opacity = 0.4 + t * 0.35
+      glowRef.current.scale.setScalar(4.5 + t * 3)
+    }
+    if (rimRef.current) {
+      rimRef.current.material.opacity = 0.55 + t * 0.3
+    }
+  })
+
+  return (
+    <group position={[BLACK_HOLE.x, BLACK_HOLE.y, BLACK_HOLE.z]}>
+      <sprite ref={glowRef} scale={[6, 6, 1]}>
+        <spriteMaterial map={glowTexture} color="#8fe9f7" transparent opacity={0.35} depthWrite={false} blending={THREE.AdditiveBlending} />
+      </sprite>
+      <mesh rotation={[Math.PI / 2.9, 0.15, 0]}>
+        <ringGeometry args={[BLACK_HOLE.horizonRadius * 1.5, BLACK_HOLE.horizonRadius * 3.4, 80]} />
+        <meshBasicMaterial color="#5fd8ea" transparent opacity={0.22} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+      <mesh ref={diskRef} rotation={[Math.PI / 2.9, 0.15, 0]}>
+        <ringGeometry args={[BLACK_HOLE.horizonRadius * 1.1, BLACK_HOLE.horizonRadius * 1.85, 80]} />
+        <meshBasicMaterial color="#e2fbff" transparent opacity={0.85} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+      <mesh>
+        <sphereGeometry args={[BLACK_HOLE.horizonRadius, 40, 40]} />
+        <meshBasicMaterial color="#000000" />
+      </mesh>
+      <mesh ref={rimRef}>
+        <ringGeometry args={[BLACK_HOLE.horizonRadius * 0.97, BLACK_HOLE.horizonRadius * 1.18, 72]} />
+        <meshBasicMaterial color="#ffffff" transparent opacity={0.85} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </mesh>
+    </group>
+  )
+}
+
 function CameraRig({ reduced }) {
   const { camera } = useThree()
   const scrollProgress = useRef(0)
@@ -428,6 +532,7 @@ function Scene({ tier, reduced, bloomEnabled }) {
         colorCore="#9fe9f2"
         colorLine="#22d3ee"
         opacityLine={0.16}
+        gravity
       />
       <NetworkLayer
         count={counts.near}
@@ -441,7 +546,9 @@ function Scene({ tier, reduced, bloomEnabled }) {
         colorCore="#eafeff"
         colorLine="#7ff3ff"
         opacityLine={0.26}
+        gravity
       />
+      <BlackHole glowTexture={glowTexture} reduced={reduced} />
       <Debris enabled={!reduced} />
       {bloomEnabled && (
         <EffectComposer>
