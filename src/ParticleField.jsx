@@ -767,13 +767,132 @@ function CrystalDebrisField({ count, reduced }) {
   )
 }
 
+// Cheap value-noise / fbm shared by the accretion disk and its lensed halo,
+// used to give both a turbulent, flowing plasma look instead of a flat tint.
+const BH_NOISE_GLSL = `
+  float bhHash(vec2 p) {
+    p = fract(p * vec2(123.34, 456.21));
+    p += dot(p, p + 45.32);
+    return fract(p.x * p.y);
+  }
+  float bhNoise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    float a = bhHash(i);
+    float b = bhHash(i + vec2(1.0, 0.0));
+    float c = bhHash(i + vec2(0.0, 1.0));
+    float d = bhHash(i + vec2(1.0, 1.0));
+    vec2 u = f * f * (3.0 - 2.0 * f);
+    return mix(mix(a, b, u.x), mix(c, d, u.x), u.y);
+  }
+  float bhFbm(vec2 p) {
+    float v = 0.0;
+    float amp = 0.5;
+    for (int i = 0; i < 4; i++) {
+      v += amp * bhNoise(p);
+      p *= 2.03;
+      amp *= 0.5;
+    }
+    return v;
+  }
+`
+
+const BH_RING_VERTEX_SHADER = `
+  varying vec2 vPos;
+  void main() {
+    vPos = position.xy;
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+  }
+`
+
+// The accretion disk: hot white-gold near the horizon cooling to ember
+// orange at the outer edge, streaked with flowing turbulence, and brighter
+// on one side to suggest relativistic Doppler beaming as it spins.
+const BH_DISK_FRAGMENT_SHADER = `
+  ${BH_NOISE_GLSL}
+  varying vec2 vPos;
+  uniform float uTime;
+  uniform float uInner;
+  uniform float uOuter;
+  uniform float uOpacity;
+  uniform vec3 uColorHot;
+  uniform vec3 uColorCool;
+
+  void main() {
+    float r = length(vPos);
+    if (r < uInner || r > uOuter) discard;
+    float rn = clamp((r - uInner) / (uOuter - uInner), 0.0, 1.0);
+    float ang = atan(vPos.y, vPos.x);
+
+    float flow = bhFbm(vec2(ang * 2.6, rn * 3.4 - uTime * 0.32)) * 0.65
+               + bhFbm(vec2(ang * 7.0 + uTime * 0.18, rn * 7.0)) * 0.35;
+    float density = smoothstep(0.18, 0.92, flow);
+
+    float beam = 0.5 + 0.9 * pow(max(0.0, cos(ang)), 1.4);
+
+    vec3 color = mix(uColorHot, uColorCool, rn) * beam;
+    float edgeFade = smoothstep(0.0, 0.12, rn) * (1.0 - smoothstep(0.8, 1.0, rn));
+    float alpha = density * edgeFade * uOpacity;
+
+    gl_FragColor = vec4(color, alpha);
+  }
+`
+
+// A pale, lensed halo ring standing in for light bent around the horizon —
+// brighter top/bottom, mimicking the classic gravitational-lensing wrap.
+const BH_HALO_FRAGMENT_SHADER = `
+  ${BH_NOISE_GLSL}
+  varying vec2 vPos;
+  uniform float uTime;
+  uniform float uInner;
+  uniform float uOuter;
+  uniform float uOpacity;
+  uniform vec3 uColor;
+
+  void main() {
+    float r = length(vPos);
+    if (r < uInner || r > uOuter) discard;
+    float rn = clamp((r - uInner) / (uOuter - uInner), 0.0, 1.0);
+    float ang = atan(vPos.y, vPos.x);
+
+    float flow = bhFbm(vec2(ang * 3.2 - uTime * 0.45, rn * 5.0));
+    float ring = smoothstep(0.0, 0.2, rn) * (1.0 - smoothstep(0.75, 1.0, rn));
+    float vertical = 0.45 + 0.7 * pow(abs(sin(ang)), 2.0);
+
+    float alpha = ring * (0.45 + 0.55 * flow) * vertical * uOpacity;
+    gl_FragColor = vec4(uColor, alpha);
+  }
+`
+
 function BlackHole({ glowTexture, reduced }) {
   const groupRef = useRef()
   const diskRef = useRef()
   const glowRef = useRef()
   const rimRef = useRef()
-  const outerRef = useRef()
+  const haloRef = useRef()
   const scrollRef = useScrollProgressRef()
+
+  const diskUniforms = useMemo(
+    () => ({
+      uTime: { value: 0 },
+      uInner: { value: BLACK_HOLE.horizonRadius * 1.15 },
+      uOuter: { value: BLACK_HOLE.horizonRadius * 2.3 },
+      uOpacity: { value: 0 },
+      uColorHot: { value: new THREE.Color('#fff6e6') },
+      uColorCool: { value: new THREE.Color('#ff8a3d') },
+    }),
+    []
+  )
+  const haloUniforms = useMemo(
+    () => ({
+      uTime: { value: 0 },
+      uInner: { value: BLACK_HOLE.horizonRadius * 2.4 },
+      uOuter: { value: BLACK_HOLE.horizonRadius * 3.9 },
+      uOpacity: { value: 0 },
+      uColor: { value: new THREE.Color('#bfeeff') },
+    }),
+    []
+  )
 
   useFrame((state, delta) => {
     const t = scrollRef.current
@@ -783,20 +902,22 @@ function BlackHole({ glowTexture, reduced }) {
     const flicker = reduced ? 0 : Math.sin(state.clock.elapsedTime * 2.3) * 0.06 + Math.sin(state.clock.elapsedTime * 5.1) * 0.03
 
     if (!reduced && diskRef.current) diskRef.current.rotation.z += delta * 0.18
-    if (!reduced && outerRef.current) outerRef.current.rotation.z -= delta * 0.07
-    if (diskRef.current) {
-      diskRef.current.material.opacity = (0.5 + t * 0.35 + flicker) * fade
-      diskRef.current.scale.setScalar(1 + t * 0.55)
-    }
+    if (!reduced && haloRef.current) haloRef.current.rotation.z -= delta * 0.07
+
+    diskUniforms.uTime.value = state.clock.elapsedTime
+    haloUniforms.uTime.value = state.clock.elapsedTime
+    diskUniforms.uOpacity.value = Math.min(0.85 + t * 0.3 + flicker, 1.1) * fade
+    haloUniforms.uOpacity.value = Math.min(0.55 + t * 0.3 + flicker * 1.4, 1) * fade
+
+    if (diskRef.current) diskRef.current.scale.setScalar(1 + t * 0.55)
+    if (haloRef.current) haloRef.current.scale.setScalar(1 + t * 0.3)
+
     if (glowRef.current) {
       glowRef.current.material.opacity = (0.4 + t * 0.35 + flicker) * fade
       glowRef.current.scale.setScalar(9 + t * 4)
     }
     if (rimRef.current) {
       rimRef.current.material.opacity = (0.55 + t * 0.3 + flicker * 1.5) * fade
-    }
-    if (outerRef.current) {
-      outerRef.current.material.opacity = (0.22 + flicker * 0.5) * fade
     }
     if (groupRef.current) {
       groupRef.current.visible = fade > 0.01
@@ -808,13 +929,29 @@ function BlackHole({ glowTexture, reduced }) {
       <sprite ref={glowRef} scale={[9, 9, 1]}>
         <spriteMaterial map={glowTexture} color="#8fe9f7" transparent opacity={0.35} depthWrite={false} blending={THREE.AdditiveBlending} />
       </sprite>
-      <mesh ref={outerRef} rotation={[Math.PI / 2.9, 0.15, 0]}>
-        <ringGeometry args={[BLACK_HOLE.horizonRadius * 1.5, BLACK_HOLE.horizonRadius * 3.4, 80]} />
-        <meshBasicMaterial color="#5fd8ea" transparent opacity={0.22} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} depthWrite={false} />
+      <mesh ref={haloRef} rotation={[Math.PI / 2.9, 0.15, 0]}>
+        <ringGeometry args={[haloUniforms.uInner.value, haloUniforms.uOuter.value, 96]} />
+        <shaderMaterial
+          transparent
+          depthWrite={false}
+          side={THREE.DoubleSide}
+          blending={THREE.AdditiveBlending}
+          uniforms={haloUniforms}
+          vertexShader={BH_RING_VERTEX_SHADER}
+          fragmentShader={BH_HALO_FRAGMENT_SHADER}
+        />
       </mesh>
       <mesh ref={diskRef} rotation={[Math.PI / 2.9, 0.15, 0]}>
-        <ringGeometry args={[BLACK_HOLE.horizonRadius * 1.1, BLACK_HOLE.horizonRadius * 1.85, 80]} />
-        <meshBasicMaterial color="#e2fbff" transparent opacity={0.85} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <ringGeometry args={[diskUniforms.uInner.value, diskUniforms.uOuter.value, 128]} />
+        <shaderMaterial
+          transparent
+          depthWrite={false}
+          side={THREE.DoubleSide}
+          blending={THREE.AdditiveBlending}
+          uniforms={diskUniforms}
+          vertexShader={BH_RING_VERTEX_SHADER}
+          fragmentShader={BH_DISK_FRAGMENT_SHADER}
+        />
       </mesh>
       <mesh>
         <sphereGeometry args={[BLACK_HOLE.horizonRadius, 40, 40]} />
