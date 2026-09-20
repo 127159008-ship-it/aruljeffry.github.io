@@ -1,329 +1,501 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Canvas, useFrame, useThree } from '@react-three/fiber'
+import { EffectComposer, Bloom } from '@react-three/postprocessing'
+import * as THREE from 'three'
+import usePrefersReducedMotion from './usePrefersReducedMotion'
 
-// Tunable configuration — kept in one place so the feel of the field can be
-// adjusted without touching the render/physics logic below.
+// Tunables — kept in one place so the feel of the scene can be adjusted
+// without hunting through the render/physics code below.
 const CONFIG = {
-  countDesktop: 110,
-  countTablet: 70,
-  countMobile: 38,
-  sizeMin: 1,
-  sizeMax: 2.2,
-  connectionDistance: 130,
-  maxConnectionsPerParticle: 5,
-  connectionOpacity: 0.16,
-  driftSpeed: 0.00028,
-  driftAmp: 22,
-  cursorRadius: 150,
-  cursorStrength: 34,
-  rippleDuration: 950,
-  rippleMaxRadius: 260,
-  rippleStrength: 30,
-  structureLerp: 0.02,
-  formationLerp: 0.015,
+  dust: { desktop: 260, tablet: 160, mobile: 90 },
+  mid: { desktop: 130, tablet: 80, mobile: 46 },
+  near: { desktop: 70, tablet: 46, mobile: 26 },
+  midConnections: 2,
+  nearConnections: 3,
+  twinkleChance: 0.0025,
+  cursorRadius: 2.4,
+  cursorStrength: 0.9,
+  scrollTravel: 20,
+  debrisSlots: 4,
+  debrisMinDelay: 9,
+  debrisMaxDelay: 24,
+  debrisDuration: [4.5, 7],
 }
 
-// Which section pulls the field into a more "designed" formation, and how
-// strongly. 0 = fully organic drift, 1 = fully locked to the formation.
-const SECTION_FORMATIONS = {
-  top: { structure: 0, formation: 'organic' },
-  about: { structure: 0.16, formation: 'grid' },
-  skills: { structure: 0.38, formation: 'grid' },
-  projects: { structure: 0.5, formation: 'cluster' },
-  experience: { structure: 0.55, formation: 'timeline' },
-  education: { structure: 0.55, formation: 'timeline' },
-  certifications: { structure: 0.4, formation: 'grid' },
-  contact: { structure: 0.75, formation: 'center' },
-}
-
-function getParticleCount(width) {
-  if (width < 640) return CONFIG.countMobile
-  if (width < 1024) return CONFIG.countTablet
-  return CONFIG.countDesktop
-}
-
-function formationTarget(kind, p, width, height) {
-  switch (kind) {
-    case 'grid': {
-      const cell = 110
-      return {
-        x: Math.round(p.baseX / cell) * cell,
-        y: Math.round(p.baseY / cell) * cell,
-      }
-    }
-    case 'timeline': {
-      const centerX = width * 0.5
-      return {
-        x: centerX + p.timelineJitter,
-        y: p.baseY,
-      }
-    }
-    case 'cluster': {
-      const clusterX = width * 0.62
-      return {
-        x: p.baseX + (clusterX - p.baseX) * 0.6,
-        y: p.baseY,
-      }
-    }
-    case 'center': {
-      const cx = width * 0.5
-      const cy = height * 0.5
-      return {
-        x: p.baseX + (cx - p.baseX) * 0.55,
-        y: p.baseY + (cy - p.baseY) * 0.55,
-      }
-    }
-    default:
-      return { x: p.baseX, y: p.baseY }
+const GLOW_VERTEX_SHADER = `
+  attribute float aSize;
+  uniform float uScale;
+  void main() {
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    gl_PointSize = aSize * uScale * (300.0 / -mvPosition.z);
+    gl_Position = projectionMatrix * mvPosition;
   }
+`
+
+const GLOW_FRAGMENT_SHADER = `
+  uniform sampler2D uMap;
+  uniform vec3 uColor;
+  uniform float uOpacity;
+  void main() {
+    vec4 tex = texture2D(uMap, gl_PointCoord);
+    gl_FragColor = vec4(uColor, tex.a * uOpacity);
+  }
+`
+
+function GlowPointsMaterial({ map, color, opacity, scale }) {
+  const uniforms = useMemo(
+    () => ({
+      uMap: { value: map },
+      uColor: { value: new THREE.Color(color) },
+      uOpacity: { value: opacity },
+      uScale: { value: scale },
+    }),
+    [map, color, opacity, scale]
+  )
+  return (
+    <shaderMaterial
+      transparent
+      depthWrite={false}
+      blending={THREE.AdditiveBlending}
+      uniforms={uniforms}
+      vertexShader={GLOW_VERTEX_SHADER}
+      fragmentShader={GLOW_FRAGMENT_SHADER}
+    />
+  )
 }
 
-export default function ParticleField() {
-  const canvasRef = useRef(null)
-  const containerRef = useRef(null)
+function useGlowTexture() {
+  return useMemo(() => {
+    const size = 64
+    const canvas = document.createElement('canvas')
+    canvas.width = size
+    canvas.height = size
+    const ctx = canvas.getContext('2d')
+    const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
+    gradient.addColorStop(0, 'rgba(255,255,255,1)')
+    gradient.addColorStop(0.4, 'rgba(255,255,255,0.55)')
+    gradient.addColorStop(1, 'rgba(255,255,255,0)')
+    ctx.fillStyle = gradient
+    ctx.fillRect(0, 0, size, size)
+    const texture = new THREE.CanvasTexture(canvas)
+    texture.needsUpdate = true
+    return texture
+  }, [])
+}
+
+function clusteredField(count, { zMin, zMax, spread, clusterCount = 5, clusterRatio = 0.6 }) {
+  const clusters = new Array(clusterCount).fill(null).map(() => ({
+    x: (Math.random() - 0.5) * spread * 1.4,
+    y: (Math.random() - 0.5) * spread * 0.9,
+  }))
+  const points = []
+  for (let i = 0; i < count; i++) {
+    const z = zMin + Math.random() * (zMax - zMin)
+    let x, y
+    if (Math.random() < clusterRatio) {
+      const c = clusters[Math.floor(Math.random() * clusters.length)]
+      x = c.x + (Math.random() - 0.5) * spread * 0.35
+      y = c.y + (Math.random() - 0.5) * spread * 0.35
+    } else {
+      x = (Math.random() - 0.5) * spread * 1.6
+      y = (Math.random() - 0.5) * spread * 1.1
+    }
+    points.push({
+      baseX: x,
+      baseY: y,
+      x, y, z,
+      phase: Math.random() * Math.PI * 2,
+      speed: 0.15 + Math.random() * 0.25,
+      amp: 0.06 + Math.random() * 0.1,
+      size: 0.55 + Math.random() * 0.9,
+      flare: 0,
+    })
+  }
+  return points
+}
+
+function buildLayerEdges(points, k) {
+  const edgeSet = new Set()
+  const edges = []
+  points.forEach((p, i) => {
+    const distances = points
+      .map((o, j) => (i === j ? null : { j, d: (p.x - o.x) ** 2 + (p.y - o.y) ** 2 + (p.z - o.z) ** 2 }))
+      .filter(Boolean)
+      .sort((a, b) => a.d - b.d)
+      .slice(0, k)
+    distances.forEach(({ j }) => {
+      const key = i < j ? `${i}-${j}` : `${j}-${i}`
+      if (!edgeSet.has(key)) {
+        edgeSet.add(key)
+        edges.push([i, j])
+      }
+    })
+  })
+  return edges
+}
+
+function DustLayer({ count, glowTexture, reduced }) {
+  const pointsRef = useRef()
+  const { camera } = useThree()
+  const points = useMemo(
+    () => clusteredField(count, { zMin: -70, zMax: -15, spread: 46, clusterCount: 6, clusterRatio: 0.5 }),
+    [count]
+  )
+  const positions = useMemo(() => new Float32Array(points.length * 3), [points])
+  const sizes = useMemo(() => new Float32Array(points.length), [points])
+
+  useFrame((state, delta) => {
+    const geo = pointsRef.current?.geometry
+    if (!geo) return
+    const posAttr = geo.attributes.position
+    const sizeAttr = geo.attributes.aSize
+
+    for (let i = 0; i < points.length; i++) {
+      const p = points[i]
+      if (!reduced) {
+        p.phase += delta * p.speed
+        if (p.z > camera.position.z + 4) {
+          p.z = camera.position.z - 60 - Math.random() * 15
+          p.baseX = (Math.random() - 0.5) * 46
+          p.baseY = (Math.random() - 0.5) * 30
+          p.x = p.baseX
+          p.y = p.baseY
+        }
+        if (Math.random() < CONFIG.twinkleChance) p.flare = 1
+        p.flare *= 0.94
+      }
+      const tw = 0.7 + Math.sin(p.phase) * 0.3 + p.flare * 1.4
+      posAttr.array[i * 3] = p.x
+      posAttr.array[i * 3 + 1] = p.y
+      posAttr.array[i * 3 + 2] = p.z
+      sizeAttr.array[i] = p.size * tw
+    }
+    posAttr.needsUpdate = true
+    sizeAttr.needsUpdate = true
+  })
+
+  return (
+    <points ref={pointsRef}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" count={points.length} array={positions} itemSize={3} />
+        <bufferAttribute attach="attributes-aSize" count={points.length} array={sizes} itemSize={1} />
+      </bufferGeometry>
+      <GlowPointsMaterial map={glowTexture} color="#dfeef2" opacity={0.6} scale={0.55} />
+    </points>
+  )
+}
+
+function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactive, reduced, colorCore, colorLine, opacityLine }) {
+  const pointsRef = useRef()
+  const lineRef = useRef()
+  const { camera, size } = useThree()
+  const mouse = useRef({ x: -9999, y: -9999 })
+
+  const points = useMemo(
+    () => clusteredField(count, { zMin, zMax, spread, clusterCount: 4, clusterRatio: 0.55 }),
+    [count, zMin, zMax, spread]
+  )
+  const edges = useMemo(() => buildLayerEdges(points, k), [points, k])
+
+  const positions = useMemo(() => new Float32Array(points.length * 3), [points])
+  const sizes = useMemo(() => new Float32Array(points.length), [points])
+  const edgePositions = useMemo(() => new Float32Array(edges.length * 6), [edges])
 
   useEffect(() => {
-    const canvas = canvasRef.current
-    const ctx = canvas.getContext('2d')
-    const prefersReducedMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches
-
-    let width = window.innerWidth
-    let height = window.innerHeight
-    let dpr = Math.min(window.devicePixelRatio || 1, 2)
-    let particles = []
-    let ripples = []
-    let mouseX = -9999
-    let mouseY = -9999
-    let mouseActive = false
-    let rafId = null
-    let running = true
-    let currentStructure = 0
-    let targetStructure = 0
-
-    function resize() {
-      width = window.innerWidth
-      height = window.innerHeight
-      dpr = Math.min(window.devicePixelRatio || 1, 2)
-      canvas.width = width * dpr
-      canvas.height = height * dpr
-      canvas.style.width = `${width}px`
-      canvas.style.height = `${height}px`
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0)
-      buildParticles()
+    if (!cursorReactive) return
+    const onMove = (e) => {
+      mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1
+      mouse.current.y = -((e.clientY / window.innerHeight) * 2 - 1)
     }
-
-    function buildParticles() {
-      const count = getParticleCount(width)
-      particles = new Array(count).fill(null).map(() => {
-        const baseX = Math.random() * width
-        const baseY = Math.random() * height
-        return {
-          baseX,
-          baseY,
-          phaseX: Math.random() * Math.PI * 2,
-          phaseY: Math.random() * Math.PI * 2,
-          ampX: CONFIG.driftAmp * (0.5 + Math.random() * 0.6),
-          ampY: CONFIG.driftAmp * (0.5 + Math.random() * 0.6),
-          speed: CONFIG.driftSpeed * (0.7 + Math.random() * 0.6),
-          size: CONFIG.sizeMin + Math.random() * (CONFIG.sizeMax - CONFIG.sizeMin),
-          timelineJitter: (Math.random() - 0.5) * 60,
-          targetX: baseX,
-          targetY: baseY,
-          x: baseX,
-          y: baseY,
-        }
-      })
+    const onLeave = () => {
+      mouse.current.x = -9999
+      mouse.current.y = -9999
     }
-
-    function getActiveFormation() {
-      const centerY = height / 2
-      let closestId = 'top'
-      let closestDist = Infinity
-      Object.keys(SECTION_FORMATIONS).forEach((id) => {
-        const el = document.getElementById(id)
-        if (!el) return
-        const rect = el.getBoundingClientRect()
-        const mid = rect.top + rect.height / 2
-        const dist = Math.abs(mid - centerY)
-        if (dist < closestDist) {
-          closestDist = dist
-          closestId = id
-        }
-      })
-      return SECTION_FORMATIONS[closestId] || SECTION_FORMATIONS.top
-    }
-
-    let activeFormation = SECTION_FORMATIONS.top
-    let scrollTicking = false
-    function onScroll() {
-      if (scrollTicking) return
-      scrollTicking = true
-      requestAnimationFrame(() => {
-        activeFormation = getActiveFormation()
-        targetStructure = activeFormation.structure
-        scrollTicking = false
-      })
-    }
-
-    function onMouseMove(e) {
-      mouseX = e.clientX
-      mouseY = e.clientY
-      mouseActive = true
-    }
-
-    function onMouseLeave() {
-      mouseActive = false
-      mouseX = -9999
-      mouseY = -9999
-    }
-
-    function onClick(e) {
-      ripples.push({ x: e.clientX, y: e.clientY, start: performance.now() })
-      if (ripples.length > 4) ripples.shift()
-    }
-
-    function onVisibility() {
-      running = !document.hidden
-      if (running) {
-        rafId = requestAnimationFrame(draw)
-      } else if (rafId) {
-        cancelAnimationFrame(rafId)
-      }
-    }
-
-    function draw(now) {
-      if (!running) return
-      ctx.clearRect(0, 0, width, height)
-
-      if (!prefersReducedMotion) {
-        currentStructure += (targetStructure - currentStructure) * CONFIG.structureLerp
-      }
-
-      const activeRipples = ripples.filter((r) => now - r.start < CONFIG.rippleDuration)
-      ripples = activeRipples
-
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i]
-
-        let organicX = p.baseX
-        let organicY = p.baseY
-        if (!prefersReducedMotion) {
-          organicX = p.baseX + Math.sin(now * p.speed + p.phaseX) * p.ampX
-          organicY = p.baseY + Math.cos(now * p.speed * 0.85 + p.phaseY) * p.ampY
-
-          const ft = formationTarget(activeFormation.formation, p, width, height)
-          p.targetX += (ft.x - p.targetX) * CONFIG.formationLerp
-          p.targetY += (ft.y - p.targetY) * CONFIG.formationLerp
-        }
-
-        let renderX = organicX + (p.targetX - p.baseX) * currentStructure
-        let renderY = organicY + (p.targetY - p.baseY) * currentStructure
-
-        if (!prefersReducedMotion && mouseActive) {
-          const dx = renderX - mouseX
-          const dy = renderY - mouseY
-          const dist = Math.sqrt(dx * dx + dy * dy)
-          if (dist < CONFIG.cursorRadius && dist > 0.001) {
-            const falloff = 1 - dist / CONFIG.cursorRadius
-            const push = falloff * falloff * CONFIG.cursorStrength
-            renderX += (dx / dist) * push
-            renderY += (dy / dist) * push
-          }
-        }
-
-        if (!prefersReducedMotion) {
-          for (let r = 0; r < activeRipples.length; r++) {
-            const ripple = activeRipples[r]
-            const elapsed = now - ripple.start
-            const progress = elapsed / CONFIG.rippleDuration
-            const rippleRadius = progress * CONFIG.rippleMaxRadius
-            const dx = renderX - ripple.x
-            const dy = renderY - ripple.y
-            const dist = Math.sqrt(dx * dx + dy * dy)
-            const band = 40
-            const distFromFront = Math.abs(dist - rippleRadius)
-            if (distFromFront < band && dist > 0.001) {
-              const strength = (1 - distFromFront / band) * (1 - progress) * CONFIG.rippleStrength
-              renderX += (dx / dist) * strength
-              renderY += (dy / dist) * strength
-            }
-          }
-        }
-
-        p.x = renderX
-        p.y = renderY
-      }
-
-      ctx.fillStyle = 'rgba(230, 240, 242, 0.55)'
-      for (let i = 0; i < particles.length; i++) {
-        const p = particles[i]
-        ctx.globalAlpha = 0.75
-        ctx.beginPath()
-        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2)
-        ctx.fill()
-      }
-      ctx.globalAlpha = 1
-
-      const maxDistSq = CONFIG.connectionDistance * CONFIG.connectionDistance
-      for (let i = 0; i < particles.length; i++) {
-        const a = particles[i]
-        let connections = 0
-        for (let j = i + 1; j < particles.length; j++) {
-          if (connections >= CONFIG.maxConnectionsPerParticle) break
-          const b = particles[j]
-          const dx = a.x - b.x
-          const dy = a.y - b.y
-          const distSq = dx * dx + dy * dy
-          if (distSq < maxDistSq) {
-            const t = 1 - distSq / maxDistSq
-            ctx.strokeStyle = `rgba(210, 226, 230, ${(CONFIG.connectionOpacity * t).toFixed(3)})`
-            ctx.lineWidth = 1
-            ctx.beginPath()
-            ctx.moveTo(a.x, a.y)
-            ctx.lineTo(b.x, b.y)
-            ctx.stroke()
-            connections++
-          }
-        }
-      }
-
-      rafId = requestAnimationFrame(draw)
-    }
-
-    resize()
-    activeFormation = getActiveFormation()
-    targetStructure = activeFormation.structure
-    currentStructure = targetStructure
-
-    let resizeTimer = null
-    function onResize() {
-      clearTimeout(resizeTimer)
-      resizeTimer = setTimeout(resize, 150)
-    }
-
-    window.addEventListener('resize', onResize, { passive: true })
-    window.addEventListener('scroll', onScroll, { passive: true })
-    window.addEventListener('mousemove', onMouseMove, { passive: true })
-    window.addEventListener('mouseleave', onMouseLeave, { passive: true })
-    window.addEventListener('click', onClick, { passive: true })
-    document.addEventListener('visibilitychange', onVisibility)
-
-    rafId = requestAnimationFrame(draw)
-
+    window.addEventListener('mousemove', onMove, { passive: true })
+    window.addEventListener('mouseleave', onLeave, { passive: true })
     return () => {
-      running = false
-      if (rafId) cancelAnimationFrame(rafId)
-      window.removeEventListener('resize', onResize)
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseleave', onLeave)
+    }
+  }, [cursorReactive])
+
+  useFrame((state, delta) => {
+    const fovRad = (camera.fov * Math.PI) / 180
+
+    for (let i = 0; i < points.length; i++) {
+      const p = points[i]
+      if (!reduced) {
+        p.phase += delta * p.speed
+        if (Math.random() < CONFIG.twinkleChance * 0.6) p.flare = 1
+        p.flare *= 0.95
+      }
+      let x = p.baseX + Math.sin(p.phase) * p.amp
+      let y = p.baseY + Math.cos(p.phase * 0.8) * p.amp
+
+      if (cursorReactive && !reduced && mouse.current.x > -999) {
+        const dist = camera.position.z - p.z
+        const halfH = Math.tan(fovRad / 2) * dist
+        const halfW = halfH * (size.width / size.height)
+        const worldMouseX = camera.position.x + mouse.current.x * halfW
+        const worldMouseY = camera.position.y + mouse.current.y * halfH
+        const dx = x - worldMouseX
+        const dy = y - worldMouseY
+        const d = Math.sqrt(dx * dx + dy * dy)
+        if (d < CONFIG.cursorRadius && d > 0.001) {
+          const push = (1 - d / CONFIG.cursorRadius) * CONFIG.cursorStrength
+          x += (dx / d) * push
+          y += (dy / d) * push
+        }
+      }
+
+      p.x = x
+      p.y = y
+      const tw = 0.75 + Math.sin(p.phase * 1.3) * 0.25 + p.flare * 1.6
+      positions[i * 3] = x
+      positions[i * 3 + 1] = y
+      positions[i * 3 + 2] = p.z
+      sizes[i] = p.size * tw
+    }
+
+    if (pointsRef.current) {
+      pointsRef.current.geometry.attributes.position.needsUpdate = true
+      pointsRef.current.geometry.attributes.aSize.needsUpdate = true
+    }
+
+    for (let e = 0; e < edges.length; e++) {
+      const [a, b] = edges[e]
+      edgePositions[e * 6] = points[a].x
+      edgePositions[e * 6 + 1] = points[a].y
+      edgePositions[e * 6 + 2] = points[a].z
+      edgePositions[e * 6 + 3] = points[b].x
+      edgePositions[e * 6 + 4] = points[b].y
+      edgePositions[e * 6 + 5] = points[b].z
+    }
+    if (lineRef.current) {
+      lineRef.current.geometry.attributes.position.needsUpdate = true
+    }
+  })
+
+  return (
+    <group>
+      <points ref={pointsRef}>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" count={points.length} array={positions} itemSize={3} />
+          <bufferAttribute attach="attributes-aSize" count={points.length} array={sizes} itemSize={1} />
+        </bufferGeometry>
+        <GlowPointsMaterial map={glowTexture} color={colorCore} opacity={0.95} scale={0.95} />
+      </points>
+      <lineSegments ref={lineRef}>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" count={edges.length * 2} array={edgePositions} itemSize={3} />
+        </bufferGeometry>
+        <lineBasicMaterial color={colorLine} transparent opacity={opacityLine} />
+      </lineSegments>
+    </group>
+  )
+}
+
+function Debris({ enabled }) {
+  const { camera } = useThree()
+  const slots = useMemo(
+    () =>
+      new Array(CONFIG.debrisSlots).fill(null).map(() => ({
+        active: false,
+        t: 0,
+        duration: 5,
+        nextSpawn: 4 + Math.random() * CONFIG.debrisMaxDelay,
+        start: new THREE.Vector3(),
+        end: new THREE.Vector3(),
+        rotSpeed: (Math.random() - 0.5) * 2,
+      })),
+    []
+  )
+  const meshRefs = useRef([])
+
+  useFrame((state, delta) => {
+    if (!enabled) return
+    slots.forEach((s, i) => {
+      const mesh = meshRefs.current[i]
+      if (!mesh) return
+
+      if (!s.active) {
+        s.nextSpawn -= delta
+        if (s.nextSpawn <= 0) {
+          s.active = true
+          s.t = 0
+          s.duration = CONFIG.debrisDuration[0] + Math.random() * (CONFIG.debrisDuration[1] - CONFIG.debrisDuration[0])
+          const camZ = camera.position.z
+          s.start.set((Math.random() - 0.5) * 10, (Math.random() - 0.5) * 6, camZ - 22 - Math.random() * 14)
+          s.end.set((Math.random() - 0.5) * 3, (Math.random() - 0.5) * 2, camZ + 2.5 + Math.random() * 1.5)
+        }
+        mesh.visible = false
+        return
+      }
+
+      s.t += delta / s.duration
+      if (s.t >= 1) {
+        s.active = false
+        s.nextSpawn = CONFIG.debrisMinDelay + Math.random() * (CONFIG.debrisMaxDelay - CONFIG.debrisMinDelay)
+        mesh.visible = false
+        return
+      }
+
+      mesh.visible = true
+      const eased = s.t * s.t * (3 - 2 * s.t)
+      mesh.position.lerpVectors(s.start, s.end, eased)
+      const scale = 0.12 + eased * eased * 1.6
+      mesh.scale.setScalar(scale)
+      mesh.rotation.x += delta * s.rotSpeed
+      mesh.rotation.y += delta * s.rotSpeed * 0.7
+
+      const fadeIn = Math.min(s.t / 0.12, 1)
+      const fadeOut = 1 - Math.max((s.t - 0.82) / 0.18, 0)
+      mesh.material.opacity = Math.min(fadeIn, fadeOut) * 0.85
+    })
+  })
+
+  return (
+    <group>
+      {slots.map((_, i) => (
+        <mesh key={i} ref={(el) => (meshRefs.current[i] = el)} visible={false}>
+          <octahedronGeometry args={[0.16, 0]} />
+          <meshBasicMaterial color="#baf8ff" wireframe transparent opacity={0} />
+        </mesh>
+      ))}
+    </group>
+  )
+}
+
+function CameraRig({ reduced }) {
+  const { camera } = useThree()
+  const scrollProgress = useRef(0)
+  const mouse = useRef({ x: 0, y: 0 })
+
+  useEffect(() => {
+    const onScroll = () => {
+      const max = document.documentElement.scrollHeight - window.innerHeight
+      scrollProgress.current = max > 0 ? Math.min(window.scrollY / max, 1) : 0
+    }
+    const onMove = (e) => {
+      mouse.current.x = (e.clientX / window.innerWidth) * 2 - 1
+      mouse.current.y = -((e.clientY / window.innerHeight) * 2 - 1)
+    }
+    onScroll()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('mousemove', onMove, { passive: true })
+    return () => {
       window.removeEventListener('scroll', onScroll)
-      window.removeEventListener('mousemove', onMouseMove)
-      window.removeEventListener('mouseleave', onMouseLeave)
-      window.removeEventListener('click', onClick)
-      document.removeEventListener('visibilitychange', onVisibility)
+      window.removeEventListener('mousemove', onMove)
     }
   }, [])
 
+  useFrame(() => {
+    const targetZ = reduced ? 8 : 8 - scrollProgress.current * CONFIG.scrollTravel
+    const targetX = reduced ? 0 : mouse.current.x * 1.1
+    const targetY = reduced ? 0 : mouse.current.y * 0.7
+
+    camera.position.z += (targetZ - camera.position.z) * 0.035
+    camera.position.x += (targetX - camera.position.x) * 0.04
+    camera.position.y += (targetY - camera.position.y) * 0.04
+    camera.lookAt(camera.position.x * 0.3, camera.position.y * 0.3, camera.position.z - 12)
+  })
+
+  return null
+}
+
+function Scene({ tier, reduced, bloomEnabled }) {
+  const glowTexture = useGlowTexture()
+  const counts = {
+    dust: CONFIG.dust[tier],
+    mid: CONFIG.mid[tier],
+    near: CONFIG.near[tier],
+  }
+
   return (
-    <div className="particle-canvas" ref={containerRef} aria-hidden="true">
-      <canvas ref={canvasRef} />
+    <>
+      <fog attach="fog" args={['#030607', 10, 62]} />
+      <CameraRig reduced={reduced} />
+      <DustLayer count={counts.dust} glowTexture={glowTexture} reduced={reduced} />
+      <NetworkLayer
+        count={counts.mid}
+        zMin={-30}
+        zMax={-9}
+        spread={20}
+        k={CONFIG.midConnections}
+        glowTexture={glowTexture}
+        cursorReactive={false}
+        reduced={reduced}
+        colorCore="#9fe9f2"
+        colorLine="#22d3ee"
+        opacityLine={0.16}
+      />
+      <NetworkLayer
+        count={counts.near}
+        zMin={-9}
+        zMax={-1.5}
+        spread={11}
+        k={CONFIG.nearConnections}
+        glowTexture={glowTexture}
+        cursorReactive
+        reduced={reduced}
+        colorCore="#eafeff"
+        colorLine="#7ff3ff"
+        opacityLine={0.26}
+      />
+      <Debris enabled={!reduced} />
+      {bloomEnabled && (
+        <EffectComposer>
+          <Bloom intensity={1.05} luminanceThreshold={0.32} luminanceSmoothing={0.35} mipmapBlur radius={0.5} />
+        </EffectComposer>
+      )}
+    </>
+  )
+}
+
+function useTier() {
+  const [tier, setTier] = useState('desktop')
+  useEffect(() => {
+    const compute = () => {
+      const w = window.innerWidth
+      if (w < 640) setTier('mobile')
+      else if (w < 1024) setTier('tablet')
+      else setTier('desktop')
+    }
+    compute()
+    let timer = null
+    const onResize = () => {
+      clearTimeout(timer)
+      timer = setTimeout(compute, 200)
+    }
+    window.addEventListener('resize', onResize, { passive: true })
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
+  return tier
+}
+
+export default function ParticleField() {
+  const reduced = usePrefersReducedMotion()
+  const tier = useTier()
+  const [visible, setVisible] = useState(!document.hidden)
+
+  useEffect(() => {
+    const onVisibility = () => setVisible(!document.hidden)
+    document.addEventListener('visibilitychange', onVisibility)
+    return () => document.removeEventListener('visibilitychange', onVisibility)
+  }, [])
+
+  return (
+    <div className="particle-canvas" aria-hidden="true">
+      {visible && (
+        <Canvas
+          camera={{ position: [0, 0, 8], fov: 58, near: 0.1, far: 90 }}
+          dpr={[1, tier === 'mobile' ? 1.3 : 1.6]}
+          gl={{ antialias: true, powerPreference: 'high-performance' }}
+          frameloop={visible ? 'always' : 'never'}
+        >
+          <Scene tier={tier} reduced={reduced} bloomEnabled={tier !== 'mobile'} />
+        </Canvas>
+      )}
     </div>
   )
 }
