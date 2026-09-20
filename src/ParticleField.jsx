@@ -21,6 +21,8 @@ const CONFIG = {
   debrisMaxDelay: 24,
   debrisDuration: [4.5, 7],
   crystals: { desktop: 32, tablet: 20, mobile: 10 },
+  stars: { desktop: 280, tablet: 170, mobile: 80 },
+  sparkles: { desktop: 12, tablet: 7, mobile: 3 },
 }
 
 const BLACK_HOLE = {
@@ -105,6 +107,232 @@ function useGlowTexture() {
     texture.needsUpdate = true
     return texture
   }, [])
+}
+
+// A tiny four-point diffraction-spike sprite — the classic "glint" shape a
+// bright star makes through a camera lens or the human eye, used for the
+// handful of standout glitter particles rather than the soft round glow.
+function useSparkleTexture() {
+  return useMemo(() => {
+    const size = 128
+    const c = size / 2
+    const canvas = document.createElement('canvas')
+    canvas.width = size
+    canvas.height = size
+    const ctx = canvas.getContext('2d')
+
+    const core = ctx.createRadialGradient(c, c, 0, c, c, size * 0.17)
+    core.addColorStop(0, 'rgba(255,255,255,1)')
+    core.addColorStop(1, 'rgba(255,255,255,0)')
+    ctx.fillStyle = core
+    ctx.fillRect(0, 0, size, size)
+
+    const drawSpike = (w, h) => {
+      const grad = ctx.createLinearGradient(0, -h, 0, h)
+      grad.addColorStop(0, 'rgba(255,255,255,0)')
+      grad.addColorStop(0.5, 'rgba(255,255,255,0.9)')
+      grad.addColorStop(1, 'rgba(255,255,255,0)')
+      ctx.fillStyle = grad
+      ctx.fillRect(-w / 2, -h, w, h * 2)
+    }
+    ctx.save()
+    ctx.translate(c, c)
+    drawSpike(size * 0.045, size * 0.5)
+    ctx.rotate(Math.PI / 2)
+    drawSpike(size * 0.045, size * 0.5)
+    ctx.restore()
+
+    const texture = new THREE.CanvasTexture(canvas)
+    texture.needsUpdate = true
+    return texture
+  }, [])
+}
+
+// Realistic star tints — mostly white/blue-white with a scattering of
+// warmer stars, roughly matching how a real night sky reads to the eye.
+function pickStarColor() {
+  const r = Math.random()
+  if (r < 0.5) return [1, 1, 1]
+  if (r < 0.78) return [0.74, 0.85, 1]
+  if (r < 0.94) return [1, 0.93, 0.8]
+  return [1, 0.8, 0.64]
+}
+
+const STAR_VERTEX_SHADER = `
+  attribute float aSize;
+  attribute vec3 aColor;
+  uniform float uScale;
+  varying vec3 vColor;
+  void main() {
+    vColor = aColor;
+    vec4 mvPosition = modelViewMatrix * vec4(position, 1.0);
+    gl_PointSize = aSize * uScale * (300.0 / -mvPosition.z);
+    gl_Position = projectionMatrix * mvPosition;
+  }
+`
+
+const STAR_FRAGMENT_SHADER = `
+  uniform sampler2D uMap;
+  uniform float uOpacity;
+  varying vec3 vColor;
+  void main() {
+    vec4 tex = texture2D(uMap, gl_PointCoord);
+    gl_FragColor = vec4(vColor, tex.a * uOpacity);
+  }
+`
+
+function StarPointsMaterial({ map, opacity, scale }) {
+  const uniforms = useMemo(
+    () => ({
+      uMap: { value: map },
+      uOpacity: { value: opacity },
+      uScale: { value: scale },
+    }),
+    [map, opacity, scale]
+  )
+  return (
+    <shaderMaterial
+      transparent
+      depthWrite={false}
+      blending={THREE.AdditiveBlending}
+      uniforms={uniforms}
+      vertexShader={STAR_VERTEX_SHADER}
+      fragmentShader={STAR_FRAGMENT_SHADER}
+    />
+  )
+}
+
+// A wide, deep field of tiny twinkling stars scattered evenly across the
+// whole backdrop (unlike the clustered nebula/network layers), each with
+// its own colour, phase and twinkle speed for a natural scintillation feel.
+function StarField({ count, glowTexture, reduced }) {
+  const pointsRef = useRef()
+
+  const stars = useMemo(() => {
+    const arr = []
+    for (let i = 0; i < count; i++) {
+      const isBright = Math.random() > 0.9
+      const [r, g, b] = pickStarColor()
+      arr.push({
+        x: (Math.random() - 0.5) * 180,
+        y: (Math.random() - 0.5) * 96,
+        z: -30 - Math.random() * 55,
+        size: isBright ? 0.6 + Math.random() * 0.6 : 0.15 + Math.random() * 0.22,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.5 + Math.random() * 1.7,
+        flare: 0,
+        flareChance: isBright ? 0.012 : 0.0022,
+        r, g, b,
+      })
+    }
+    return arr
+  }, [count])
+
+  const positions = useMemo(() => {
+    const arr = new Float32Array(stars.length * 3)
+    stars.forEach((s, i) => {
+      arr[i * 3] = s.x
+      arr[i * 3 + 1] = s.y
+      arr[i * 3 + 2] = s.z
+    })
+    return arr
+  }, [stars])
+  const colors = useMemo(() => {
+    const arr = new Float32Array(stars.length * 3)
+    stars.forEach((s, i) => {
+      arr[i * 3] = s.r
+      arr[i * 3 + 1] = s.g
+      arr[i * 3 + 2] = s.b
+    })
+    return arr
+  }, [stars])
+  const sizes = useMemo(() => new Float32Array(stars.length), [stars])
+
+  useFrame((state, delta) => {
+    const geo = pointsRef.current?.geometry
+    if (!geo) return
+    const sizeAttr = geo.attributes.aSize
+    for (let i = 0; i < stars.length; i++) {
+      const s = stars[i]
+      if (!reduced) {
+        s.phase += delta * s.speed
+        if (Math.random() < s.flareChance) s.flare = 1
+        s.flare *= 0.9
+      }
+      const twinkle = 0.5 + Math.sin(s.phase) * 0.35 + s.flare * 2.4
+      sizeAttr.array[i] = s.size * Math.max(twinkle, 0.1)
+    }
+    sizeAttr.needsUpdate = true
+  })
+
+  return (
+    <points ref={pointsRef}>
+      <bufferGeometry>
+        <bufferAttribute attach="attributes-position" count={stars.length} array={positions} itemSize={3} />
+        <bufferAttribute attach="attributes-aSize" count={stars.length} array={sizes} itemSize={1} />
+        <bufferAttribute attach="attributes-aColor" count={stars.length} array={colors} itemSize={3} />
+      </bufferGeometry>
+      <StarPointsMaterial map={glowTexture} opacity={0.9} scale={0.5} />
+    </points>
+  )
+}
+
+// A small handful of brighter, closer "glitter" stars that flash with a
+// four-point diffraction spike — the sparkle accents the sea of tiny
+// background stars alone can't give.
+function SparkleField({ count, sparkleTexture, reduced }) {
+  const items = useMemo(() => {
+    const arr = []
+    for (let i = 0; i < count; i++) {
+      arr.push({
+        x: (Math.random() - 0.5) * 50,
+        y: (Math.random() - 0.5) * 28,
+        z: -4 - Math.random() * 30,
+        baseScale: 0.4 + Math.random() * 0.55,
+        phase: Math.random() * Math.PI * 2,
+        speed: 0.5 + Math.random() * 1.1,
+        flare: 0,
+        rot: Math.random() * Math.PI,
+      })
+    }
+    return arr
+  }, [count])
+  const refs = useRef([])
+
+  useFrame((state, delta) => {
+    items.forEach((it, i) => {
+      const mesh = refs.current[i]
+      if (!mesh) return
+      if (!reduced) {
+        it.phase += delta * it.speed
+        if (Math.random() < 0.01) it.flare = 1
+        it.flare *= 0.92
+        it.rot += delta * 0.12
+      }
+      const twinkle = 0.35 + Math.sin(it.phase) * 0.3 + it.flare * 1.9
+      const s = it.baseScale * Math.max(twinkle, 0.18)
+      mesh.scale.set(s, s, 1)
+      mesh.material.rotation = it.rot
+      mesh.material.opacity = Math.min(0.3 + twinkle * 0.45, 1)
+    })
+  })
+
+  return (
+    <group>
+      {items.map((it, i) => (
+        <sprite key={i} ref={(el) => (refs.current[i] = el)} position={[it.x, it.y, it.z]}>
+          <spriteMaterial
+            map={sparkleTexture}
+            color="#eafcff"
+            transparent
+            opacity={0.6}
+            depthWrite={false}
+            blending={THREE.AdditiveBlending}
+          />
+        </sprite>
+      ))}
+    </group>
+  )
 }
 
 function clusteredField(count, { zMin, zMax, spread, clusterCount = 5, clusterRatio = 0.6 }) {
@@ -639,17 +867,22 @@ function CameraRig({ reduced }) {
 
 function Scene({ tier, reduced, bloomEnabled }) {
   const glowTexture = useGlowTexture()
+  const sparkleTexture = useSparkleTexture()
   const counts = {
     dust: CONFIG.dust[tier],
     mid: CONFIG.mid[tier],
     near: CONFIG.near[tier],
     crystals: CONFIG.crystals[tier],
+    stars: CONFIG.stars[tier],
+    sparkles: CONFIG.sparkles[tier],
   }
 
   return (
     <>
       <fog attach="fog" args={['#030607', 10, 62]} />
       <CameraRig reduced={reduced} />
+      <StarField count={counts.stars} glowTexture={glowTexture} reduced={reduced} />
+      <SparkleField count={counts.sparkles} sparkleTexture={sparkleTexture} reduced={reduced} />
       <DustLayer count={counts.dust} glowTexture={glowTexture} reduced={reduced} />
       <NetworkLayer
         count={counts.mid}
