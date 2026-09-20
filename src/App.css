@@ -273,7 +273,8 @@ main section {
   max-width: 900px;
 }
 
-.hero-name-accent .char {
+.hero-name-accent {
+  display: inline-block;
   background: linear-gradient(160deg, var(--accent-bright) 0%, var(--accent) 45%, var(--accent-bright) 65%, rgba(34, 211, 238, 0.5) 100%);
   background-size: 200% 200%;
   -webkit-background-clip: text;

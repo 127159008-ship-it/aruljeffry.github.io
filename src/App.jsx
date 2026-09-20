@@ -6,7 +6,7 @@ import SmoothScroll from './SmoothScroll'
 import CustomCursor from './CustomCursor'
 import ScrollProgress from './ScrollProgress'
 import MagneticButton from './MagneticButton'
-import SplitHeroName from './SplitHeroName'
+import ParticleTextIntro from './ParticleTextIntro'
 import useIsDesktop from './useIsDesktop'
 import usePrefersReducedMotion from './usePrefersReducedMotion'
 import { skillGroups, projects, timeline, certifications, contactLinks, resumeUrl, stats } from './content'
@@ -125,7 +125,7 @@ function App() {
           ENGINEER · LEARNER · BUILDER
         </motion.p>
         <h1 className="hero-name">
-          <SplitHeroName as="span" className="hero-name-accent" text="ARUL JEFFRY A" />
+          <ParticleTextIntro as="span" className="hero-name-accent" text="ARUL JEFFRY A" />
         </h1>
         <motion.p
           className="hero-tagline"
