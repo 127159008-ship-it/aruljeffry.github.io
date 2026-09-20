@@ -493,16 +493,27 @@ main section {
    Skills — spec sheet
    ============================================================ */
 .spec-sheet {
-  border-top: 1px solid var(--border);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
 }
 
 .spec-row {
   display: grid;
   grid-template-columns: 56px 220px 1fr;
   gap: 24px;
-  padding: 24px 0;
-  border-bottom: 1px solid var(--border);
+  padding: 26px 28px;
   align-items: baseline;
+  background: var(--bg-alt);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+}
+
+.spec-row:hover {
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  transform: translateY(-2px);
 }
 
 .spec-index {
