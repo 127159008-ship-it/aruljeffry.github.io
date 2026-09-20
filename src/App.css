@@ -504,7 +504,7 @@ main section {
   gap: 24px;
   padding: 26px 28px;
   align-items: baseline;
-  background: var(--bg-alt);
+  background: #0a0f13;
   border: 1px solid var(--border);
   border-radius: 14px;
   transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
@@ -512,7 +512,7 @@ main section {
 
 .spec-row:hover {
   border-color: var(--accent);
-  background: var(--accent-soft);
+  background: #0d151b;
   transform: translateY(-2px);
 }
 
