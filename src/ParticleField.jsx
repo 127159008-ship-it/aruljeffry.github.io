@@ -824,22 +824,28 @@ const BH_DISK_FRAGMENT_SHADER = `
     float rn = clamp((r - uInner) / (uOuter - uInner), 0.0, 1.0);
     float ang = atan(vPos.y, vPos.x);
 
-    float flow = bhFbm(vec2(ang * 2.6, rn * 3.4 - uTime * 0.32)) * 0.65
-               + bhFbm(vec2(ang * 7.0 + uTime * 0.18, rn * 7.0)) * 0.35;
-    float density = smoothstep(0.18, 0.92, flow);
+    // Fine Keplerian shear streaks (high angular frequency) layered under a
+    // broader flow, closer to a smooth, fast-spinning disk than a nebula.
+    float flow = bhFbm(vec2(ang * 5.0, rn * 2.2 - uTime * 0.28)) * 0.55
+               + bhFbm(vec2(ang * 16.0 + uTime * 0.12, rn * 3.0)) * 0.45;
+    float density = mix(0.55, 1.05, smoothstep(0.15, 0.9, flow));
 
-    float beam = 0.5 + 0.9 * pow(max(0.0, cos(ang)), 1.4);
+    // Strong relativistic Doppler beaming: the side spinning toward the
+    // camera reads dramatically brighter than the receding side.
+    float beam = 0.35 + 1.35 * pow(max(0.0, cos(ang)), 1.1);
+    float innerGlow = (1.0 - smoothstep(0.0, 0.4, rn)) * 0.7;
 
-    vec3 color = mix(uColorHot, uColorCool, rn) * beam;
-    float edgeFade = smoothstep(0.0, 0.12, rn) * (1.0 - smoothstep(0.8, 1.0, rn));
+    vec3 color = mix(uColorHot, uColorCool, rn) * beam + uColorHot * innerGlow * beam * 0.5;
+    float edgeFade = smoothstep(0.0, 0.06, rn) * (1.0 - smoothstep(0.82, 1.0, rn));
     float alpha = density * edgeFade * uOpacity;
 
     gl_FragColor = vec4(color, alpha);
   }
 `
 
-// A pale, lensed halo ring standing in for light bent around the horizon —
-// brighter top/bottom, mimicking the classic gravitational-lensing wrap.
+// The lensed halo — light from the disk's far side bent up and over the
+// horizon, the single most recognisable Interstellar/Gargantua cue. Reads
+// as two bright arcs (top/bottom) rather than a uniform ring.
 const BH_HALO_FRAGMENT_SHADER = `
   ${BH_NOISE_GLSL}
   varying vec2 vPos;
@@ -855,12 +861,13 @@ const BH_HALO_FRAGMENT_SHADER = `
     float rn = clamp((r - uInner) / (uOuter - uInner), 0.0, 1.0);
     float ang = atan(vPos.y, vPos.x);
 
-    float flow = bhFbm(vec2(ang * 3.2 - uTime * 0.45, rn * 5.0));
+    float flow = bhFbm(vec2(ang * 6.0 - uTime * 0.45, rn * 4.0));
     float ring = smoothstep(0.0, 0.2, rn) * (1.0 - smoothstep(0.75, 1.0, rn));
-    float vertical = 0.45 + 0.7 * pow(abs(sin(ang)), 2.0);
+    float vertical = 0.12 + 1.6 * pow(abs(sin(ang)), 3.0);
 
-    float alpha = ring * (0.45 + 0.55 * flow) * vertical * uOpacity;
-    gl_FragColor = vec4(uColor, alpha);
+    vec3 color = mix(uColor, vec3(1.0), clamp(vertical * 0.35, 0.0, 0.6));
+    float alpha = ring * (0.4 + 0.6 * flow) * vertical * uOpacity;
+    gl_FragColor = vec4(color, alpha);
   }
 `
 
@@ -879,8 +886,8 @@ function BlackHole({ glowTexture, reduced }) {
   const diskUniforms = useMemo(
     () => ({
       uTime: { value: 0 },
-      uInner: { value: BLACK_HOLE.horizonRadius * 1.15 },
-      uOuter: { value: BLACK_HOLE.horizonRadius * 2.3 },
+      uInner: { value: BLACK_HOLE.horizonRadius * 1.08 },
+      uOuter: { value: BLACK_HOLE.horizonRadius * 2.7 },
       uOpacity: { value: 0 },
       uColorHot: { value: new THREE.Color('#eafeff') },
       uColorCool: { value: new THREE.Color('#22d3ee') },
@@ -894,8 +901,8 @@ function BlackHole({ glowTexture, reduced }) {
   const haloUniforms = useMemo(
     () => ({
       uTime: { value: 0 },
-      uInner: { value: BLACK_HOLE.horizonRadius * 1.25 },
-      uOuter: { value: BLACK_HOLE.horizonRadius * 2.05 },
+      uInner: { value: BLACK_HOLE.horizonRadius * 1.2 },
+      uOuter: { value: BLACK_HOLE.horizonRadius * 2.3 },
       uOpacity: { value: 0 },
       uColor: { value: new THREE.Color('#baf8ff') },
     }),
@@ -917,8 +924,8 @@ function BlackHole({ glowTexture, reduced }) {
 
     diskUniforms.uTime.value = state.clock.elapsedTime
     haloUniforms.uTime.value = state.clock.elapsedTime
-    diskUniforms.uOpacity.value = Math.min(0.85 + t * 0.3 + flicker, 1.1) * fade
-    haloUniforms.uOpacity.value = Math.min(0.55 + t * 0.3 + flicker * 1.4, 1) * fade
+    diskUniforms.uOpacity.value = Math.min(0.95 + t * 0.3 + flicker, 1.2) * fade
+    haloUniforms.uOpacity.value = Math.min(0.7 + t * 0.3 + flicker * 1.4, 1.15) * fade
 
     if (diskRef.current) diskRef.current.scale.setScalar(1 + t * 0.55)
     if (haloRef.current) haloRef.current.scale.setScalar(1 + t * 0.3)
@@ -952,7 +959,7 @@ function BlackHole({ glowTexture, reduced }) {
           fragmentShader={BH_HALO_FRAGMENT_SHADER}
         />
       </mesh>
-      <mesh ref={diskRef} rotation={[Math.PI / 2.9, 0.15, 0]}>
+      <mesh ref={diskRef} rotation={[Math.PI / 2.2, 0.15, 0]}>
         <ringGeometry args={[diskUniforms.uInner.value, diskUniforms.uOuter.value, 128]} />
         <shaderMaterial
           transparent
