@@ -865,6 +865,7 @@ const BH_HALO_FRAGMENT_SHADER = `
 `
 
 function BlackHole({ glowTexture, reduced }) {
+  const { camera } = useThree()
   const groupRef = useRef()
   const diskRef = useRef()
   const glowRef = useRef()
@@ -872,24 +873,31 @@ function BlackHole({ glowTexture, reduced }) {
   const haloRef = useRef()
   const scrollRef = useScrollProgressRef()
 
+  // Colours pulled straight from the site's own theme tokens (--accent /
+  // --accent-bright) rather than a generic orange accretion disk — still
+  // physically sound, since the hottest plasma skews blue-white anyway.
   const diskUniforms = useMemo(
     () => ({
       uTime: { value: 0 },
       uInner: { value: BLACK_HOLE.horizonRadius * 1.15 },
       uOuter: { value: BLACK_HOLE.horizonRadius * 2.3 },
       uOpacity: { value: 0 },
-      uColorHot: { value: new THREE.Color('#fff6e6') },
-      uColorCool: { value: new THREE.Color('#ff8a3d') },
+      uColorHot: { value: new THREE.Color('#eafeff') },
+      uColorCool: { value: new THREE.Color('#22d3ee') },
     }),
     []
   )
+  // A tight, camera-facing ring hugging the horizon — a Schwarzschild
+  // black hole's shadow and photon ring stay circular from every viewing
+  // angle (unlike the tilted disk itself), so this billboards to the
+  // camera every frame instead of following the disk's fixed tilt.
   const haloUniforms = useMemo(
     () => ({
       uTime: { value: 0 },
-      uInner: { value: BLACK_HOLE.horizonRadius * 2.4 },
-      uOuter: { value: BLACK_HOLE.horizonRadius * 3.9 },
+      uInner: { value: BLACK_HOLE.horizonRadius * 1.25 },
+      uOuter: { value: BLACK_HOLE.horizonRadius * 2.05 },
       uOpacity: { value: 0 },
-      uColor: { value: new THREE.Color('#bfeeff') },
+      uColor: { value: new THREE.Color('#baf8ff') },
     }),
     []
   )
@@ -902,7 +910,10 @@ function BlackHole({ glowTexture, reduced }) {
     const flicker = reduced ? 0 : Math.sin(state.clock.elapsedTime * 2.3) * 0.06 + Math.sin(state.clock.elapsedTime * 5.1) * 0.03
 
     if (!reduced && diskRef.current) diskRef.current.rotation.z += delta * 0.18
-    if (!reduced && haloRef.current) haloRef.current.rotation.z -= delta * 0.07
+    // The halo billboards to the camera every frame (its own swirl comes
+    // from the shader's internal uTime-driven flow, not mesh rotation) so
+    // the lensed ring stays circular around the horizon from any angle.
+    if (haloRef.current) haloRef.current.quaternion.copy(camera.quaternion)
 
     diskUniforms.uTime.value = state.clock.elapsedTime
     haloUniforms.uTime.value = state.clock.elapsedTime
@@ -929,7 +940,7 @@ function BlackHole({ glowTexture, reduced }) {
       <sprite ref={glowRef} scale={[9, 9, 1]}>
         <spriteMaterial map={glowTexture} color="#8fe9f7" transparent opacity={0.35} depthWrite={false} blending={THREE.AdditiveBlending} />
       </sprite>
-      <mesh ref={haloRef} rotation={[Math.PI / 2.9, 0.15, 0]}>
+      <mesh ref={haloRef}>
         <ringGeometry args={[haloUniforms.uInner.value, haloUniforms.uOuter.value, 96]} />
         <shaderMaterial
           transparent
