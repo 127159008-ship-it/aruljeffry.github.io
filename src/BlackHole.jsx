@@ -34,7 +34,7 @@ const FRAGMENT_SHADER = `
   const float PHOTON_R        = 1.5;    // photon sphere radius -> the bright ring
   const vec3  DISK_HOT        = vec3(0.85, 0.97, 1.0);  // near-ISCO: blue-white
   const vec3  DISK_COOL       = vec3(1.0, 0.55, 0.22);  // outer edge: orange-red
-  const int   RAY_STEPS       = 90;
+  const int   RAY_STEPS       = 120;
   // ---------------------------------------------------------------------
 
   float hash21(vec2 p) {
@@ -80,8 +80,9 @@ const FRAGMENT_SHADER = `
       float bend = LENS_STRENGTH / (r * r * r);
       dir = normalize(dir + toCenter * bend * stepSize);
 
-      // Finer steps near the hole (where curvature is sharp), coarser far out.
-      stepSize = clamp(r * 0.10, 0.02, 0.35);
+      // Finer steps near the hole (where curvature — and the disk/halo
+      // "joining" cusp — is sharpest), coarser far out.
+      stepSize = clamp(r * 0.07, 0.008, 0.35);
       vec3 next = pos + dir * stepSize;
 
       // Thin-disk intersection: did we cross the tilted equatorial plane?
@@ -101,8 +102,13 @@ const FRAGMENT_SHADER = `
           float beam = dot(tangent, -dir);
           float beamFactor = pow(clamp(0.65 + beam, 0.0, 2.2), 2.0);
 
-          float density = 1.0 - smoothstep(DISK_OUTER * 0.75, DISK_OUTER, rad);
-          color += diskCol * beamFactor * density * BLOOM_INTENSITY * 0.35;
+          // Sharper edges (tight inner cutoff, tighter outer taper) instead
+          // of a broad haze, so the disk reads as a crisp streak rather
+          // than a soft glow.
+          float innerCut = smoothstep(0.0, 0.03, rn);
+          float outerCut = 1.0 - smoothstep(0.5, 0.72, rn);
+          float density = innerCut * outerCut;
+          color += diskCol * beamFactor * density * BLOOM_INTENSITY * 0.4;
         }
       }
 
@@ -110,10 +116,13 @@ const FRAGMENT_SHADER = `
       if (r > 30.0) break; // escaped to the background
     }
 
-    // Photon ring: a bright rim wherever a ray's closest approach hugs the
-    // photon sphere — the signature "ring" silhouette, brighter than the disk.
-    float ring = smoothstep(0.35, 0.0, abs(minApproach - PHOTON_R));
-    color += vec3(0.92, 0.99, 1.0) * ring * BLOOM_INTENSITY;
+    // Photon ring: a thin, bright rim wherever a ray's closest approach
+    // hugs the photon sphere. Kept narrow and high-contrast — this is what
+    // forms the sharp cusp where the direct disk streak meets the lensed
+    // halo, instead of the two blending into a soft blob.
+    float ringDist = abs(minApproach - PHOTON_R);
+    float ring = smoothstep(0.14, 0.0, ringDist) + 0.4 * smoothstep(0.4, 0.0, ringDist);
+    color += vec3(0.95, 0.99, 1.0) * ring * BLOOM_INTENSITY;
 
     color += starField(dir);
     return color;
@@ -147,7 +156,7 @@ const FRAGMENT_SHADER = `
     // Cheap Reinhard-ish tone mapping so bright highlights glow without
     // hard-clipping to white.
     col = col / (col + vec3(1.0));
-    col = pow(col, vec3(0.85));
+    col = pow(col, vec3(1.3));
 
     gl_FragColor = vec4(col, 1.0);
   }
