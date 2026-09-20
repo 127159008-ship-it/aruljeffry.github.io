@@ -9,8 +9,7 @@ import MagneticButton from './MagneticButton'
 import SplitHeroName from './SplitHeroName'
 import useIsDesktop from './useIsDesktop'
 import usePrefersReducedMotion from './usePrefersReducedMotion'
-
-const base = import.meta.env.BASE_URL
+import { skillGroups, projects, timeline, certifications, contactLinks, resumeUrl, stats } from './content'
 
 const cornerLabels = [
   { key: 'topLeft', className: 'corner-label corner-top-left', lines: ['CIRCUITS', 'POWER', 'PEOPLE', 'A BRIGHTER TOMORROW'] },
@@ -19,80 +18,12 @@ const cornerLabels = [
   { key: 'bottomRight', className: 'corner-label corner-bottom-right', lines: ['IDEAS', 'FLOW', 'BEYOND', 'LIMITS'] },
 ]
 
-const skillGroups = [
-  {
-    title: 'Power Electronics',
-    items: ['Buck / SIMO DC-DC Converters', 'PWM Generation', 'PI Closed-Loop Control', 'Power Conversion System Design'],
-  },
-  {
-    title: 'Microcontrollers & Embedded',
-    items: ['TI C2000 (F280049C, F28069)', 'STM32F103C8T6', 'Embedded C', 'ADC / DAC', 'ePWM', 'I²C', 'SPI'],
-  },
-  {
-    title: 'PCB Design & Fabrication',
-    items: ['KiCad', 'Schematic Capture', 'Multi-layer Layout', 'Power/Ground Planes', 'DRC', 'Gerber / BOM Generation'],
-  },
-  {
-    title: 'Power Systems',
-    items: ['Energy Metering', 'CTs / PTs', 'Relays & Circuit Breakers', 'Substation & SCADA Monitoring'],
-  },
-  {
-    title: 'Development Tools',
-    items: ['MATLAB / Simulink', 'Code Composer Studio', 'STM32CubeIDE'],
-  },
-  {
-    title: 'Programming Languages',
-    items: ['C', 'C++', 'Python'],
-  },
-]
-
-const projects = [
-  {
-    title: 'SIMO DC-DC Buck Converter — Design & Simulation',
-    tag: 'MATLAB/Simulink',
-    meta: 'Design Calculations Lead · Three-member team · SASTRA Deemed to be University · May 2026',
-    desc: 'Designed a six-switch, five-inductor Single-Input Multiple-Output buck converter generating regulated 18.5V, 15V, 12V, 5V, and a newly added 3.3V output from a 48V DC input. Performed duty-cycle, inductance, and capacitance calculations for Continuous Conduction Mode with a 0.02% output-ripple target, then built the MATLAB/Simulink model with PI closed-loop control and NAND-based switching logic, verifying voltage, current, PWM, and ripple performance.',
-    report: `${base}SIMO_Buck_Converter_Report.pdf`,
-  },
-  {
-    title: 'Synchronous Buck Converter for TT Motor Drive — Embedded Firmware',
-    tag: 'TI TMS320F28069 · Code Composer Studio',
-    meta: 'SASTRA Deemed to be University · Nov 2025',
-    desc: 'Designed and implemented an open-loop synchronous buck converter stepping a 12V DC input down to 5V to drive a DC motor. Developed firmware on a TI TMS320F28069 microcontroller generating complementary PWM signals with deadband through the ePWM module, driving two MOSFETs via an IR gate driver for accurate voltage and speed control.',
-    report: `${base}TT_Motor_Drive_C2000_Report.pdf`,
-  },
-  {
-    title: 'LAUNCHXL-F280049C — Four-Layer PCB Design',
-    tag: 'KiCad',
-    meta: 'SASTRA Deemed to be University',
-    desc: 'Designed a four-layer TI C2000 LaunchPad PCB in KiCad with dedicated power/ground planes, component placement, and routing. Performed Design Rule Checks and generated Gerber, drill, and BOM files for fabrication.',
-  },
-  {
-    title: 'STM32F103C8T6 — Two-Layer PCB Design',
-    tag: 'KiCad',
-    meta: 'SASTRA Deemed to be University',
-    desc: 'Designed a two-layer STM32F103C8T6 PCB with schematic capture, ground pour, and routing. Performed Design Rule Checks and generated Gerber files for fabrication.',
-  },
-]
-
-function Reveal({ children, delay = 0 }) {
+function Reveal({ children, delay = 0, className = '' }) {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 24 }}
+      className={className}
+      initial={{ opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '-60px' }}
-      transition={{ duration: 0.55, delay, ease: [0.22, 1, 0.36, 1] }}
-    >
-      {children}
-    </motion.div>
-  )
-}
-
-function RevealSide({ children, delay = 0, fromRight = false }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, x: fromRight ? 40 : -40 }}
-      whileInView={{ opacity: 1, x: 0 }}
       viewport={{ once: true, margin: '-80px' }}
       transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
     >
@@ -101,33 +32,40 @@ function RevealSide({ children, delay = 0, fromRight = false }) {
   )
 }
 
+function SectionFrame({ index, eyebrow, heading, children, className = '' }) {
+  return (
+    <div className={`section-frame ${className}`}>
+      <span className="frame-index">{index}</span>
+      <Reveal className="section-head">
+        <p className="eyebrow">{eyebrow}</p>
+        <h2 className="display-heading">{heading}</h2>
+      </Reveal>
+      {children}
+    </div>
+  )
+}
+
 function App() {
   const isDesktop = useIsDesktop()
   const prefersReducedMotion = usePrefersReducedMotion()
 
-  const handleCardMove = (e) => {
-    const card = e.currentTarget
-    const rect = card.getBoundingClientRect()
+  const handleRowMove = (e) => {
+    if (!isDesktop || prefersReducedMotion) return
+    const el = e.currentTarget
+    const rect = el.getBoundingClientRect()
     const px = (e.clientX - rect.left) / rect.width
     const py = (e.clientY - rect.top) / rect.height
-    card.style.setProperty('--mx', `${px * 100}%`)
-    card.style.setProperty('--my', `${py * 100}%`)
-
-    if (!isDesktop || prefersReducedMotion) return
-    const rotateY = (px - 0.5) * 14
-    const rotateX = (0.5 - py) * 14
-    gsap.to(card, {
-      rotateX,
-      rotateY,
-      scale: 1.015,
-      transformPerspective: 800,
+    gsap.to(el, {
+      rotateX: (0.5 - py) * 6,
+      rotateY: (px - 0.5) * 6,
+      transformPerspective: 1000,
       duration: 0.4,
       ease: 'power3.out',
     })
   }
 
-  const handleCardLeave = (e) => {
-    gsap.to(e.currentTarget, { rotateX: 0, rotateY: 0, scale: 1, duration: 0.6, ease: 'power3.out' })
+  const handleRowLeave = (e) => {
+    gsap.to(e.currentTarget, { rotateX: 0, rotateY: 0, duration: 0.6, ease: 'power3.out' })
   }
 
   return (
@@ -150,217 +88,216 @@ function App() {
         </div>
       </nav>
 
-      <div className="site" id="top">
-        <header className="hero hero-centered">
-          {cornerLabels.map((group, gi) => (
-            <motion.div
-              key={group.key}
-              className={group.className}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 1, delay: 1 + gi * 0.15 }}
-            >
-              {group.lines.map((line) => (
-                <span key={line}>{line}</span>
-              ))}
-              <i className="corner-rule" />
-            </motion.div>
-          ))}
-
-          <motion.p
-            className="hero-eyebrow-label"
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            ENGINEER · LEARNER · BUILDER
-          </motion.p>
-          <h1 className="hero-name hero-name-center">
-            <SplitHeroName as="span" className="hero-name-accent" text="ARUL JEFFRY A" />
-          </h1>
-          <motion.p
-            className="hero-tagline hero-tagline-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.4 }}
-          >
-            TURNING IDEAS INTO A SMARTER TOMORROW
-          </motion.p>
+      <header className="hero" id="top">
+        {cornerLabels.map((group, gi) => (
           <motion.div
-            className="hero-actions hero-actions-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.55 }}
-          >
-            <span className="status-pill">
-              <span className="pulse-dot" />
-              Open to: <strong>Graduate Engineer Trainee</strong> roles
-            </span>
-          </motion.div>
-          <motion.div
-            className="hero-actions hero-actions-center"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.65 }}
-          >
-            <MagneticButton className="btn btn-primary" href="#projects">See My Work →</MagneticButton>
-            <MagneticButton className="btn btn-secondary" href={`${base}Arul_Jeffry_A_Resume.pdf`} target="_blank" rel="noreferrer">Download Résumé ⬇</MagneticButton>
-            <MagneticButton className="btn btn-tertiary" href="#contact">Let&apos;s Connect ↗</MagneticButton>
-          </motion.div>
-
-          <motion.div
-            className="scroll-indicator scroll-indicator-center"
+            key={group.key}
+            className={group.className}
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 0.6, delay: 0.9 }}
+            transition={{ duration: 1, delay: 1 + gi * 0.15 }}
           >
-            SCROLL TO EXPLORE
-            <span className="scroll-mouse"><span className="scroll-mouse-dot" /></span>
+            {group.lines.map((line) => (
+              <span key={line}>{line}</span>
+            ))}
+            <i className="corner-rule" />
           </motion.div>
-        </header>
+        ))}
 
-        <section id="about">
-          <Reveal>
-            <p className="section-title">About</p>
-            <h2 className="section-heading">Background</h2>
-            <div className="about">
-              <p>
-                I'm an Electrical &amp; Electronics Engineering student specializing in Smart Grid
-                and Electric Vehicles at SASTRA Deemed to be University, Thanjavur. My work centers
-                on DC-DC power conversion, closed-loop control design, and embedded firmware for
-                power electronic systems — from duty-cycle and component calculations through to
-                MATLAB/Simulink modeling, C2000 firmware, and multi-layer PCB fabrication in KiCad.
-                I've also spent time on the power-systems side through an internship covering energy
-                metering, protection equipment, and SCADA-based substation monitoring.
-              </p>
+        <motion.p
+          className="hero-eyebrow"
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          ENGINEER · LEARNER · BUILDER
+        </motion.p>
+        <h1 className="hero-name">
+          <SplitHeroName as="span" className="hero-name-accent" text="ARUL JEFFRY A" />
+        </h1>
+        <motion.p
+          className="hero-tagline"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.4 }}
+        >
+          TURNING IDEAS INTO A SMARTER TOMORROW
+        </motion.p>
+        <motion.div
+          className="hero-row"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.55 }}
+        >
+          <span className="status-pill">
+            <span className="pulse-dot" />
+            Open to: <strong>Graduate Engineer Trainee</strong> roles
+          </span>
+        </motion.div>
+        <motion.div
+          className="hero-row"
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.65 }}
+        >
+          <MagneticButton className="btn btn-primary" href="#projects">See My Work →</MagneticButton>
+          <MagneticButton className="btn btn-secondary" href={resumeUrl} target="_blank" rel="noreferrer">Download Résumé ⬇</MagneticButton>
+          <MagneticButton className="btn btn-tertiary" href="#contact">Let&apos;s Connect ↗</MagneticButton>
+        </motion.div>
+
+        <motion.div
+          className="scroll-indicator"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.6, delay: 0.9 }}
+        >
+          SCROLL TO EXPLORE
+          <span className="scroll-mouse"><span className="scroll-mouse-dot" /></span>
+        </motion.div>
+      </header>
+
+      <main>
+        <section id="about" className="about-section">
+          <SectionFrame index="01" eyebrow="About" heading={<>Engineering systems<br />that carry real power.</>}>
+            <div className="about-grid">
+              <Reveal delay={0.1} className="about-copy">
+                <p>
+                  I'm an Electrical &amp; Electronics Engineering student specializing in Smart Grid
+                  and Electric Vehicles at SASTRA Deemed to be University, Thanjavur. My work centers
+                  on DC-DC power conversion, closed-loop control design, and embedded firmware for
+                  power electronic systems — from duty-cycle and component calculations through to
+                  MATLAB/Simulink modeling, C2000 firmware, and multi-layer PCB fabrication in KiCad.
+                </p>
+                <p>
+                  I've also spent time on the power-systems side through an internship covering energy
+                  metering, protection equipment, and SCADA-based substation monitoring.
+                </p>
+              </Reveal>
+              <Reveal delay={0.2} className="about-stats">
+                {stats.map((s) => (
+                  <div className="stat-row" key={s.label}>
+                    <span className="stat-value">{s.value}</span>
+                    <span className="stat-label">{s.label}</span>
+                  </div>
+                ))}
+              </Reveal>
             </div>
-          </Reveal>
+          </SectionFrame>
         </section>
 
-        <section id="skills">
-          <Reveal>
-            <p className="section-title">Skills</p>
-            <h2 className="section-heading">What I work with</h2>
-          </Reveal>
-          <div className="skills-grid">
-            {skillGroups.map((group, i) => (
-              <Reveal key={group.title} delay={i * 0.06}>
-                <div className="skill-card">
-                  <h3>{group.title}</h3>
-                  <div className="chip-row">
+        <section id="skills" className="skills-section">
+          <SectionFrame index="02" eyebrow="Skills" heading="Systems I work across.">
+            <div className="spec-sheet">
+              {skillGroups.map((group, i) => (
+                <Reveal key={group.title} delay={i * 0.05} className="spec-row">
+                  <span className="spec-index">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="spec-title">{group.title}</span>
+                  <div className="spec-tags">
                     {group.items.map((item) => (
-                      <span className="chip" key={item}>{item}</span>
+                      <span className="spec-tag" key={item}>{item}</span>
                     ))}
                   </div>
-                </div>
-              </Reveal>
-            ))}
-          </div>
+                </Reveal>
+              ))}
+            </div>
+          </SectionFrame>
         </section>
 
-        <section id="projects">
-          <Reveal>
-            <p className="section-title">Projects</p>
-            <h2 className="section-heading">Selected work</h2>
-          </Reveal>
-          <div className="project-list">
-            {projects.map((p, i) => (
-              <RevealSide key={p.title} delay={i * 0.05} fromRight={i % 2 === 1}>
-                <article className="project-card" onMouseMove={handleCardMove} onMouseLeave={handleCardLeave}>
-                  <span className="project-number">{String(i + 1).padStart(2, '0')}</span>
-                  <div className="project-head">
-                    <h3>{p.title}</h3>
-                    <span className="project-tag">{p.tag}</span>
-                  </div>
-                  <p className="project-meta">{p.meta}</p>
-                  <p className="desc">{p.desc}</p>
-                  {p.report && (
-                    <div className="project-links">
-                      <a href={p.report} target="_blank" rel="noreferrer">Read full report →</a>
+        <section id="projects" className="projects-section">
+          <SectionFrame index="03" eyebrow="Projects" heading="Selected engineering work.">
+            <div className="project-rows">
+              {projects.map((p, i) => (
+                <Reveal key={p.title} delay={i * 0.06}>
+                  <article
+                    className={`project-row ${i % 2 === 1 ? 'project-row-reverse' : ''}`}
+                    onMouseMove={handleRowMove}
+                    onMouseLeave={handleRowLeave}
+                  >
+                    <span className="project-index">{String(i + 1).padStart(2, '0')}</span>
+                    <div className="project-body">
+                      <span className="project-tag">{p.tag}</span>
+                      <h3>{p.title}</h3>
+                      <p className="project-meta">{p.meta}</p>
+                      <p className="project-desc">{p.desc}</p>
+                      {p.report && (
+                        <a className="project-link" href={p.report} target="_blank" rel="noreferrer">
+                          Read full report →
+                        </a>
+                      )}
                     </div>
-                  )}
-                </article>
-              </RevealSide>
-            ))}
-          </div>
-        </section>
-
-        <section id="experience">
-          <Reveal>
-            <p className="section-title">Experience</p>
-            <h2 className="section-heading">Internship</h2>
-            <div className="timeline-item">
-              <h3>Electrical Engineering Intern</h3>
-              <span className="org">TANGEDCO — Trichy Electricity Distribution Circle</span>
-              <span className="period">Dec 2025</span>
-              <ul>
-                <li>Studied energy meter types, operating principles, and testing procedures.</li>
-                <li>Covered CTs, PTs, transformers, relays, and circuit breakers, including their operating principles and ratings.</li>
-                <li>Analyzed substation single-line diagrams and SCADA-based voltage and current monitoring.</li>
-              </ul>
+                  </article>
+                </Reveal>
+              ))}
             </div>
-          </Reveal>
+          </SectionFrame>
         </section>
 
-        <section id="education">
-          <Reveal>
-            <p className="section-title">Education</p>
-            <h2 className="section-heading">Academics</h2>
-            <div className="timeline-item">
-              <h3>B.Tech, Electrical &amp; Electronics Engineering (Smart Grid and Electric Vehicles)</h3>
-              <span className="org">SASTRA Deemed to be University, Thanjavur</span>
-              <span className="period">2023 – 2027</span>
-              <ul>
-                <li>CGPA: 7.115 / 10 · No standing arrears</li>
-              </ul>
+        <section id="experience" className="timeline-section">
+          <SectionFrame index="04" eyebrow="Path" heading="Experience & education.">
+            <div className="timeline">
+              {timeline.map((t, i) => (
+                <Reveal key={t.title} delay={i * 0.08} className="timeline-entry">
+                  <div className="timeline-marker" />
+                  <div className="timeline-content">
+                    <span className="timeline-kind">{t.kind} · {t.period}</span>
+                    <h3>{t.title}</h3>
+                    <span className="timeline-org">{t.org}</span>
+                    {t.points.length > 0 && (
+                      <ul>
+                        {t.points.map((pt) => (
+                          <li key={pt}>{pt}</li>
+                        ))}
+                      </ul>
+                    )}
+                  </div>
+                </Reveal>
+              ))}
             </div>
-            <div className="timeline-item">
-              <h3>Higher Secondary Certificate (HSC)</h3>
-              <span className="org">St. Joseph's College Hr Sec School</span>
-              <span className="period">80%</span>
-            </div>
-          </Reveal>
-        </section>
-
-        <section id="certifications">
-          <Reveal>
-            <p className="section-title">Certifications</p>
-            <h2 className="section-heading">Courses &amp; workshops</h2>
-            <ul className="cert-list">
-              <li>PCB Design Course — MHI Training Centre, SASTRA Deemed to be University</li>
-              <li>Introduction to MATLAB and Simulink Workshop</li>
-            </ul>
-          </Reveal>
-        </section>
-
-        <section id="contact">
-          <Reveal>
-            <p className="section-title">Contact</p>
-            <h2 className="section-heading">Get in touch</h2>
-            <div className="contact-grid">
-              <a className="contact-card" href="mailto:aruljeffry.2005a@gmail.com">
-                <span className="label">Email</span>
-                <span className="value">aruljeffry.2005a@gmail.com</span>
-              </a>
-              <a className="contact-card" href="tel:+918754534022">
-                <span className="label">Phone</span>
-                <span className="value">+91 87545 34022</span>
-              </a>
-              <a className="contact-card" href="https://www.linkedin.com/in/arul-jeffry-a-3489b7300" target="_blank" rel="noreferrer">
-                <span className="label">LinkedIn</span>
-                <span className="value">arul-jeffry-a</span>
-              </a>
-              <div className="contact-card">
-                <span className="label">Location</span>
-                <span className="value">Tiruchirappalli / Tirunelveli, Tamil Nadu, India</span>
+            <Reveal delay={0.3} className="cert-strip">
+              <span className="cert-strip-label">Certifications</span>
+              <div className="cert-strip-list">
+                {certifications.map((c) => (
+                  <span className="cert-chip" key={c}>{c}</span>
+                ))}
               </div>
-            </div>
-          </Reveal>
+            </Reveal>
+          </SectionFrame>
         </section>
-      </div>
 
-      <footer>
-        © {new Date().getFullYear()} Arul Jeffry A. Built with React &amp; Vite, deployed on GitHub Pages.
+        <section id="contact" className="contact-section">
+          <SectionFrame index="05" eyebrow="Contact" heading={<>Let&apos;s build something<br />that matters.</>}>
+            <Reveal delay={0.15} className="contact-links">
+              {contactLinks.map((c) =>
+                c.href ? (
+                  <a
+                    className="contact-link"
+                    href={c.href}
+                    target={c.href.startsWith('http') ? '_blank' : undefined}
+                    rel="noreferrer"
+                    key={c.label}
+                  >
+                    <span className="contact-link-label">{c.label}</span>
+                    <span className="contact-link-value">{c.value}</span>
+                  </a>
+                ) : (
+                  <div className="contact-link" key={c.label}>
+                    <span className="contact-link-label">{c.label}</span>
+                    <span className="contact-link-value">{c.value}</span>
+                  </div>
+                )
+              )}
+            </Reveal>
+            <Reveal delay={0.3}>
+              <MagneticButton className="btn btn-primary contact-cta" href="mailto:aruljeffry.2005a@gmail.com">
+                Say Hello →
+              </MagneticButton>
+            </Reveal>
+          </SectionFrame>
+        </section>
+      </main>
+
+      <footer className="site-footer">
+        © {new Date().getFullYear()} Arul Jeffry A — Electrical &amp; Electronics Engineering
       </footer>
     </SmoothScroll>
   )

@@ -487,6 +487,7 @@ function CrystalDebrisField({ count, reduced }) {
 }
 
 function BlackHole({ glowTexture, reduced }) {
+  const groupRef = useRef()
   const diskRef = useRef()
   const glowRef = useRef()
   const rimRef = useRef()
@@ -494,22 +495,29 @@ function BlackHole({ glowTexture, reduced }) {
 
   useFrame((state, delta) => {
     const t = scrollRef.current
+    // Prominent through the hero, fades out once the visitor scrolls into
+    // the content sections so it never competes with readable text.
+    const fade = 1 - Math.min(t / 0.06, 1)
+
     if (!reduced && diskRef.current) diskRef.current.rotation.z += delta * 0.18
     if (diskRef.current) {
-      diskRef.current.material.opacity = 0.5 + t * 0.35
+      diskRef.current.material.opacity = (0.5 + t * 0.35) * fade
       diskRef.current.scale.setScalar(1 + t * 0.55)
     }
     if (glowRef.current) {
-      glowRef.current.material.opacity = 0.4 + t * 0.35
+      glowRef.current.material.opacity = (0.4 + t * 0.35) * fade
       glowRef.current.scale.setScalar(9 + t * 4)
     }
     if (rimRef.current) {
-      rimRef.current.material.opacity = 0.55 + t * 0.3
+      rimRef.current.material.opacity = (0.55 + t * 0.3) * fade
+    }
+    if (groupRef.current) {
+      groupRef.current.visible = fade > 0.01
     }
   })
 
   return (
-    <group position={[BLACK_HOLE.x, BLACK_HOLE.y, BLACK_HOLE.z]}>
+    <group ref={groupRef} position={[BLACK_HOLE.x, BLACK_HOLE.y, BLACK_HOLE.z]}>
       <sprite ref={glowRef} scale={[9, 9, 1]}>
         <spriteMaterial map={glowTexture} color="#8fe9f7" transparent opacity={0.35} depthWrite={false} blending={THREE.AdditiveBlending} />
       </sprite>
