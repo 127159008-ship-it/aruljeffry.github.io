@@ -1,6 +1,7 @@
 import { motion } from 'framer-motion'
 import './App.css'
 import ParticleField from './ParticleField'
+import GridLines from './GridLines'
 
 const base = import.meta.env.BASE_URL
 
@@ -73,6 +74,19 @@ function Reveal({ children, delay = 0 }) {
   )
 }
 
+function RevealSide({ children, delay = 0, fromRight = false }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: fromRight ? 40 : -40 }}
+      whileInView={{ opacity: 1, x: 0 }}
+      viewport={{ once: true, margin: '-80px' }}
+      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
+    >
+      {children}
+    </motion.div>
+  )
+}
+
 function handleTilt(e) {
   const card = e.currentTarget
   const rect = card.getBoundingClientRect()
@@ -84,6 +98,7 @@ function App() {
   return (
     <>
       <ParticleField />
+      <GridLines />
       <div className="glow-orb one" />
       <div className="glow-orb two" />
 
@@ -103,40 +118,58 @@ function App() {
       <div className="site" id="top">
         <header className="hero">
           <motion.p
-            className="hero-eyebrow"
+            className="hero-eyebrow-label"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <span className="pulse-dot" />
-            Available for Graduate Engineer Trainee roles
+            HELLO, I&apos;M
           </motion.p>
           <motion.h1
-            initial={{ opacity: 0, y: 20 }}
+            className="hero-name"
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.1 }}
+            transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
           >
-            Power electronics, embedded<br />control, and <span className="accent-text">PCB design.</span>
+            Arul Jeffry
           </motion.h1>
           <motion.p
+            className="hero-tagline"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.2 }}
+            transition={{ duration: 0.6, delay: 0.25 }}
           >
-            Final-year EEE undergraduate (2027 batch, SASTRA Deemed University) with hands-on
-            experience in power conversion, closed-loop control, multi-layer PCB design in KiCad,
-            and embedded firmware on TI C2000 microcontrollers. Looking for a Graduate Engineer
-            Trainee / Project Engineer role in power conversion, circuit design, and embedded
-            control for industrial and electrification applications.
+            EEE student. Power electronics &amp; embedded systems builder.<br />
+            Turning circuits and code into working hardware.
           </motion.p>
           <motion.div
             className="hero-actions"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
+            transition={{ duration: 0.6, delay: 0.35 }}
           >
-            <a className="btn btn-primary" href="#projects">View projects</a>
+            <span className="status-pill">
+              <span className="pulse-dot" />
+              Open to: <strong>Graduate Engineer Trainee</strong> roles
+            </span>
+          </motion.div>
+          <motion.div
+            className="hero-actions"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.6, delay: 0.45 }}
+          >
+            <a className="btn btn-primary" href="#projects">See my work ↓</a>
             <a className="btn btn-secondary" href={`${base}Arul_Jeffry_A_Resume.pdf`} target="_blank" rel="noreferrer">Download résumé</a>
+          </motion.div>
+          <motion.div
+            className="scroll-indicator"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.6, delay: 0.8 }}
+          >
+            <span className="scroll-line" />
+            SCROLL
           </motion.div>
         </header>
 
@@ -186,8 +219,9 @@ function App() {
           </Reveal>
           <div className="project-list">
             {projects.map((p, i) => (
-              <Reveal key={p.title} delay={i * 0.08}>
+              <RevealSide key={p.title} delay={i * 0.05} fromRight={i % 2 === 1}>
                 <article className="project-card" onMouseMove={handleTilt}>
+                  <span className="project-number">{String(i + 1).padStart(2, '0')}</span>
                   <div className="project-head">
                     <h3>{p.title}</h3>
                     <span className="project-tag">{p.tag}</span>
@@ -200,7 +234,7 @@ function App() {
                     </div>
                   )}
                 </article>
-              </Reveal>
+              </RevealSide>
             ))}
           </div>
         </section>

@@ -42,7 +42,7 @@ function Field({ count = 1400 }) {
       </bufferGeometry>
       <pointsMaterial
         size={0.045}
-        color="#3fd6b8"
+        color="#6ee7b7"
         transparent
         opacity={0.75}
         sizeAttenuation
@@ -91,7 +91,7 @@ function Lines({ count = 60 }) {
               itemSize={3}
             />
           </bufferGeometry>
-          <lineBasicMaterial color="#3fd6b8" transparent opacity={0.18} />
+          <lineBasicMaterial color="#6ee7b7" transparent opacity={0.18} />
         </line>
       ))}
     </group>
