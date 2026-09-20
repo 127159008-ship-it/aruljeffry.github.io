@@ -1,13 +1,15 @@
 import { useRef } from 'react'
 import gsap from 'gsap'
 import useIsDesktop from './useIsDesktop'
+import usePrefersReducedMotion from './usePrefersReducedMotion'
 
-export default function MagneticButton({ as: Tag = 'a', className, strength = 0.4, children, ...props }) {
+export default function MagneticButton({ as: Tag = 'a', className, strength = 0.25, children, ...props }) {
   const ref = useRef(null)
   const isDesktop = useIsDesktop()
+  const prefersReducedMotion = usePrefersReducedMotion()
 
   const onMouseMove = (e) => {
-    if (!isDesktop || !ref.current) return
+    if (!isDesktop || prefersReducedMotion || !ref.current) return
     const rect = ref.current.getBoundingClientRect()
     const relX = e.clientX - (rect.left + rect.width / 2)
     const relY = e.clientY - (rect.top + rect.height / 2)

@@ -20,6 +20,7 @@
 
 html {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 body {
@@ -60,5 +61,14 @@ img {
 @media (hover: hover) and (pointer: fine) {
   body, a, button {
     cursor: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+  body, a, button {
+    cursor: auto !important;
   }
 }

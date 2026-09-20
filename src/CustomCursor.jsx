@@ -1,14 +1,17 @@
 import { useEffect, useRef } from 'react'
 import gsap from 'gsap'
 import useIsDesktop from './useIsDesktop'
+import usePrefersReducedMotion from './usePrefersReducedMotion'
 
 export default function CustomCursor() {
   const isDesktop = useIsDesktop()
+  const prefersReducedMotion = usePrefersReducedMotion()
   const dotRef = useRef(null)
   const ringRef = useRef(null)
+  const active = isDesktop && !prefersReducedMotion
 
   useEffect(() => {
-    if (!isDesktop) return
+    if (!active) return
 
     const dot = dotRef.current
     const ring = ringRef.current
@@ -52,9 +55,9 @@ export default function CustomCursor() {
         el.removeEventListener('mouseleave', onLeaveInteractive)
       })
     }
-  }, [isDesktop])
+  }, [active])
 
-  if (!isDesktop) return null
+  if (!active) return null
 
   return (
     <>

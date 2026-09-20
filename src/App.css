@@ -9,30 +9,6 @@
   display: block;
 }
 
-.glow-orb {
-  position: fixed;
-  width: 45vw;
-  height: 45vw;
-  max-width: 600px;
-  max-height: 600px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(34, 211, 238, 0.16) 0%, rgba(34, 211, 238, 0) 70%);
-  z-index: 0;
-  pointer-events: none;
-  filter: blur(20px);
-}
-
-.glow-orb.one {
-  top: -10%;
-  left: -10%;
-}
-
-.glow-orb.two {
-  bottom: -15%;
-  right: -10%;
-  background: radial-gradient(circle, rgba(56, 200, 224, 0.14) 0%, rgba(56, 200, 224, 0) 70%);
-}
-
 .site {
   position: relative;
   z-index: 1;

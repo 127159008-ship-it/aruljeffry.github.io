@@ -8,6 +8,7 @@ import ScrollProgress from './ScrollProgress'
 import MagneticButton from './MagneticButton'
 import SplitHeroName from './SplitHeroName'
 import useIsDesktop from './useIsDesktop'
+import usePrefersReducedMotion from './usePrefersReducedMotion'
 
 const base = import.meta.env.BASE_URL
 
@@ -95,6 +96,7 @@ function RevealSide({ children, delay = 0, fromRight = false }) {
 
 function App() {
   const isDesktop = useIsDesktop()
+  const prefersReducedMotion = usePrefersReducedMotion()
 
   const handleCardMove = (e) => {
     const card = e.currentTarget
@@ -104,7 +106,7 @@ function App() {
     card.style.setProperty('--mx', `${px * 100}%`)
     card.style.setProperty('--my', `${py * 100}%`)
 
-    if (!isDesktop) return
+    if (!isDesktop || prefersReducedMotion) return
     const rotateY = (px - 0.5) * 14
     const rotateX = (0.5 - py) * 14
     gsap.to(card, {
@@ -126,8 +128,6 @@ function App() {
       <CustomCursor />
       <ScrollProgress />
       <ParticleField />
-      <div className="glow-orb one" />
-      <div className="glow-orb two" />
 
       <nav className="nav">
         <div className="nav-inner">
@@ -334,7 +334,7 @@ function App() {
       </div>
 
       <footer>
-        © {new Date().getFullYear()} Arul Jeffry A. Built with React, Three.js &amp; Vite, deployed on GitHub Pages.
+        © {new Date().getFullYear()} Arul Jeffry A. Built with React &amp; Vite, deployed on GitHub Pages.
       </footer>
     </SmoothScroll>
   )
