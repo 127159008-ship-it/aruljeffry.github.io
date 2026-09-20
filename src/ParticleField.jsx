@@ -23,6 +23,7 @@ const CONFIG = {
   crystals: { desktop: 32, tablet: 20, mobile: 10 },
   stars: { desktop: 280, tablet: 170, mobile: 80 },
   sparkles: { desktop: 12, tablet: 7, mobile: 3 },
+  shootingStars: { desktop: 7, tablet: 5, mobile: 3 },
 }
 
 const BLACK_HOLE = {
@@ -701,6 +702,131 @@ function Debris({ enabled }) {
   )
 }
 
+// Bright meteor-style streaks that cut across the screen at random angles
+// and depths — some skimming the far background, some flying close enough
+// to the camera to feel like they've broken the fourth wall — each a short
+// fading line (bright head, invisible tail) plus a glowing point at the head.
+function ShootingStars({ count, glowTexture, enabled }) {
+  const { camera } = useThree()
+  const lineRef = useRef()
+  const headRef = useRef()
+
+  const stars = useMemo(
+    () =>
+      new Array(count).fill(null).map(() => ({
+        active: false,
+        t: 0,
+        duration: 1,
+        trailLen: 2,
+        nextSpawn: 1 + Math.random() * 8,
+        start: new THREE.Vector3(),
+        dir: new THREE.Vector3(1, 0, 0),
+      })),
+    [count]
+  )
+
+  const linePositions = useMemo(() => new Float32Array(count * 6), [count])
+  const lineColors = useMemo(() => new Float32Array(count * 6), [count])
+  const headPositions = useMemo(() => new Float32Array(count * 3), [count])
+  const headSizes = useMemo(() => new Float32Array(count), [count])
+
+  const headVec = useMemo(() => new THREE.Vector3(), [])
+  const tailVec = useMemo(() => new THREE.Vector3(), [])
+
+  useFrame((state, delta) => {
+    if (!enabled) return
+    const camZ = camera.position.z
+
+    stars.forEach((s, i) => {
+      if (!s.active) {
+        s.nextSpawn -= delta
+        if (s.nextSpawn <= 0) {
+          s.active = true
+          s.t = 0
+          s.duration = 0.55 + Math.random() * 0.7
+          s.trailLen = 1.6 + Math.random() * 2.6
+
+          const startX = (Math.random() - 0.5) * 22
+          const startY = (Math.random() - 0.5) * 13
+          const startZ = camZ - 3 - Math.random() * 14
+          s.start.set(startX, startY, startZ)
+
+          const angle = Math.random() * Math.PI * 2
+          s.dir.set(Math.cos(angle), Math.sin(angle) * 0.6, (Math.random() - 0.5) * 0.5).normalize()
+        }
+        headSizes[i] = 0
+        return
+      }
+
+      s.t += delta / s.duration
+      if (s.t >= 1) {
+        s.active = false
+        s.nextSpawn = 2.5 + Math.random() * 7.5
+        headSizes[i] = 0
+        lineColors[i * 6] = 0
+        lineColors[i * 6 + 1] = 0
+        lineColors[i * 6 + 2] = 0
+        return
+      }
+
+      const travel = s.t * 16
+      headVec.copy(s.start).addScaledVector(s.dir, travel)
+      tailVec.copy(headVec).addScaledVector(s.dir, -s.trailLen)
+
+      const fadeIn = Math.min(s.t / 0.12, 1)
+      const fadeOut = 1 - Math.max((s.t - 0.7) / 0.3, 0)
+      const fade = fadeIn * fadeOut
+
+      linePositions[i * 6] = headVec.x
+      linePositions[i * 6 + 1] = headVec.y
+      linePositions[i * 6 + 2] = headVec.z
+      linePositions[i * 6 + 3] = tailVec.x
+      linePositions[i * 6 + 4] = tailVec.y
+      linePositions[i * 6 + 5] = tailVec.z
+
+      lineColors[i * 6] = fade
+      lineColors[i * 6 + 1] = fade * 0.97
+      lineColors[i * 6 + 2] = fade
+      lineColors[i * 6 + 3] = 0
+      lineColors[i * 6 + 4] = 0
+      lineColors[i * 6 + 5] = 0
+
+      headPositions[i * 3] = headVec.x
+      headPositions[i * 3 + 1] = headVec.y
+      headPositions[i * 3 + 2] = headVec.z
+      headSizes[i] = 0.55 * fade
+    })
+
+    if (lineRef.current) {
+      lineRef.current.geometry.attributes.position.needsUpdate = true
+      lineRef.current.geometry.attributes.color.needsUpdate = true
+    }
+    if (headRef.current) {
+      headRef.current.geometry.attributes.position.needsUpdate = true
+      headRef.current.geometry.attributes.aSize.needsUpdate = true
+    }
+  })
+
+  return (
+    <group>
+      <lineSegments ref={lineRef}>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" count={count * 2} array={linePositions} itemSize={3} />
+          <bufferAttribute attach="attributes-color" count={count * 2} array={lineColors} itemSize={3} />
+        </bufferGeometry>
+        <lineBasicMaterial vertexColors transparent opacity={0.95} blending={THREE.AdditiveBlending} depthWrite={false} />
+      </lineSegments>
+      <points ref={headRef}>
+        <bufferGeometry>
+          <bufferAttribute attach="attributes-position" count={count} array={headPositions} itemSize={3} />
+          <bufferAttribute attach="attributes-aSize" count={count} array={headSizes} itemSize={1} />
+        </bufferGeometry>
+        <GlowPointsMaterial map={glowTexture} color="#eafeff" opacity={1} scale={0.7} />
+      </points>
+    </group>
+  )
+}
+
 function CrystalDebrisField({ count, reduced }) {
   const fillRef = useRef()
   const wireRef = useRef()
@@ -1030,6 +1156,7 @@ function Scene({ tier, reduced, bloomEnabled }) {
     crystals: CONFIG.crystals[tier],
     stars: CONFIG.stars[tier],
     sparkles: CONFIG.sparkles[tier],
+    shootingStars: CONFIG.shootingStars[tier],
   }
 
   return (
@@ -1070,6 +1197,7 @@ function Scene({ tier, reduced, bloomEnabled }) {
       <CrystalDebrisField count={counts.crystals} reduced={reduced} />
       <BlackHole glowTexture={glowTexture} reduced={reduced} />
       <Debris enabled={!reduced} />
+      <ShootingStars count={counts.shootingStars} glowTexture={glowTexture} enabled={!reduced} />
       {bloomEnabled && (
         <EffectComposer>
           <Bloom intensity={1.0} luminanceThreshold={0.32} luminanceSmoothing={0.35} mipmapBlur radius={0.5} height={360} />
