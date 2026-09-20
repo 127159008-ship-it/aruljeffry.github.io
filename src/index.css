@@ -54,3 +54,9 @@ img {
   background: var(--border);
   border-radius: 10px;
 }
+
+@media (hover: hover) and (pointer: fine) {
+  body, a, button {
+    cursor: none;
+  }
+}

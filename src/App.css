@@ -166,10 +166,84 @@
   margin: 0 0 24px;
   letter-spacing: -0.03em;
   font-weight: 800;
-  background: linear-gradient(160deg, var(--accent-bright) 0%, var(--accent) 55%, rgba(110, 231, 183, 0.4) 100%);
+}
+
+.hero-name .char {
+  background: linear-gradient(160deg, var(--accent-bright) 0%, var(--accent) 45%, var(--accent-bright) 65%, rgba(110, 231, 183, 0.5) 100%);
+  background-size: 200% 200%;
   -webkit-background-clip: text;
   background-clip: text;
+  -webkit-text-fill-color: transparent;
   color: transparent;
+  animation: gradient-flow 6s ease-in-out infinite;
+}
+
+@keyframes gradient-flow {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+/* Custom cursor */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 200;
+  transform: translate(-50%, -50%);
+}
+
+.cursor-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--accent-bright);
+  box-shadow: 0 0 10px 2px rgba(110, 231, 183, 0.8);
+}
+
+.cursor-ring {
+  width: 34px;
+  height: 34px;
+  border: 1px solid var(--accent);
+  opacity: 0.6;
+}
+
+/* Scroll progress wire */
+.scroll-progress {
+  position: fixed;
+  right: 18px;
+  top: 0;
+  bottom: 0;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  pointer-events: none;
+}
+
+.scroll-progress-track {
+  width: 2px;
+  height: 40vh;
+  background: var(--border);
+  border-radius: 2px;
+  overflow: hidden;
+  display: flex;
+  align-items: flex-end;
+}
+
+.scroll-progress-fill {
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(180deg, var(--accent-bright), var(--accent));
+  transform-origin: bottom;
+  transform: scaleY(0);
+  box-shadow: 0 0 8px rgba(110, 231, 183, 0.6);
+}
+
+@media (max-width: 640px) {
+  .scroll-progress {
+    display: none;
+  }
 }
 
 .hero-tagline {

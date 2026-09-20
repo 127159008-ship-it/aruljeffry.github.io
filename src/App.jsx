@@ -1,7 +1,14 @@
 import { motion } from 'framer-motion'
+import gsap from 'gsap'
 import './App.css'
 import ParticleField from './ParticleField'
 import GridLines from './GridLines'
+import SmoothScroll from './SmoothScroll'
+import CustomCursor from './CustomCursor'
+import ScrollProgress from './ScrollProgress'
+import MagneticButton from './MagneticButton'
+import SplitHeroName from './SplitHeroName'
+import useIsDesktop from './useIsDesktop'
 
 const base = import.meta.env.BASE_URL
 
@@ -87,16 +94,38 @@ function RevealSide({ children, delay = 0, fromRight = false }) {
   )
 }
 
-function handleTilt(e) {
-  const card = e.currentTarget
-  const rect = card.getBoundingClientRect()
-  card.style.setProperty('--mx', `${((e.clientX - rect.left) / rect.width) * 100}%`)
-  card.style.setProperty('--my', `${((e.clientY - rect.top) / rect.height) * 100}%`)
-}
-
 function App() {
+  const isDesktop = useIsDesktop()
+
+  const handleCardMove = (e) => {
+    const card = e.currentTarget
+    const rect = card.getBoundingClientRect()
+    const px = (e.clientX - rect.left) / rect.width
+    const py = (e.clientY - rect.top) / rect.height
+    card.style.setProperty('--mx', `${px * 100}%`)
+    card.style.setProperty('--my', `${py * 100}%`)
+
+    if (!isDesktop) return
+    const rotateY = (px - 0.5) * 14
+    const rotateX = (0.5 - py) * 14
+    gsap.to(card, {
+      rotateX,
+      rotateY,
+      scale: 1.015,
+      transformPerspective: 800,
+      duration: 0.4,
+      ease: 'power3.out',
+    })
+  }
+
+  const handleCardLeave = (e) => {
+    gsap.to(e.currentTarget, { rotateX: 0, rotateY: 0, scale: 1, duration: 0.6, ease: 'power3.out' })
+  }
+
   return (
-    <>
+    <SmoothScroll>
+      <CustomCursor />
+      <ScrollProgress />
       <ParticleField />
       <GridLines />
       <div className="glow-orb one" />
@@ -125,14 +154,7 @@ function App() {
           >
             HELLO, I&apos;M
           </motion.p>
-          <motion.h1
-            className="hero-name"
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-          >
-            Arul Jeffry
-          </motion.h1>
+          <SplitHeroName className="hero-name" text="Arul Jeffry" />
           <motion.p
             className="hero-tagline"
             initial={{ opacity: 0, y: 20 }}
@@ -159,8 +181,8 @@ function App() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.45 }}
           >
-            <a className="btn btn-primary" href="#projects">See my work ↓</a>
-            <a className="btn btn-secondary" href={`${base}Arul_Jeffry_A_Resume.pdf`} target="_blank" rel="noreferrer">Download résumé</a>
+            <MagneticButton className="btn btn-primary" href="#projects">See my work ↓</MagneticButton>
+            <MagneticButton className="btn btn-secondary" href={`${base}Arul_Jeffry_A_Resume.pdf`} target="_blank" rel="noreferrer">Download résumé</MagneticButton>
           </motion.div>
           <motion.div
             className="scroll-indicator"
@@ -220,7 +242,7 @@ function App() {
           <div className="project-list">
             {projects.map((p, i) => (
               <RevealSide key={p.title} delay={i * 0.05} fromRight={i % 2 === 1}>
-                <article className="project-card" onMouseMove={handleTilt}>
+                <article className="project-card" onMouseMove={handleCardMove} onMouseLeave={handleCardLeave}>
                   <span className="project-number">{String(i + 1).padStart(2, '0')}</span>
                   <div className="project-head">
                     <h3>{p.title}</h3>
@@ -316,7 +338,7 @@ function App() {
       <footer>
         © {new Date().getFullYear()} Arul Jeffry A. Built with React, Three.js &amp; Vite, deployed on GitHub Pages.
       </footer>
-    </>
+    </SmoothScroll>
   )
 }
 
