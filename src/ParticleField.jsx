@@ -161,6 +161,15 @@ function buildLayerEdges(points, k) {
   return edges
 }
 
+function buildAdjacency(pointCount, edges) {
+  const adjacency = Array.from({ length: pointCount }, () => [])
+  edges.forEach(([a, b]) => {
+    adjacency[a].push(b)
+    adjacency[b].push(a)
+  })
+  return adjacency
+}
+
 function DustLayer({ count, glowTexture, reduced }) {
   const pointsRef = useRef()
   const { camera } = useThree()
@@ -224,10 +233,14 @@ function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactiv
     [count, zMin, zMax, spread]
   )
   const edges = useMemo(() => buildLayerEdges(points, k), [points, k])
+  const adjacency = useMemo(() => buildAdjacency(points.length, edges), [points.length, edges])
+  const baseLineColor = useMemo(() => new THREE.Color(colorLine), [colorLine])
+  const prevScroll = useRef(0)
 
   const positions = useMemo(() => new Float32Array(points.length * 3), [points])
   const sizes = useMemo(() => new Float32Array(points.length), [points])
   const edgePositions = useMemo(() => new Float32Array(edges.length * 6), [edges])
+  const edgeColors = useMemo(() => new Float32Array(edges.length * 6), [edges])
 
   useEffect(() => {
     if (!cursorReactive) return
@@ -250,11 +263,27 @@ function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactiv
   useFrame((state, delta) => {
     const fovRad = (camera.fov * Math.PI) / 180
 
+    // Scrolling makes the network feel briefly more energetic — a subtle
+    // burst of activity while the visitor is actively moving through it.
+    const scrollDelta = Math.abs(scrollRef.current - prevScroll.current)
+    prevScroll.current = scrollRef.current
+    const scrollEnergy = Math.min(scrollDelta * 500, 1)
+
     for (let i = 0; i < points.length; i++) {
       const p = points[i]
       if (!reduced) {
         p.phase += delta * p.speed
-        if (Math.random() < CONFIG.twinkleChance * 0.6) p.flare = 1
+        if (Math.random() < CONFIG.twinkleChance * 0.6 + scrollEnergy * 0.01) {
+          p.flare = 1
+          // Energy pulse: a flaring node briefly lights up one of its
+          // existing connections' neighbors too, so brightness appears
+          // to travel along the network rather than flashing in isolation.
+          const neighbors = adjacency[i]
+          if (neighbors.length) {
+            const n = neighbors[Math.floor(Math.random() * neighbors.length)]
+            points[n].flare = Math.max(points[n].flare, 0.55)
+          }
+        }
         p.flare *= 0.95
       }
       let x = p.baseX + Math.sin(p.phase) * p.amp
@@ -302,6 +331,8 @@ function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactiv
           const push = (1 - d / CONFIG.cursorRadius) * CONFIG.cursorStrength
           x += (dx / d) * push
           y += (dy / d) * push
+          // The network "wakes up" where the cursor is nearby, not just moves.
+          p.flare = Math.max(p.flare, (1 - d / CONFIG.cursorRadius) * 0.85)
         }
       }
 
@@ -309,6 +340,7 @@ function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactiv
       p.y = y
       p.z = z
       const tw = 0.75 + Math.sin(p.phase * 1.3) * 0.25 + p.flare * 1.6
+      p.tw = tw
       positions[i * 3] = x
       positions[i * 3 + 1] = y
       positions[i * 3 + 2] = z
@@ -320,17 +352,33 @@ function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactiv
       pointsRef.current.geometry.attributes.aSize.needsUpdate = true
     }
 
+    // Slow ambient "breathing" applied on top of the existing connection
+    // opacity, plus a lift while the visitor is scrolling.
+    const breath = 0.85 + Math.sin(state.clock.elapsedTime * 0.6) * 0.15 + scrollEnergy * 0.25
+
     for (let e = 0; e < edges.length; e++) {
       const [a, b] = edges[e]
-      edgePositions[e * 6] = points[a].x
-      edgePositions[e * 6 + 1] = points[a].y
-      edgePositions[e * 6 + 2] = points[a].z
-      edgePositions[e * 6 + 3] = points[b].x
-      edgePositions[e * 6 + 4] = points[b].y
-      edgePositions[e * 6 + 5] = points[b].z
+      const pa = points[a]
+      const pb = points[b]
+      edgePositions[e * 6] = pa.x
+      edgePositions[e * 6 + 1] = pa.y
+      edgePositions[e * 6 + 2] = pa.z
+      edgePositions[e * 6 + 3] = pb.x
+      edgePositions[e * 6 + 4] = pb.y
+      edgePositions[e * 6 + 5] = pb.z
+
+      const brightA = Math.min((0.55 + pa.flare * 1.2) * breath, 1.8)
+      const brightB = Math.min((0.55 + pb.flare * 1.2) * breath, 1.8)
+      edgeColors[e * 6] = baseLineColor.r * brightA
+      edgeColors[e * 6 + 1] = baseLineColor.g * brightA
+      edgeColors[e * 6 + 2] = baseLineColor.b * brightA
+      edgeColors[e * 6 + 3] = baseLineColor.r * brightB
+      edgeColors[e * 6 + 4] = baseLineColor.g * brightB
+      edgeColors[e * 6 + 5] = baseLineColor.b * brightB
     }
     if (lineRef.current) {
       lineRef.current.geometry.attributes.position.needsUpdate = true
+      lineRef.current.geometry.attributes.color.needsUpdate = true
     }
   })
 
@@ -346,8 +394,9 @@ function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactiv
       <lineSegments ref={lineRef}>
         <bufferGeometry>
           <bufferAttribute attach="attributes-position" count={edges.length * 2} array={edgePositions} itemSize={3} />
+          <bufferAttribute attach="attributes-color" count={edges.length * 2} array={edgeColors} itemSize={3} />
         </bufferGeometry>
-        <lineBasicMaterial color={colorLine} transparent opacity={opacityLine} />
+        <lineBasicMaterial vertexColors transparent opacity={opacityLine} />
       </lineSegments>
     </group>
   )
@@ -443,15 +492,19 @@ function CrystalDebrisField({ count, reduced }) {
         ry: Math.random() * Math.PI,
         rz: Math.random() * Math.PI,
         spin: (Math.random() - 0.5) * 0.06,
+        bobPhase: Math.random() * Math.PI * 2,
+        bobSpeed: 0.12 + Math.random() * 0.18,
+        bobAmp: 0.25 + Math.random() * 0.5,
       })
     }
     return arr
   }, [count])
 
-  const applyTransforms = () => {
+  const applyTransforms = (elapsed) => {
     if (!fillRef.current || !wireRef.current) return
     items.forEach((it, i) => {
-      dummy.position.set(it.x, it.y, it.z)
+      const bobY = elapsed ? Math.sin(elapsed * it.bobSpeed + it.bobPhase) * it.bobAmp : 0
+      dummy.position.set(it.x, it.y + bobY, it.z)
       dummy.rotation.set(it.rx, it.ry, it.rz)
       dummy.scale.setScalar(it.scale)
       dummy.updateMatrix()
@@ -462,14 +515,14 @@ function CrystalDebrisField({ count, reduced }) {
     wireRef.current.instanceMatrix.needsUpdate = true
   }
 
-  useEffect(applyTransforms, [items])
+  useEffect(() => applyTransforms(0), [items])
 
   useFrame((state, delta) => {
     if (reduced) return
     items.forEach((it) => {
       it.ry += it.spin * delta
     })
-    applyTransforms()
+    applyTransforms(state.clock.elapsedTime)
   })
 
   return (
@@ -491,6 +544,7 @@ function BlackHole({ glowTexture, reduced }) {
   const diskRef = useRef()
   const glowRef = useRef()
   const rimRef = useRef()
+  const outerRef = useRef()
   const scrollRef = useScrollProgressRef()
 
   useFrame((state, delta) => {
@@ -498,18 +552,23 @@ function BlackHole({ glowTexture, reduced }) {
     // Prominent through the hero, fades out once the visitor scrolls into
     // the content sections so it never competes with readable text.
     const fade = 1 - Math.min(t / 0.06, 1)
+    const flicker = reduced ? 0 : Math.sin(state.clock.elapsedTime * 2.3) * 0.06 + Math.sin(state.clock.elapsedTime * 5.1) * 0.03
 
     if (!reduced && diskRef.current) diskRef.current.rotation.z += delta * 0.18
+    if (!reduced && outerRef.current) outerRef.current.rotation.z -= delta * 0.07
     if (diskRef.current) {
-      diskRef.current.material.opacity = (0.5 + t * 0.35) * fade
+      diskRef.current.material.opacity = (0.5 + t * 0.35 + flicker) * fade
       diskRef.current.scale.setScalar(1 + t * 0.55)
     }
     if (glowRef.current) {
-      glowRef.current.material.opacity = (0.4 + t * 0.35) * fade
+      glowRef.current.material.opacity = (0.4 + t * 0.35 + flicker) * fade
       glowRef.current.scale.setScalar(9 + t * 4)
     }
     if (rimRef.current) {
-      rimRef.current.material.opacity = (0.55 + t * 0.3) * fade
+      rimRef.current.material.opacity = (0.55 + t * 0.3 + flicker * 1.5) * fade
+    }
+    if (outerRef.current) {
+      outerRef.current.material.opacity = (0.22 + flicker * 0.5) * fade
     }
     if (groupRef.current) {
       groupRef.current.visible = fade > 0.01
@@ -521,7 +580,7 @@ function BlackHole({ glowTexture, reduced }) {
       <sprite ref={glowRef} scale={[9, 9, 1]}>
         <spriteMaterial map={glowTexture} color="#8fe9f7" transparent opacity={0.35} depthWrite={false} blending={THREE.AdditiveBlending} />
       </sprite>
-      <mesh rotation={[Math.PI / 2.9, 0.15, 0]}>
+      <mesh ref={outerRef} rotation={[Math.PI / 2.9, 0.15, 0]}>
         <ringGeometry args={[BLACK_HOLE.horizonRadius * 1.5, BLACK_HOLE.horizonRadius * 3.4, 80]} />
         <meshBasicMaterial color="#5fd8ea" transparent opacity={0.22} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
