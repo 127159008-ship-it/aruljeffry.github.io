@@ -127,6 +127,19 @@
   max-width: 640px;
 }
 
+.word-mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: top;
+  padding-bottom: 0.08em;
+  margin-bottom: -0.08em;
+}
+
+.word-inner {
+  display: inline-block;
+  will-change: transform, opacity;
+}
+
 main section {
   position: relative;
   z-index: 1;

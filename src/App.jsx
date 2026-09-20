@@ -34,14 +34,40 @@ function Reveal({ children, delay = 0, className = '', onMouseMove, onMouseLeave
   )
 }
 
+function SplitWords({ text, stagger = 0.05 }) {
+  const words = String(text).split(' ')
+  return words.map((word, i) => (
+    <span className="word-mask" key={`${word}-${i}`}>
+      <motion.span
+        className="word-inner"
+        initial={{ y: '105%', opacity: 0, rotateZ: 6 }}
+        whileInView={{ y: '0%', opacity: 1, rotateZ: 0 }}
+        viewport={{ once: false, amount: 0.7 }}
+        transition={{ duration: 0.5, delay: i * stagger, ease: [0.22, 1, 0.36, 1] }}
+      >
+        {word}
+        {i < words.length - 1 ? ' ' : ''}
+      </motion.span>
+    </span>
+  ))
+}
+
 function SectionFrame({ index, eyebrow, heading, children, className = '' }) {
   return (
     <div className={`section-frame ${className}`}>
       <span className="frame-index">{index}</span>
-      <Reveal className="section-head">
-        <p className="eyebrow">{eyebrow}</p>
-        <h2 className="display-heading">{heading}</h2>
-      </Reveal>
+      <div className="section-head">
+        <Reveal delay={0}><p className="eyebrow">{eyebrow}</p></Reveal>
+        {typeof heading === 'string' ? (
+          <h2 className="display-heading">
+            <SplitWords text={heading} />
+          </h2>
+        ) : (
+          <Reveal delay={0.08}>
+            <h2 className="display-heading">{heading}</h2>
+          </Reveal>
+        )}
+      </div>
       {children}
     </div>
   )
