@@ -7,9 +7,9 @@ import usePrefersReducedMotion from './usePrefersReducedMotion'
 // Tunables — kept in one place so the feel of the scene can be adjusted
 // without hunting through the render/physics code below.
 const CONFIG = {
-  dust: { desktop: 260, tablet: 160, mobile: 90 },
-  mid: { desktop: 130, tablet: 80, mobile: 46 },
-  near: { desktop: 70, tablet: 46, mobile: 26 },
+  dust: { desktop: 190, tablet: 120, mobile: 60 },
+  mid: { desktop: 100, tablet: 64, mobile: 36 },
+  near: { desktop: 56, tablet: 36, mobile: 20 },
   midConnections: 2,
   nearConnections: 3,
   twinkleChance: 0.0025,
@@ -20,7 +20,7 @@ const CONFIG = {
   debrisMinDelay: 9,
   debrisMaxDelay: 24,
   debrisDuration: [4.5, 7],
-  crystals: { desktop: 46, tablet: 28, mobile: 12 },
+  crystals: { desktop: 32, tablet: 20, mobile: 10 },
 }
 
 const BLACK_HOLE = {
@@ -131,7 +131,7 @@ function clusteredField(count, { zMin, zMax, spread, clusterCount = 5, clusterRa
       phase: Math.random() * Math.PI * 2,
       speed: 0.15 + Math.random() * 0.25,
       amp: 0.06 + Math.random() * 0.1,
-      size: 0.55 + Math.random() * 0.9,
+      size: 0.42 + Math.random() * 0.68,
       flare: 0,
       gx: 0,
       gy: 0,
@@ -625,7 +625,7 @@ function Scene({ tier, reduced, bloomEnabled }) {
       <Debris enabled={!reduced} />
       {bloomEnabled && (
         <EffectComposer>
-          <Bloom intensity={1.05} luminanceThreshold={0.32} luminanceSmoothing={0.35} mipmapBlur radius={0.5} />
+          <Bloom intensity={1.0} luminanceThreshold={0.32} luminanceSmoothing={0.35} mipmapBlur radius={0.5} height={360} />
         </EffectComposer>
       )}
     </>
@@ -669,8 +669,8 @@ export default function ParticleField() {
       {visible && (
         <Canvas
           camera={{ position: [0, 0, 8], fov: 58, near: 0.1, far: 90 }}
-          dpr={[1, tier === 'mobile' ? 1.3 : 1.6]}
-          gl={{ antialias: true, powerPreference: 'high-performance' }}
+          dpr={[1, tier === 'mobile' ? 1 : 1.3]}
+          gl={{ antialias: false, powerPreference: 'high-performance' }}
           frameloop={visible ? 'always' : 'never'}
         >
           <Scene tier={tier} reduced={reduced} bloomEnabled={tier !== 'mobile'} />

@@ -504,7 +504,8 @@ main section {
   gap: 24px;
   padding: 26px 28px;
   align-items: baseline;
-  background: #0a0f13;
+  background: rgba(8, 13, 16, 0.72);
+  backdrop-filter: blur(6px);
   border: 1px solid var(--border);
   border-radius: 14px;
   transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
@@ -512,7 +513,7 @@ main section {
 
 .spec-row:hover {
   border-color: var(--accent);
-  background: #0d151b;
+  background: rgba(11, 18, 22, 0.82);
   transform: translateY(-2px);
 }
 
