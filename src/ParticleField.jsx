@@ -20,14 +20,15 @@ const CONFIG = {
   debrisMinDelay: 9,
   debrisMaxDelay: 24,
   debrisDuration: [4.5, 7],
+  crystals: { desktop: 46, tablet: 28, mobile: 12 },
 }
 
 const BLACK_HOLE = {
-  x: 11.5,
-  y: 2.6,
-  z: -25,
-  horizonRadius: 1.6,
-  pullRadius: 9,
+  x: 13.5,
+  y: 1.8,
+  z: -23,
+  horizonRadius: 2.4,
+  pullRadius: 11,
   gravityStrength: 0.017,
 }
 
@@ -423,6 +424,68 @@ function Debris({ enabled }) {
   )
 }
 
+function CrystalDebrisField({ count, reduced }) {
+  const fillRef = useRef()
+  const wireRef = useRef()
+  const dummy = useMemo(() => new THREE.Object3D(), [])
+
+  const items = useMemo(() => {
+    const arr = []
+    const foregroundCount = Math.max(2, Math.floor(count * 0.1))
+    for (let i = 0; i < count; i++) {
+      const isForeground = i < foregroundCount
+      arr.push({
+        x: (Math.random() - 0.5) * 42,
+        y: (Math.random() - 0.5) * 22,
+        z: isForeground ? 1.5 + Math.random() * 5 : -55 + Math.random() * 52,
+        scale: isForeground ? 1.4 + Math.random() * 1.6 : 0.22 + Math.random() * 0.55,
+        rx: Math.random() * Math.PI,
+        ry: Math.random() * Math.PI,
+        rz: Math.random() * Math.PI,
+        spin: (Math.random() - 0.5) * 0.06,
+      })
+    }
+    return arr
+  }, [count])
+
+  const applyTransforms = () => {
+    if (!fillRef.current || !wireRef.current) return
+    items.forEach((it, i) => {
+      dummy.position.set(it.x, it.y, it.z)
+      dummy.rotation.set(it.rx, it.ry, it.rz)
+      dummy.scale.setScalar(it.scale)
+      dummy.updateMatrix()
+      fillRef.current.setMatrixAt(i, dummy.matrix)
+      wireRef.current.setMatrixAt(i, dummy.matrix)
+    })
+    fillRef.current.instanceMatrix.needsUpdate = true
+    wireRef.current.instanceMatrix.needsUpdate = true
+  }
+
+  useEffect(applyTransforms, [items])
+
+  useFrame((state, delta) => {
+    if (reduced) return
+    items.forEach((it) => {
+      it.ry += it.spin * delta
+    })
+    applyTransforms()
+  })
+
+  return (
+    <group>
+      <instancedMesh ref={fillRef} args={[null, null, count]}>
+        <icosahedronGeometry args={[0.4, 0]} />
+        <meshBasicMaterial color="#0a1420" transparent opacity={0.88} />
+      </instancedMesh>
+      <instancedMesh ref={wireRef} args={[null, null, count]}>
+        <icosahedronGeometry args={[0.4, 0]} />
+        <meshBasicMaterial color="#5fd8ea" wireframe transparent opacity={0.3} />
+      </instancedMesh>
+    </group>
+  )
+}
+
 function BlackHole({ glowTexture, reduced }) {
   const diskRef = useRef()
   const glowRef = useRef()
@@ -438,7 +501,7 @@ function BlackHole({ glowTexture, reduced }) {
     }
     if (glowRef.current) {
       glowRef.current.material.opacity = 0.4 + t * 0.35
-      glowRef.current.scale.setScalar(4.5 + t * 3)
+      glowRef.current.scale.setScalar(9 + t * 4)
     }
     if (rimRef.current) {
       rimRef.current.material.opacity = 0.55 + t * 0.3
@@ -447,7 +510,7 @@ function BlackHole({ glowTexture, reduced }) {
 
   return (
     <group position={[BLACK_HOLE.x, BLACK_HOLE.y, BLACK_HOLE.z]}>
-      <sprite ref={glowRef} scale={[6, 6, 1]}>
+      <sprite ref={glowRef} scale={[9, 9, 1]}>
         <spriteMaterial map={glowTexture} color="#8fe9f7" transparent opacity={0.35} depthWrite={false} blending={THREE.AdditiveBlending} />
       </sprite>
       <mesh rotation={[Math.PI / 2.9, 0.15, 0]}>
@@ -513,6 +576,7 @@ function Scene({ tier, reduced, bloomEnabled }) {
     dust: CONFIG.dust[tier],
     mid: CONFIG.mid[tier],
     near: CONFIG.near[tier],
+    crystals: CONFIG.crystals[tier],
   }
 
   return (
@@ -548,6 +612,7 @@ function Scene({ tier, reduced, bloomEnabled }) {
         opacityLine={0.26}
         gravity
       />
+      <CrystalDebrisField count={counts.crystals} reduced={reduced} />
       <BlackHole glowTexture={glowTexture} reduced={reduced} />
       <Debris enabled={!reduced} />
       {bloomEnabled && (

@@ -12,13 +12,11 @@ import usePrefersReducedMotion from './usePrefersReducedMotion'
 
 const base = import.meta.env.BASE_URL
 
-const techLabels = [
-  { text: 'CIRCUITS', top: '7%', left: '6%' },
-  { text: 'EMBEDDED SYSTEMS', top: '13%', left: '74%' },
-  { text: 'PCB DESIGN', top: '38%', left: '87%' },
-  { text: 'SMART GRID', top: '60%', left: '78%' },
-  { text: 'POWER ELECTRONICS', top: '85%', left: '38%' },
-  { text: 'ELECTRIC VEHICLES', top: '91%', left: '62%' },
+const cornerLabels = [
+  { key: 'topLeft', className: 'corner-label corner-top-left', lines: ['CIRCUITS', 'POWER', 'PEOPLE', 'A BRIGHTER TOMORROW'] },
+  { key: 'bottomLeft', className: 'corner-label corner-bottom-left', lines: ['ELECTRICAL AND', 'ELECTRONICS ENGINEERING'] },
+  { key: 'topRight', className: 'corner-label corner-top-right', lines: ['EXPLORE', 'INNOVATE', 'DESIGN', 'SUSTAIN'] },
+  { key: 'bottomRight', className: 'corner-label corner-bottom-right', lines: ['IDEAS', 'FLOW', 'BEYOND', 'LIMITS'] },
 ]
 
 const skillGroups = [
@@ -153,41 +151,43 @@ function App() {
       </nav>
 
       <div className="site" id="top">
-        <header className="hero">
-          {techLabels.map((label, i) => (
-            <motion.span
-              key={label.text}
-              className="tech-label"
-              style={{ top: label.top, left: label.left }}
+        <header className="hero hero-centered">
+          {cornerLabels.map((group, gi) => (
+            <motion.div
+              key={group.key}
+              className={group.className}
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
-              transition={{ duration: 1, delay: 0.9 + i * 0.12 }}
+              transition={{ duration: 1, delay: 1 + gi * 0.15 }}
             >
-              {label.text}
-            </motion.span>
+              {group.lines.map((line) => (
+                <span key={line}>{line}</span>
+              ))}
+              <i className="corner-rule" />
+            </motion.div>
           ))}
+
           <motion.p
             className="hero-eyebrow-label"
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            EEE STUDENT · ENGINEER · BUILDER
+            ENGINEER · LEARNER · BUILDER
           </motion.p>
-          <h1 className="hero-name">
-            <SplitHeroName as="span" className="hero-name-plain" text="Arul " />
-            <SplitHeroName as="span" className="hero-name-accent" text="Jeffry" delayOffset={0.12} />
+          <h1 className="hero-name hero-name-center">
+            <SplitHeroName as="span" className="hero-name-accent" text="ARUL JEFFRY A" />
           </h1>
           <motion.p
-            className="hero-tagline"
+            className="hero-tagline hero-tagline-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.4 }}
           >
-            Turning circuits and code into a smarter tomorrow.
+            TURNING IDEAS INTO A SMARTER TOMORROW
           </motion.p>
           <motion.div
-            className="hero-actions"
+            className="hero-actions hero-actions-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.55 }}
@@ -198,46 +198,24 @@ function App() {
             </span>
           </motion.div>
           <motion.div
-            className="hero-actions"
+            className="hero-actions hero-actions-center"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 0.65 }}
           >
             <MagneticButton className="btn btn-primary" href="#projects">See My Work →</MagneticButton>
             <MagneticButton className="btn btn-secondary" href={`${base}Arul_Jeffry_A_Resume.pdf`} target="_blank" rel="noreferrer">Download Résumé ⬇</MagneticButton>
+            <MagneticButton className="btn btn-tertiary" href="#contact">Let&apos;s Connect ↗</MagneticButton>
           </motion.div>
 
           <motion.div
-            className="side-label side-label-right"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1.1 }}
-          >
-            <span>CURIOSITY</span>
-            <span>BUILDS</span>
-            <span>DEEPER</span>
-            <span>WORLDS</span>
-          </motion.div>
-
-          <motion.div
-            className="side-label side-label-left"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1.2 }}
-          >
-            <span>IDEAS</span>
-            <span>NEVER</span>
-            <span>STOP</span>
-          </motion.div>
-
-          <motion.div
-            className="scroll-indicator"
+            className="scroll-indicator scroll-indicator-center"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.6, delay: 0.9 }}
           >
-            <span className="scroll-ring" />
-            SCROLL —
+            SCROLL TO EXPLORE
+            <span className="scroll-mouse"><span className="scroll-mouse-dot" /></span>
           </motion.div>
         </header>
 
