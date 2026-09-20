@@ -499,36 +499,59 @@ main section {
 }
 
 .spec-row {
+  position: relative;
   display: grid;
   grid-template-columns: 56px 220px 1fr;
   gap: 24px;
   padding: 26px 28px;
   align-items: baseline;
-  background: rgba(8, 13, 16, 0.5);
+  background: rgba(8, 13, 16, 0.34);
   backdrop-filter: blur(6px);
   border: 1px solid var(--border);
   border-radius: 14px;
+  overflow: hidden;
   transition: border-color 0.25s ease, transform 0.25s ease, background 0.25s ease;
+}
+
+.spec-row::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(220px circle at var(--mx, 50%) var(--my, 50%), rgba(34, 211, 238, 0.22), transparent 65%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
 }
 
 .spec-row:hover {
   border-color: var(--accent);
-  background: rgba(11, 18, 22, 0.82);
+  background: rgba(11, 18, 22, 0.5);
   transform: translateY(-2px);
 }
 
+.spec-row:hover::before {
+  opacity: 1;
+}
+
 .spec-index {
+  position: relative;
+  z-index: 1;
   font-family: var(--mono);
   font-size: 0.82rem;
   color: var(--accent);
 }
 
 .spec-title {
+  position: relative;
+  z-index: 1;
   font-weight: 600;
   font-size: 1rem;
 }
 
 .spec-tags {
+  position: relative;
+  z-index: 1;
   display: flex;
   flex-wrap: wrap;
   gap: 8px 10px;
@@ -566,21 +589,44 @@ main section {
 }
 
 .project-row {
+  position: relative;
   display: grid;
   grid-template-columns: 200px 1fr;
   gap: 40px;
   padding: 40px 36px;
-  background: rgba(8, 13, 16, 0.5);
+  background: rgba(8, 13, 16, 0.34);
   backdrop-filter: blur(6px);
   border: 1px solid var(--border);
   border-radius: 16px;
+  overflow: hidden;
   transform-style: preserve-3d;
   transition: border-color 0.25s ease, background 0.25s ease;
 }
 
+.project-row::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(280px circle at var(--mx, 50%) var(--my, 50%), rgba(34, 211, 238, 0.24), transparent 65%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
 .project-row:hover {
   border-color: var(--accent);
-  background: rgba(11, 18, 22, 0.62);
+  background: rgba(11, 18, 22, 0.46);
+}
+
+.project-row:hover::before {
+  opacity: 1;
+}
+
+.project-index,
+.project-body {
+  position: relative;
+  z-index: 1;
 }
 
 .project-row-reverse {

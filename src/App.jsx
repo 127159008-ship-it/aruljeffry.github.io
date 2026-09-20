@@ -18,10 +18,12 @@ const cornerLabels = [
   { key: 'bottomRight', className: 'corner-label corner-bottom-right', lines: ['IDEAS', 'FLOW', 'BEYOND', 'LIMITS'] },
 ]
 
-function Reveal({ children, delay = 0, className = '' }) {
+function Reveal({ children, delay = 0, className = '', onMouseMove, onMouseLeave }) {
   return (
     <motion.div
       className={className}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
       initial={{ opacity: 0, y: 28 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true, margin: '-80px' }}
@@ -50,11 +52,14 @@ function App() {
   const prefersReducedMotion = usePrefersReducedMotion()
 
   const handleRowMove = (e) => {
-    if (!isDesktop || prefersReducedMotion) return
     const el = e.currentTarget
     const rect = el.getBoundingClientRect()
     const px = (e.clientX - rect.left) / rect.width
     const py = (e.clientY - rect.top) / rect.height
+    el.style.setProperty('--mx', `${px * 100}%`)
+    el.style.setProperty('--my', `${py * 100}%`)
+
+    if (!isDesktop || prefersReducedMotion) return
     gsap.to(el, {
       rotateX: (0.5 - py) * 6,
       rotateY: (px - 0.5) * 6,
@@ -66,6 +71,13 @@ function App() {
 
   const handleRowLeave = (e) => {
     gsap.to(e.currentTarget, { rotateX: 0, rotateY: 0, duration: 0.6, ease: 'power3.out' })
+  }
+
+  const handleGlowMove = (e) => {
+    const el = e.currentTarget
+    const rect = el.getBoundingClientRect()
+    el.style.setProperty('--mx', `${((e.clientX - rect.left) / rect.width) * 100}%`)
+    el.style.setProperty('--my', `${((e.clientY - rect.top) / rect.height) * 100}%`)
   }
 
   return (
@@ -189,7 +201,7 @@ function App() {
           <SectionFrame index="02" eyebrow="Skills" heading="Systems I work across.">
             <div className="spec-sheet">
               {skillGroups.map((group, i) => (
-                <Reveal key={group.title} delay={i * 0.05} className="spec-row">
+                <Reveal key={group.title} delay={i * 0.05} className="spec-row" onMouseMove={handleGlowMove}>
                   <span className="spec-index">{String(i + 1).padStart(2, '0')}</span>
                   <span className="spec-title">{group.title}</span>
                   <div className="spec-tags">
