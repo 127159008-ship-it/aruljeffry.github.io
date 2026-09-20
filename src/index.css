@@ -1,15 +1,15 @@
 :root {
-  --bg: #050708;
+  --bg: #030607;
   --bg-alt: rgba(255, 255, 255, 0.03);
-  --bg-alt-solid: #0a0d10;
-  --text: #f2f0ec;
-  --text-muted: #93a0a8;
-  --border: rgba(56, 200, 224, 0.16);
-  --accent: #ff9d42;
-  --accent-bright: #ffd9a8;
-  --accent-soft: rgba(255, 157, 66, 0.14);
-  --accent-cyan: #38c8e0;
-  --accent-cyan-bright: #8fe9f7;
+  --bg-alt-solid: #070c0d;
+  --text: #eef7f7;
+  --text-muted: #8ea3a3;
+  --border: rgba(34, 211, 238, 0.18);
+  --accent: #22d3ee;
+  --accent-bright: #baf8ff;
+  --accent-soft: rgba(34, 211, 238, 0.14);
+  --accent-cyan: #22d3ee;
+  --accent-cyan-bright: #baf8ff;
   --chip-bg: rgba(255, 255, 255, 0.05);
   --mono: 'JetBrains Mono', monospace;
 }

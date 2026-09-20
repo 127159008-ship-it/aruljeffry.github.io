@@ -2,7 +2,6 @@ import { motion } from 'framer-motion'
 import gsap from 'gsap'
 import './App.css'
 import ParticleField from './ParticleField'
-import GridLines from './GridLines'
 import SmoothScroll from './SmoothScroll'
 import CustomCursor from './CustomCursor'
 import ScrollProgress from './ScrollProgress'
@@ -127,7 +126,6 @@ function App() {
       <CustomCursor />
       <ScrollProgress />
       <ParticleField />
-      <GridLines />
       <div className="glow-orb one" />
       <div className="glow-orb two" />
 
