@@ -97,8 +97,7 @@ function useGlowTexture() {
     const ctx = canvas.getContext('2d')
     const gradient = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2)
     gradient.addColorStop(0, 'rgba(255,255,255,1)')
-    gradient.addColorStop(0.22, 'rgba(255,255,255,0.95)')
-    gradient.addColorStop(0.5, 'rgba(255,255,255,0.35)')
+    gradient.addColorStop(0.4, 'rgba(255,255,255,0.55)')
     gradient.addColorStop(1, 'rgba(255,255,255,0)')
     ctx.fillStyle = gradient
     ctx.fillRect(0, 0, size, size)
@@ -132,7 +131,7 @@ function clusteredField(count, { zMin, zMax, spread, clusterCount = 5, clusterRa
       phase: Math.random() * Math.PI * 2,
       speed: 0.15 + Math.random() * 0.25,
       amp: 0.06 + Math.random() * 0.1,
-      size: 0.32 + Math.random() * 0.42,
+      size: 0.55 + Math.random() * 0.9,
       flare: 0,
       gx: 0,
       gy: 0,
@@ -208,7 +207,7 @@ function DustLayer({ count, glowTexture, reduced }) {
         <bufferAttribute attach="attributes-position" count={points.length} array={positions} itemSize={3} />
         <bufferAttribute attach="attributes-aSize" count={points.length} array={sizes} itemSize={1} />
       </bufferGeometry>
-      <GlowPointsMaterial map={glowTexture} color="#dfeef2" opacity={0.6} scale={0.4} />
+      <GlowPointsMaterial map={glowTexture} color="#dfeef2" opacity={0.6} scale={0.55} />
     </points>
   )
 }
@@ -342,7 +341,7 @@ function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactiv
           <bufferAttribute attach="attributes-position" count={points.length} array={positions} itemSize={3} />
           <bufferAttribute attach="attributes-aSize" count={points.length} array={sizes} itemSize={1} />
         </bufferGeometry>
-        <GlowPointsMaterial map={glowTexture} color={colorCore} opacity={1} scale={0.62} />
+        <GlowPointsMaterial map={glowTexture} color={colorCore} opacity={0.95} scale={0.95} />
       </points>
       <lineSegments ref={lineRef}>
         <bufferGeometry>
@@ -602,7 +601,7 @@ function Scene({ tier, reduced, bloomEnabled }) {
         glowTexture={glowTexture}
         cursorReactive={false}
         reduced={reduced}
-        colorCore="#3fa0ff"
+        colorCore="#9fe9f2"
         colorLine="#22d3ee"
         opacityLine={0.16}
         gravity
@@ -616,7 +615,7 @@ function Scene({ tier, reduced, bloomEnabled }) {
         glowTexture={glowTexture}
         cursorReactive
         reduced={reduced}
-        colorCore="#4fb4ff"
+        colorCore="#eafeff"
         colorLine="#7ff3ff"
         opacityLine={0.26}
         gravity
