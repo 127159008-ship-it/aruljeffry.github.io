@@ -2,96 +2,125 @@ import { useMemo, useRef } from 'react'
 import { Canvas, useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 
-function Field({ count = 1400 }) {
-  const pointsRef = useRef()
-  const mouse = useRef({ x: 0, y: 0 })
-
-  const positions = useMemo(() => {
-    const arr = new Float32Array(count * 3)
-    for (let i = 0; i < count; i++) {
-      const radius = 6 + Math.random() * 10
-      const theta = Math.random() * Math.PI * 2
-      const phi = Math.acos(2 * Math.random() - 1)
-      arr[i * 3] = radius * Math.sin(phi) * Math.cos(theta)
-      arr[i * 3 + 1] = radius * Math.sin(phi) * Math.sin(theta)
-      arr[i * 3 + 2] = radius * Math.cos(phi)
-    }
-    return arr
-  }, [count])
-
-  useFrame((state, delta) => {
-    if (!pointsRef.current) return
-    pointsRef.current.rotation.y += delta * 0.035
-    pointsRef.current.rotation.x += delta * 0.01
-
-    mouse.current.x = state.pointer.x
-    mouse.current.y = state.pointer.y
-    pointsRef.current.rotation.y += mouse.current.x * delta * 0.15
-    pointsRef.current.rotation.x += mouse.current.y * delta * 0.08
-  })
-
-  return (
-    <points ref={pointsRef}>
-      <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          count={count}
-          array={positions}
-          itemSize={3}
-        />
-      </bufferGeometry>
-      <pointsMaterial
-        size={0.045}
-        color="#6ee7b7"
-        transparent
-        opacity={0.75}
-        sizeAttenuation
-        depthWrite={false}
-      />
-    </points>
-  )
+function generateNodes(count) {
+  const nodes = []
+  for (let i = 0; i < count; i++) {
+    const radius = 5 + Math.random() * 9
+    const theta = Math.random() * Math.PI * 2
+    const phi = Math.acos(2 * Math.random() - 1)
+    nodes.push(
+      new THREE.Vector3(
+        radius * Math.sin(phi) * Math.cos(theta),
+        radius * Math.sin(phi) * Math.sin(theta),
+        radius * Math.cos(phi)
+      )
+    )
+  }
+  return nodes
 }
 
-function Lines({ count = 60 }) {
-  const groupRef = useRef()
+function buildEdges(nodes, k) {
+  const edgeSet = new Set()
+  const edges = []
+  nodes.forEach((node, i) => {
+    const distances = nodes
+      .map((other, j) => (i === j ? null : { j, d: node.distanceToSquared(other) }))
+      .filter(Boolean)
+      .sort((a, b) => a.d - b.d)
+      .slice(0, k)
 
-  const segments = useMemo(() => {
-    const arr = []
-    for (let i = 0; i < count; i++) {
-      const radius = 6 + Math.random() * 10
-      const theta = Math.random() * Math.PI * 2
-      const phi = Math.acos(2 * Math.random() - 1)
-      const x = radius * Math.sin(phi) * Math.cos(theta)
-      const y = radius * Math.sin(phi) * Math.sin(theta)
-      const z = radius * Math.cos(phi)
-      const len = 0.6 + Math.random() * 1.2
-      arr.push([
-        new THREE.Vector3(x, y, z),
-        new THREE.Vector3(x + len, y + len * 0.3, z),
-      ])
-    }
+    distances.forEach(({ j }) => {
+      const key = i < j ? `${i}-${j}` : `${j}-${i}`
+      if (!edgeSet.has(key)) {
+        edgeSet.add(key)
+        edges.push([node, nodes[j]])
+      }
+    })
+  })
+  return edges
+}
+
+function NeuronNetwork({ count = 100, k = 2 }) {
+  const groupRef = useRef()
+  const materialRef = useRef()
+  const clock = useRef(0)
+
+  const nodes = useMemo(() => generateNodes(count), [count])
+  const edges = useMemo(() => buildEdges(nodes, k), [nodes, k])
+
+  const positions = useMemo(() => {
+    const arr = new Float32Array(nodes.length * 3)
+    nodes.forEach((n, i) => {
+      arr[i * 3] = n.x
+      arr[i * 3 + 1] = n.y
+      arr[i * 3 + 2] = n.z
+    })
     return arr
-  }, [count])
+  }, [nodes])
 
   useFrame((state, delta) => {
     if (!groupRef.current) return
-    groupRef.current.rotation.y += delta * 0.035
-    groupRef.current.rotation.x += delta * 0.01
+    clock.current += delta
+    groupRef.current.rotation.y += delta * 0.045
+    groupRef.current.rotation.x += delta * 0.012
+    groupRef.current.rotation.y += state.pointer.x * delta * 0.18
+    groupRef.current.rotation.x += state.pointer.y * delta * 0.1
+
+    if (materialRef.current) {
+      materialRef.current.opacity = 0.75 + Math.sin(clock.current * 1.3) * 0.15
+    }
   })
 
   return (
     <group ref={groupRef}>
-      {segments.map((pts, i) => (
+      <points>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={nodes.length}
+            array={positions}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <pointsMaterial
+          ref={materialRef}
+          size={0.08}
+          color="#ff9d42"
+          transparent
+          opacity={0.85}
+          sizeAttenuation
+          depthWrite={false}
+        />
+      </points>
+      <points>
+        <bufferGeometry>
+          <bufferAttribute
+            attach="attributes-position"
+            count={nodes.length}
+            array={positions}
+            itemSize={3}
+          />
+        </bufferGeometry>
+        <pointsMaterial
+          size={0.24}
+          color="#ffd9a8"
+          transparent
+          opacity={0.18}
+          sizeAttenuation
+          depthWrite={false}
+        />
+      </points>
+      {edges.map(([a, b], i) => (
         <line key={i}>
           <bufferGeometry>
             <bufferAttribute
               attach="attributes-position"
               count={2}
-              array={new Float32Array(pts.flatMap((p) => [p.x, p.y, p.z]))}
+              array={new Float32Array([a.x, a.y, a.z, b.x, b.y, b.z])}
               itemSize={3}
             />
           </bufferGeometry>
-          <lineBasicMaterial color="#6ee7b7" transparent opacity={0.18} />
+          <lineBasicMaterial color="#ff9d42" transparent opacity={0.22} />
         </line>
       ))}
     </group>
@@ -102,8 +131,7 @@ export default function ParticleField() {
   return (
     <div className="particle-canvas" aria-hidden="true">
       <Canvas camera={{ position: [0, 0, 9], fov: 55 }} dpr={[1, 1.5]}>
-        <Field />
-        <Lines />
+        <NeuronNetwork />
       </Canvas>
     </div>
   )

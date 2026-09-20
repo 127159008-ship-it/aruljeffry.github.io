@@ -1,36 +1,42 @@
-const lines = [
-  { top: '14%', left: '4%', width: '18%', dot: 'right' },
-  { top: '14%', left: '78%', width: '18%', dot: 'left' },
-  { top: '34%', left: '84%', width: '14%', dot: 'left' },
-  { top: '62%', left: '2%', width: '16%', dot: 'right' },
-  { top: '80%', left: '70%', width: '20%', dot: 'left' },
+const traces = [
+  'M 2 12 H 22 V 4 H 40',
+  'M 0 24 H 14 V 32 H 30 V 20 H 55',
+  'M 96 8 H 78 V 18 H 60',
+  'M 100 30 H 84 V 40 H 68 V 26',
+  'M 4 55 H 20 V 46 H 38 V 60',
+  'M 0 72 H 16 V 82 H 34',
+  'M 96 60 H 80 V 50 H 64',
+  'M 100 82 H 86 V 74 H 66 V 90',
+  'M 10 96 V 84 H 28 V 92 H 46',
+  'M 60 98 V 88 H 78 V 96',
+  'M 46 2 V 12 H 58',
+  'M 88 96 V 86 H 72',
 ]
 
-const verticals = [
-  { left: '22%', top: '10%', height: '20%' },
-  { left: '58%', top: '8%', height: '28%' },
-  { left: '86%', top: '30%', height: '18%' },
-  { left: '12%', top: '58%', height: '16%' },
-  { left: '92%', top: '66%', height: '20%' },
+const vias = [
+  [22, 12], [40, 4], [14, 24], [30, 32], [55, 20],
+  [78, 8], [60, 18], [84, 30], [68, 40], [20, 55],
+  [38, 46], [16, 72], [34, 82], [80, 60], [64, 50],
+  [86, 82], [66, 74], [28, 96], [46, 92], [78, 98],
+  [58, 2], [88, 86],
 ]
 
 export default function GridLines() {
   return (
     <div className="grid-lines" aria-hidden="true">
-      {lines.map((l, i) => (
-        <span
-          key={`h-${i}`}
-          className={`grid-line horizontal dot-${l.dot}`}
-          style={{ top: l.top, left: l.left, width: l.width }}
-        />
-      ))}
-      {verticals.map((l, i) => (
-        <span
-          key={`v-${i}`}
-          className="grid-line vertical"
-          style={{ left: l.left, top: l.top, height: l.height }}
-        />
-      ))}
+      <svg
+        className="circuit-svg"
+        viewBox="0 0 100 100"
+        preserveAspectRatio="none"
+        xmlns="http://www.w3.org/2000/svg"
+      >
+        {traces.map((d, i) => (
+          <path key={i} d={d} className="circuit-trace" vectorEffect="non-scaling-stroke" />
+        ))}
+        {vias.map(([x, y], i) => (
+          <circle key={i} cx={x} cy={y} r="0.45" className="circuit-via" />
+        ))}
+      </svg>
     </div>
   )
 }
