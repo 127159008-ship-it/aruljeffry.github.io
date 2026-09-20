@@ -504,7 +504,7 @@ main section {
   gap: 24px;
   padding: 26px 28px;
   align-items: baseline;
-  background: rgba(8, 13, 16, 0.72);
+  background: rgba(8, 13, 16, 0.5);
   backdrop-filter: blur(6px);
   border: 1px solid var(--border);
   border-radius: 14px;
@@ -562,19 +562,25 @@ main section {
 .project-rows {
   display: flex;
   flex-direction: column;
+  gap: 20px;
 }
 
 .project-row {
   display: grid;
   grid-template-columns: 200px 1fr;
   gap: 40px;
-  padding: 48px 0;
-  border-bottom: 1px solid var(--border);
+  padding: 40px 36px;
+  background: rgba(8, 13, 16, 0.5);
+  backdrop-filter: blur(6px);
+  border: 1px solid var(--border);
+  border-radius: 16px;
   transform-style: preserve-3d;
+  transition: border-color 0.25s ease, background 0.25s ease;
 }
 
-.project-row:first-child {
-  border-top: 1px solid var(--border);
+.project-row:hover {
+  border-color: var(--accent);
+  background: rgba(11, 18, 22, 0.62);
 }
 
 .project-row-reverse {
@@ -638,6 +644,7 @@ main section {
   .project-row-reverse {
     grid-template-columns: 1fr;
     gap: 14px;
+    padding: 26px 22px;
   }
   .project-row-reverse .project-index {
     order: 0;

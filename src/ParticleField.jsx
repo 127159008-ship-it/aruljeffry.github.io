@@ -131,7 +131,7 @@ function clusteredField(count, { zMin, zMax, spread, clusterCount = 5, clusterRa
       phase: Math.random() * Math.PI * 2,
       speed: 0.15 + Math.random() * 0.25,
       amp: 0.06 + Math.random() * 0.1,
-      size: 0.42 + Math.random() * 0.68,
+      size: 0.3 + Math.random() * 0.42,
       flare: 0,
       gx: 0,
       gy: 0,
@@ -207,7 +207,7 @@ function DustLayer({ count, glowTexture, reduced }) {
         <bufferAttribute attach="attributes-position" count={points.length} array={positions} itemSize={3} />
         <bufferAttribute attach="attributes-aSize" count={points.length} array={sizes} itemSize={1} />
       </bufferGeometry>
-      <GlowPointsMaterial map={glowTexture} color="#dfeef2" opacity={0.6} scale={0.55} />
+      <GlowPointsMaterial map={glowTexture} color="#dfeef2" opacity={0.6} scale={0.38} />
     </points>
   )
 }
@@ -341,7 +341,7 @@ function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactiv
           <bufferAttribute attach="attributes-position" count={points.length} array={positions} itemSize={3} />
           <bufferAttribute attach="attributes-aSize" count={points.length} array={sizes} itemSize={1} />
         </bufferGeometry>
-        <GlowPointsMaterial map={glowTexture} color={colorCore} opacity={0.95} scale={0.95} />
+        <GlowPointsMaterial map={glowTexture} color={colorCore} opacity={0.95} scale={0.58} />
       </points>
       <lineSegments ref={lineRef}>
         <bufferGeometry>
