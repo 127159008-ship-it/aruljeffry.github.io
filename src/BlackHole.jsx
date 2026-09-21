@@ -8,20 +8,13 @@ const VERTEX_SHADER = `
   }
 `
 
-// Exact Schwarzschild photon geodesics via the Binet equation, the same
-// core technique used by Adriwin06/black-hole (github.com/Adriwin06/black-hole,
-// a fork of oseiskar/black-hole): with u = 1/r and M = r_s/2 = 0.5,
-//   d²u/dφ² = -u + 3Mu² = -u + 1.5u²
-// is the *exact* null-geodesic equation for a non-spinning hole — not an
-// approximation. Because it's parametrised by the swept angle φ rather than
-// arc length, a photon's 3D position at any φ is just
-//   pos(φ) = (cos(φ)·n̂ + sin(φ)·t̂) / u(φ)
-// where n̂, t̂ span the (always-planar) orbit established once from the
-// camera position and initial ray direction. That single fact is what
-// replaces last version's inverse-cube bending hack: same disk-crossing /
-// beaming / starfield code as before, just fed by a physically exact path,
-// so higher-order lensed images near the photon sphere now emerge from the
-// integration itself rather than a separate closest-approach heuristic.
+// A raymarched approximation of Schwarzschild lensing: rays are bent toward
+// the singularity by an inverse-square-ish curvature term each step instead
+// of solving the full geodesic ODE. Close enough to sell the illusion —
+// stars smear into arcs near the shadow, and the same ray can cross the
+// accretion disk plane twice (direct image + bent "wrapped" image) for
+// free, since the ray is genuinely marched through curved space rather
+// than faked with a second flat ring mesh.
 const FRAGMENT_SHADER = `
   precision highp float;
 
@@ -30,23 +23,18 @@ const FRAGMENT_SHADER = `
 
   // ---------------------------------------------------------------------
   // Tunables — adjust the look here without touching the logic below.
-  // HORIZON_R and PHOTON_R are physical constants of the Schwarzschild
-  // solution in these units (r_s = 1), not stylistic knobs.
   // ---------------------------------------------------------------------
+  const float LENS_STRENGTH   = 2.6;    // gravitational bending strength
   const float INCLINATION     = 0.34;   // disk tilt off edge-on, radians
   const float ROTATION_SPEED  = 0.045;  // camera drift speed
   const float DISK_INNER      = 2.6;    // inner radius, in horizon radii (~ISCO)
   const float DISK_OUTER      = 9.0;    // outer radius, in horizon radii
   const float BLOOM_INTENSITY = 1.6;
-  const float HORIZON_R       = 1.0;    // event horizon radius (= r_s)
+  const float HORIZON_R       = 1.0;    // event horizon radius
   const float PHOTON_R        = 1.5;    // photon sphere radius -> the bright ring
-  // Pulled from the site's own theme tokens (--accent-bright / --accent)
-  // instead of a generic orange accretion disk — still physically
-  // defensible, since the hottest plasma skews blue-white, not orange.
-  const vec3  DISK_HOT        = vec3(0.729, 0.973, 1.0);  // near-ISCO: --accent-bright
-  const vec3  DISK_COOL       = vec3(0.133, 0.827, 0.933); // outer edge: --accent
-  const int   RAY_STEPS       = 140;    // integration steps (φ-parametrised)
-  const float MAX_REVOLUTIONS = 1.8;    // max angle swept, in full turns
+  const vec3  DISK_HOT        = vec3(0.85, 0.97, 1.0);  // near-ISCO: blue-white
+  const vec3  DISK_COOL       = vec3(1.0, 0.55, 0.22);  // outer edge: orange-red
+  const int   RAY_STEPS       = 120;
   // ---------------------------------------------------------------------
 
   float hash21(vec2 p) {
@@ -72,184 +60,71 @@ const FRAGMENT_SHADER = `
     return vec3(star) * tint;
   }
 
-  // The exact Schwarzschild Binet acceleration: d²u/dφ² = -u + 1.5u².
-  float geodesicAccel(float u) {
-    return -u + 1.5 * u * u;
-  }
-
-  // Classic RK4 step for the (u, du/dφ) system, one φ-increment at a time.
-  void integrateStep(inout float u, inout float du, float h) {
-    float k1u = du;
-    float k1du = geodesicAccel(u);
-
-    float u2 = u + 0.5 * h * k1u;
-    float du2 = du + 0.5 * h * k1du;
-    float k2u = du2;
-    float k2du = geodesicAccel(u2);
-
-    float u3 = u + 0.5 * h * k2u;
-    float du3 = du + 0.5 * h * k2du;
-    float k3u = du3;
-    float k3du = geodesicAccel(u3);
-
-    float u4 = u + h * k3u;
-    float du4 = du + h * k3du;
-    float k4u = du4;
-    float k4du = geodesicAccel(u4);
-
-    u += (h / 6.0) * (k1u + 2.0 * k2u + 2.0 * k3u + k4u);
-    du += (h / 6.0) * (k1du + 2.0 * k2du + 2.0 * k3du + k4du);
-  }
-
-  // Shades a single disk-plane crossing between two nearby path points, or
-  // returns black if the segment doesn't cross the disk / falls outside its
-  // radii. Factored out so the photon-sphere region can call it several
-  // times per step on sub-segments (see below) instead of once on the
-  // whole step.
-  vec3 diskCrossingColor(vec3 a, vec3 b, vec3 diskNormal) {
-    float d0 = dot(a, diskNormal);
-    float d1 = dot(b, diskNormal);
-    if (d0 * d1 >= 0.0) return vec3(0.0);
-    float t = d0 / (d0 - d1);
-    vec3 hit = mix(a, b, t);
-    float rad = length(hit);
-    if (rad <= DISK_INNER || rad >= DISK_OUTER) return vec3(0.0);
-
-    float rn = clamp((rad - DISK_INNER) / (DISK_OUTER - DISK_INNER), 0.0, 1.0);
-    vec3 diskCol = mix(DISK_HOT, DISK_COOL, rn);
-
-    // Relativistic beaming: brighter where the disk's orbital motion points
-    // toward the camera, dimmer on the receding side.
-    vec3 rayDir = normalize(b - a);
-    vec3 tangentAtHit = normalize(cross(diskNormal, hit));
-    float beam = dot(tangentAtHit, -rayDir);
-    float beamFactor = pow(clamp(0.65 + beam, 0.0, 2.2), 2.0);
-
-    // Sharper edges (tight inner cutoff, tighter outer taper) instead of a
-    // broad haze, so the disk reads as a crisp streak rather than a soft glow.
-    float innerCut = smoothstep(0.0, 0.03, rn);
-    float outerCut = 1.0 - smoothstep(0.5, 0.72, rn);
-    float density = innerCut * outerCut;
-    return diskCol * beamFactor * density * BLOOM_INTENSITY * 0.55;
-  }
-
   vec3 traceRay(vec3 ro, vec3 rd, vec3 diskNormal) {
-    float r0 = length(ro);
-    float u = 1.0 / r0;
-    vec3 normalVec = ro / r0;
-
-    // The orbit plane is spanned by normalVec (radial at the camera) and
-    // the component of the ray direction perpendicular to it — a photon's
-    // path around a non-spinning hole always stays in this one plane.
-    vec3 rdPerp = rd - normalVec * dot(rd, normalVec);
-    float rdPerpLen = length(rdPerp);
-    vec3 tangentVec;
-    if (rdPerpLen > 1e-6) {
-      tangentVec = rdPerp / rdPerpLen;
-    } else {
-      tangentVec = abs(normalVec.y) < 0.9
-        ? normalize(cross(normalVec, vec3(0.0, 1.0, 0.0)))
-        : normalize(cross(normalVec, vec3(1.0, 0.0, 0.0)));
-    }
-
-    // Initial du/dφ from the ray's radial vs. tangential direction cosines.
-    float radialComp = dot(rd, normalVec);
-    float tangComp = dot(rd, tangentVec);
-    float du = (abs(tangComp) > 1e-6) ? -radialComp / tangComp * u : -sign(radialComp) * u * 200.0;
-    du = clamp(du, -200.0, 200.0);
-
-    float phi = 0.0;
-    float baseStep = MAX_REVOLUTIONS * 6.28318530718 / float(RAY_STEPS);
-
-    vec3 color = vec3(0.0);
     vec3 pos = ro;
-    float minApproach = r0;
-    bool captured = false;
+    vec3 dir = rd;
+    vec3 color = vec3(0.0);
+    float minApproach = 1000.0;
+    float stepSize = 0.15;
 
     for (int i = 0; i < RAY_STEPS; i++) {
-      // Finer angular steps near the photon sphere, where deflection is
-      // sharpest and the disk/halo "joining" cusp actually forms.
-      float photonProximity = exp(-14.0 * (u - 0.6667) * (u - 0.6667));
-      float step = baseStep * (1.0 - 0.93 * photonProximity);
+      float r = length(pos);
+      minApproach = min(minApproach, r);
 
-      vec3 oldPos = pos;
-      integrateStep(u, du, step);
-      phi += step;
-
-      if (u >= 1.0 / HORIZON_R) {
-        captured = true;
-        break; // swallowed — whatever light was gathered en route, nothing more
+      if (r < HORIZON_R) {
+        return color; // swallowed — whatever light was gathered en route, nothing more
       }
 
-      pos = (cos(phi) * normalVec + sin(phi) * tangentVec) / u;
-      minApproach = min(minApproach, 1.0 / u);
+      // Curvature: bend the ray toward the singularity, stronger up close.
+      vec3 toCenter = -pos;
+      float bend = LENS_STRENGTH / (r * r * r);
+      dir = normalize(dir + toCenter * bend * stepSize);
+
+      // Finer steps near the hole (where curvature — and the disk/halo
+      // "joining" cusp — is sharpest), coarser far out.
+      stepSize = clamp(r * 0.07, 0.008, 0.35);
+      vec3 next = pos + dir * stepSize;
 
       // Thin-disk intersection: did we cross the tilted equatorial plane?
-      // pos is reconstructed as (...)/u, so as u shrinks toward the escape
-      // threshold any tiny per-pixel difference upstream gets divided back
-      // up into a large positional error — exactly the regime a ray is in
-      // right after a strong deflection, on its way back out. That shows
-      // up as speckle no smooth damping fixes without supersampling/TAA.
-      // Fade the crossing test out smoothly as u drops toward that unsafe
-      // range (a hard cutoff instead just traded speckle for a jagged
-      // step edge, since the flip happens on a whole-step granularity).
-      float uGate = smoothstep(1.1 / DISK_OUTER, 1.6 / DISK_OUTER, u);
-      // Also fade it out near the photon sphere itself — same chaotic-
-      // sensitivity problem, and this is exactly the region the smooth
-      // analytic halo below already covers, so nothing is lost.
-      float crossingGate = uGate * (1.0 - photonProximity);
-      if (crossingGate > 0.0) {
-        color += diskCrossingColor(oldPos, pos, diskNormal) * crossingGate;
+      float d0 = dot(pos, diskNormal);
+      float d1 = dot(next, diskNormal);
+      if (d0 * d1 < 0.0) {
+        float t = d0 / (d0 - d1);
+        vec3 hit = mix(pos, next, t);
+        float rad = length(hit);
+        if (rad > DISK_INNER && rad < DISK_OUTER) {
+          float rn = clamp((rad - DISK_INNER) / (DISK_OUTER - DISK_INNER), 0.0, 1.0);
+          vec3 diskCol = mix(DISK_HOT, DISK_COOL, rn);
+
+          // Relativistic beaming: brighter where the disk's orbital motion
+          // points toward the camera, dimmer on the receding side.
+          vec3 tangent = normalize(cross(diskNormal, hit));
+          float beam = dot(tangent, -dir);
+          float beamFactor = pow(clamp(0.65 + beam, 0.0, 2.2), 2.0);
+
+          // Sharper edges (tight inner cutoff, tighter outer taper) instead
+          // of a broad haze, so the disk reads as a crisp streak rather
+          // than a soft glow.
+          float innerCut = smoothstep(0.0, 0.03, rn);
+          float outerCut = 1.0 - smoothstep(0.5, 0.72, rn);
+          float density = innerCut * outerCut;
+          color += diskCol * beamFactor * density * BLOOM_INTENSITY * 0.4;
+        }
       }
 
-      if (u < 1.0 / 34.0) break; // escaped far enough — stop marching
+      pos = next;
+      if (r > 30.0) break; // escaped to the background
     }
 
-    if (captured) return color;
-
-    // Photon ring: a thin, bright rim wherever the path's closest approach
-    // hugs the photon sphere. With a true geodesic this also naturally
-    // catches higher-order lensed images that wind close to r = 1.5.
+    // Photon ring: a thin, bright rim wherever a ray's closest approach
+    // hugs the photon sphere. Kept narrow and high-contrast — this is what
+    // forms the sharp cusp where the direct disk streak meets the lensed
+    // halo, instead of the two blending into a soft blob.
     float ringDist = abs(minApproach - PHOTON_R);
     float ring = smoothstep(0.14, 0.0, ringDist) + 0.4 * smoothstep(0.4, 0.0, ringDist);
     color += vec3(0.95, 0.99, 1.0) * ring * BLOOM_INTENSITY;
 
-    // Lensed halo: light from every disk radius gets swept past the photon
-    // sphere and multiply-imaged into a wrapped arc above/below the horizon
-    // — the single most recognisable "Gargantua" cue. The per-crossing disk
-    // shading above can't render this reliably (that regime is where the
-    // u-shrinks-toward-escape speckle lives, so it's damped there by design),
-    // so this is a second, purely analytic term driven only by minApproach —
-    // continuous and identical on every side of the hole, so unlike a
-    // per-crossing accumulation it can't fade out on one side or show
-    // per-integration-step banding. Coloured like the hot inner disk, since
-    // it's dominated by light that grazed deep into the potential well.
-    // A Lorentzian-style falloff instead of smoothstep: no finite-width
-    // transition zone with a steep middle slope, so the same per-pixel
-    // noise in minApproach (still present near the photon sphere, just
-    // reduced) maps to a far smaller, smoother change in brightness —
-    // everywhere, not just at one particular distance.
-    float haloDist = max(minApproach - PHOTON_R, 0.0);
-    float haloBand = 1.0 / (1.0 + haloDist * haloDist * 2.6);
-    vec3 haloColor = mix(DISK_COOL, DISK_HOT, 0.75);
-    color += haloColor * haloBand * BLOOM_INTENSITY * 0.95;
-
-    // Analytic exit direction from the Binet parametrisation — the exact
-    // tangent to the geodesic where marching stopped — instead of a noisy
-    // finite difference of the last two positions.
-    vec3 rHat = cos(phi) * normalVec + sin(phi) * tangentVec;
-    vec3 phiHat = -sin(phi) * normalVec + cos(phi) * tangentVec;
-    vec3 exitDir = phiHat / max(u, 1e-4) - rHat * du / max(u * u, 1e-6);
-
-    // Strongly-lensed rays (large total deflection) pack many stars into a
-    // few pixels — genuine gravitational magnification, but at a finite
-    // step budget without supersampling/TAA it aliases into speckle rather
-    // than a clean smear. Fade the raw star sample out as deflection grows,
-    // letting the smooth ring/disk glow (unaffected — it's geometry, not a
-    // per-pixel noise sample) dominate that band instead.
-    float deflection = 1.0 - dot(normalize(exitDir), rd);
-    float lensDamp = smoothstep(0.15, 0.6, deflection);
-    color += starField(normalize(exitDir)) * (1.0 - lensDamp);
+    color += starField(dir);
     return color;
   }
 

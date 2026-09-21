@@ -2,7 +2,6 @@ import { motion } from 'framer-motion'
 import gsap from 'gsap'
 import './App.css'
 import ParticleField from './ParticleField'
-import BlackHole from './BlackHole'
 import SmoothScroll from './SmoothScroll'
 import CustomCursor from './CustomCursor'
 import ScrollProgress from './ScrollProgress'
@@ -111,9 +110,6 @@ function App() {
     <SmoothScroll>
       <CustomCursor />
       <ScrollProgress />
-      <div className="hero-blackhole" aria-hidden="true">
-        <BlackHole />
-      </div>
       <ParticleField />
 
       <nav className="nav">

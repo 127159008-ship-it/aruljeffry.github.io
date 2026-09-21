@@ -236,48 +236,6 @@ main section {
   z-index: 1;
 }
 
-.hero-blackhole {
-  /* A sibling of ParticleField (not nested in .hero) so it can sit behind
-     the network canvas — a descendant of .hero would always paint above
-     .particle-canvas regardless of its own z-index, since .hero itself
-     already stacks above it. Positioned relative to the page rather than
-     the hero box, since it's no longer inside it. */
-  position: absolute;
-  top: 38vh;
-  right: 0;
-  /* Flush with the viewport edge (no rightward bleed): both a negative
-     offset and a transform-based shift measurably extend the box past
-     100vw here (document.documentElement.scrollWidth reflects transformed
-     geometry too), and this element no longer lives inside .hero, which
-     used to absorb that overflow. */
-  transform: translateY(-50%);
-  width: min(52vw, 600px);
-  height: min(52vw, 600px);
-  pointer-events: none;
-  z-index: -1;
-  /* The canvas itself renders opaque (it has its own starfield), so a plain
-     rectangle would hard-clip the network layer in front of it. Fade the
-     edges out with a mask so only the hole/disk/halo stays solid and the
-     rest blends into the existing cosmic-network background instead of
-     showing a box. */
-  mask-image: radial-gradient(circle at 50% 50%, #000 52%, transparent 82%);
-  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 52%, transparent 82%);
-}
-
-@media (max-width: 760px) {
-  .hero-blackhole {
-    top: 28vh;
-    /* Exactly 100vw and anchored at right:0 (no horizontal transform) so
-       it can't push document.documentElement.scrollWidth past the
-       viewport — transformed/offset overflow both measurably count here. */
-    right: 0;
-    width: 100vw;
-    height: 100vw;
-    transform: translateY(-50%);
-    opacity: 0.55;
-  }
-}
-
 .corner-label {
   position: absolute;
   display: flex;
