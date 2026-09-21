@@ -130,7 +130,7 @@ const FRAGMENT_SHADER = `
     float innerCut = smoothstep(0.0, 0.03, rn);
     float outerCut = 1.0 - smoothstep(0.5, 0.72, rn);
     float density = innerCut * outerCut;
-    return diskCol * beamFactor * density * BLOOM_INTENSITY * 0.4;
+    return diskCol * beamFactor * density * BLOOM_INTENSITY * 0.55;
   }
 
   vec3 traceRay(vec3 ro, vec3 rd, vec3 diskNormal) {
@@ -230,9 +230,9 @@ const FRAGMENT_SHADER = `
     // reduced) maps to a far smaller, smoother change in brightness —
     // everywhere, not just at one particular distance.
     float haloDist = max(minApproach - PHOTON_R, 0.0);
-    float haloBand = 1.0 / (1.0 + haloDist * haloDist * 0.5);
+    float haloBand = 1.0 / (1.0 + haloDist * haloDist * 2.6);
     vec3 haloColor = mix(DISK_COOL, DISK_HOT, 0.75);
-    color += haloColor * haloBand * BLOOM_INTENSITY * 0.6;
+    color += haloColor * haloBand * BLOOM_INTENSITY * 0.95;
 
     // Analytic exit direction from the Binet parametrisation — the exact
     // tangent to the geodesic where marching stopped — instead of a noisy
