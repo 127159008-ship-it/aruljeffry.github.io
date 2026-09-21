@@ -805,9 +805,46 @@ const BH_RING_VERTEX_SHADER = `
   }
 `
 
-// The accretion disk: hot white-gold near the horizon cooling to ember
-// orange at the outer edge, streaked with flowing turbulence, and brighter
-// on one side to suggest relativistic Doppler beaming as it spins.
+// Bends the halo ring's own geometry into the Gargantua "Einstein ring"
+// silhouette instead of faking it with alpha: pinched to a thin sliver
+// where it grazes the horizon's left/right limb, flared out to the disk's
+// outer radius top and bottom, where the disk's far side is lensed up and
+// over the hole. vPos still carries the ORIGINAL (unwarped) coordinate so
+// the fragment shader's radius/angle-based colour and turbulence stay
+// simple and consistent regardless of the on-screen warp.
+const BH_HALO_VERTEX_SHADER = `
+  varying vec2 vPos;
+  uniform float uInner;
+  uniform float uOuter;
+  uniform float uHorizon;
+  uniform float uWrapOuter;
+
+  void main() {
+    vPos = position.xy;
+    float ang = atan(position.y, position.x);
+    float baseR = length(position.xy);
+    float t = clamp((baseR - uInner) / (uOuter - uInner), 0.0, 1.0);
+
+    // 0 at the left/right limb, 1 at top/bottom — the actual shape change
+    // that makes this a continuous lensed band rather than a rigid circle.
+    // A steep exponent keeps most of the ring pinched to a thin photon-ring
+    // sliver, flaring wide only within a narrow arc of true top/bottom —
+    // a bulge that fills half the circle just reads as a soft round blob.
+    float bulge = pow(abs(sin(ang)), 4.5);
+    float rInner = uHorizon * 1.01;
+    float rOuter = mix(uHorizon * 1.14, uWrapOuter, bulge);
+    float r = mix(rInner, rOuter, t);
+
+    vec3 warped = vec3(cos(ang) * r, sin(ang) * r, 0.0);
+    gl_Position = projectionMatrix * modelViewMatrix * vec4(warped, 1.0);
+  }
+`
+
+// The accretion disk: white-hot near the horizon, cooling through gold to
+// ember orange at the outer edge (Shakura-Sunyaev-style falloff), streaked
+// with flowing turbulence, brighter on one side for relativistic Doppler
+// beaming, and with a noise-eroded outer edge so the boundary frays rather
+// than reading as a crisp, rigid ellipse.
 const BH_DISK_FRAGMENT_SHADER = `
   ${BH_NOISE_GLSL}
   varying vec2 vPos;
@@ -816,6 +853,7 @@ const BH_DISK_FRAGMENT_SHADER = `
   uniform float uOuter;
   uniform float uOpacity;
   uniform vec3 uColorHot;
+  uniform vec3 uColorMid;
   uniform vec3 uColorCool;
 
   void main() {
@@ -843,12 +881,22 @@ const BH_DISK_FRAGMENT_SHADER = `
 
     // Shakura-Sunyaev-style temperature falloff (T ~ r^-3/4): a compact
     // hot core that cools fast at first then levels off, rather than an
-    // even linear blend from hot to cool across the whole disk.
+    // even linear blend from hot to cool across the whole disk. Two-stage
+    // white -> gold -> ember mix instead of a single lerp, to match the
+    // reference's wider, richer colour range.
     float tempMix = pow(rn, 0.42);
+    vec3 base = mix(uColorHot, uColorMid, smoothstep(0.0, 0.5, tempMix));
+    base = mix(base, uColorCool, smoothstep(0.35, 1.0, tempMix));
     float innerGlow = (1.0 - smoothstep(0.0, 0.35, rn)) * 0.85;
 
-    vec3 color = mix(uColorHot, uColorCool, tempMix) * beam + uColorHot * innerGlow * beam * 0.6;
-    float edgeFade = smoothstep(0.0, 0.05, rn) * (1.0 - smoothstep(0.8, 1.0, rn));
+    vec3 color = base * beam + uColorHot * innerGlow * beam * 0.6;
+
+    // Frayed outer edge: erode the cutoff with noise instead of a clean
+    // smoothstep circle, so the boundary flickers and tears like real
+    // plasma rather than the edge of a rigid disc.
+    float fray = bhFbm(vec2(ang * 7.0 + uTime * 0.12, 4.0));
+    float outerEdge = 0.8 + 0.14 * (fray - 0.5);
+    float edgeFade = smoothstep(0.0, 0.05, rn) * (1.0 - smoothstep(outerEdge, outerEdge + 0.16, rn));
     float alpha = density * edgeFade * uOpacity;
 
     gl_FragColor = vec4(color, alpha);
@@ -856,8 +904,10 @@ const BH_DISK_FRAGMENT_SHADER = `
 `
 
 // The lensed halo — light from the disk's far side bent up and over the
-// horizon, the single most recognisable Interstellar/Gargantua cue. Reads
-// as two bright arcs (top/bottom) rather than a uniform ring.
+// horizon, the single most recognisable Interstellar/Gargantua cue. Its
+// paired vertex shader already bends the mesh into two bright arcs
+// (top/bottom) pinched to a sliver at the sides, so this only needs to
+// colour and texture that shape, not fake it with a brightness mask.
 const BH_HALO_FRAGMENT_SHADER = `
   ${BH_NOISE_GLSL}
   varying vec2 vPos;
@@ -865,7 +915,8 @@ const BH_HALO_FRAGMENT_SHADER = `
   uniform float uInner;
   uniform float uOuter;
   uniform float uOpacity;
-  uniform vec3 uColor;
+  uniform vec3 uColorHot;
+  uniform vec3 uColorCool;
 
   void main() {
     float r = length(vPos);
@@ -875,11 +926,23 @@ const BH_HALO_FRAGMENT_SHADER = `
 
     float flow = bhFbm(vec2(ang * 6.0 - uTime * 0.45, rn * 4.0)) * 0.7
                + bhFbm(vec2(ang * 18.0 + uTime * 0.2, rn * 8.0)) * 0.3;
-    float ring = smoothstep(0.0, 0.2, rn) * (1.0 - smoothstep(0.75, 1.0, rn));
-    float vertical = 0.1 + 1.7 * pow(abs(sin(ang)), 3.0);
+    float fray = bhFbm(vec2(ang * 9.0 + uTime * 0.1, 2.0));
+    float outerEdge = 0.72 + 0.14 * (fray - 0.5);
+    // Narrow transition zones on both edges — a crisp lensed band, not a
+    // wide soft-focus glow that bloom turns into a shapeless cloud.
+    float ring = smoothstep(0.0, 0.05, rn) * (1.0 - smoothstep(outerEdge, outerEdge + 0.08, rn));
 
-    vec3 color = mix(uColor, vec3(1.0), clamp(vertical * 0.4, 0.0, 0.65));
-    float alpha = ring * (0.35 + 0.65 * flow) * vertical * uOpacity;
+    // Push the flow noise's contrast up so bright filaments and dark gaps
+    // both survive bloom, instead of a uniformly-lit haze.
+    float streaks = pow(clamp(flow, 0.0, 1.0), 2.4);
+
+    // The geometry itself is already pinched thin at the sides and flared
+    // top/bottom, so brightness only needs a gentle nudge to sell the
+    // "hottest where the band is widest" read, not the shape.
+    float boost = 0.45 + 1.05 * pow(abs(sin(ang)), 2.0);
+
+    vec3 color = mix(uColorHot, uColorCool, rn);
+    float alpha = ring * (0.04 + 0.96 * streaks) * boost * uOpacity;
     gl_FragColor = vec4(color, alpha);
   }
 `
@@ -893,31 +956,38 @@ function BlackHole({ glowTexture, reduced }) {
   const haloRef = useRef()
   const scrollRef = useScrollProgressRef()
 
-  // Colours pulled straight from the site's own theme tokens (--accent /
-  // --accent-bright) rather than a generic orange accretion disk — still
-  // physically sound, since the hottest plasma skews blue-white anyway.
+  // Reference-matched palette: white-hot near the horizon, through gold,
+  // to ember orange at the outer edge — the real blackbody gradient a hot
+  // accretion disk actually has, and what makes the reference read as
+  // molten plasma rather than a flat coloured ring.
   const diskUniforms = useMemo(
     () => ({
       uTime: { value: 0 },
       uInner: { value: BLACK_HOLE.horizonRadius * 1.08 },
-      uOuter: { value: BLACK_HOLE.horizonRadius * 2.7 },
+      uOuter: { value: BLACK_HOLE.horizonRadius * 2.9 },
       uOpacity: { value: 0 },
-      uColorHot: { value: new THREE.Color('#eafeff') },
-      uColorCool: { value: new THREE.Color('#22d3ee') },
+      uColorHot: { value: new THREE.Color('#fffaf0') },
+      uColorMid: { value: new THREE.Color('#ffc46b') },
+      uColorCool: { value: new THREE.Color('#ff5a1f') },
     }),
     []
   )
-  // A tight, camera-facing ring hugging the horizon — a Schwarzschild
-  // black hole's shadow and photon ring stay circular from every viewing
-  // angle (unlike the tilted disk itself), so this billboards to the
-  // camera every frame instead of following the disk's fixed tilt.
+  // A camera-facing ring warped by BH_HALO_VERTEX_SHADER into a thin sliver
+  // at the horizon's left/right limb and a wide flared band top/bottom —
+  // the lensed "Einstein ring" image of the disk's far side. Billboarding
+  // to the camera every frame keeps that lensed shape circular-symmetric
+  // from any viewing angle, matching a Schwarzschild hole's shadow (unlike
+  // the tilted disk itself, which keeps its own fixed inclination).
   const haloUniforms = useMemo(
     () => ({
       uTime: { value: 0 },
       uInner: { value: BLACK_HOLE.horizonRadius * 1.2 },
       uOuter: { value: BLACK_HOLE.horizonRadius * 2.3 },
+      uHorizon: { value: BLACK_HOLE.horizonRadius },
+      uWrapOuter: { value: BLACK_HOLE.horizonRadius * 1.7 },
       uOpacity: { value: 0 },
-      uColor: { value: new THREE.Color('#baf8ff') },
+      uColorHot: { value: new THREE.Color('#fff3e0') },
+      uColorCool: { value: new THREE.Color('#ffa64d') },
     }),
     []
   )
@@ -938,14 +1008,16 @@ function BlackHole({ glowTexture, reduced }) {
     diskUniforms.uTime.value = state.clock.elapsedTime
     haloUniforms.uTime.value = state.clock.elapsedTime
     diskUniforms.uOpacity.value = Math.min(0.95 + t * 0.3 + flicker, 1.2) * fade
-    haloUniforms.uOpacity.value = Math.min(0.7 + t * 0.3 + flicker * 1.4, 1.15) * fade
+    haloUniforms.uOpacity.value = Math.min(0.75 + t * 0.3 + flicker * 1.2, 1.1) * fade
 
     if (diskRef.current) diskRef.current.scale.setScalar(1 + t * 0.55)
     if (haloRef.current) haloRef.current.scale.setScalar(1 + t * 0.3)
 
     if (glowRef.current) {
-      glowRef.current.material.opacity = (0.4 + t * 0.35 + flicker) * fade
-      glowRef.current.scale.setScalar(9 + t * 4)
+      // Kept small and faint — an ember seed behind the horizon, not a
+      // dominant shape. The halo/disk meshes carry the actual silhouette.
+      glowRef.current.material.opacity = (0.16 + t * 0.15 + flicker * 0.5) * fade
+      glowRef.current.scale.setScalar(4.5 + t * 2)
     }
     if (rimRef.current) {
       rimRef.current.material.opacity = (0.55 + t * 0.3 + flicker * 1.5) * fade
@@ -958,21 +1030,21 @@ function BlackHole({ glowTexture, reduced }) {
   return (
     <group ref={groupRef} position={[BLACK_HOLE.x, BLACK_HOLE.y, BLACK_HOLE.z]}>
       <sprite ref={glowRef} scale={[9, 9, 1]}>
-        <spriteMaterial map={glowTexture} color="#8fe9f7" transparent opacity={0.35} depthWrite={false} blending={THREE.AdditiveBlending} />
+        <spriteMaterial map={glowTexture} color="#ffb870" transparent opacity={0.35} depthWrite={false} blending={THREE.AdditiveBlending} />
       </sprite>
       <mesh ref={haloRef}>
-        <ringGeometry args={[haloUniforms.uInner.value, haloUniforms.uOuter.value, 96]} />
+        <ringGeometry args={[haloUniforms.uInner.value, haloUniforms.uOuter.value, 160]} />
         <shaderMaterial
           transparent
           depthWrite={false}
           side={THREE.DoubleSide}
           blending={THREE.AdditiveBlending}
           uniforms={haloUniforms}
-          vertexShader={BH_RING_VERTEX_SHADER}
+          vertexShader={BH_HALO_VERTEX_SHADER}
           fragmentShader={BH_HALO_FRAGMENT_SHADER}
         />
       </mesh>
-      <mesh ref={diskRef} rotation={[Math.PI / 2.2, 0.15, 0]}>
+      <mesh ref={diskRef} rotation={[Math.PI / 2.08, 0.15, 0]}>
         <ringGeometry args={[diskUniforms.uInner.value, diskUniforms.uOuter.value, 128]} />
         <shaderMaterial
           transparent
@@ -990,7 +1062,7 @@ function BlackHole({ glowTexture, reduced }) {
       </mesh>
       <mesh ref={rimRef}>
         <ringGeometry args={[BLACK_HOLE.horizonRadius * 0.97, BLACK_HOLE.horizonRadius * 1.18, 72]} />
-        <meshBasicMaterial color="#ffffff" transparent opacity={0.85} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} depthWrite={false} />
+        <meshBasicMaterial color="#fff4e0" transparent opacity={0.85} side={THREE.DoubleSide} blending={THREE.AdditiveBlending} depthWrite={false} />
       </mesh>
     </group>
   )
