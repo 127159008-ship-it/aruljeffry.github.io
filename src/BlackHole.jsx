@@ -40,8 +40,11 @@ const FRAGMENT_SHADER = `
   const float BLOOM_INTENSITY = 1.6;
   const float HORIZON_R       = 1.0;    // event horizon radius (= r_s)
   const float PHOTON_R        = 1.5;    // photon sphere radius -> the bright ring
-  const vec3  DISK_HOT        = vec3(0.85, 0.97, 1.0);  // near-ISCO: blue-white
-  const vec3  DISK_COOL       = vec3(1.0, 0.55, 0.22);  // outer edge: orange-red
+  // Pulled from the site's own theme tokens (--accent-bright / --accent)
+  // instead of a generic orange accretion disk — still physically
+  // defensible, since the hottest plasma skews blue-white, not orange.
+  const vec3  DISK_HOT        = vec3(0.729, 0.973, 1.0);  // near-ISCO: --accent-bright
+  const vec3  DISK_COOL       = vec3(0.133, 0.827, 0.933); // outer edge: --accent
   const int   RAY_STEPS       = 90;     // integration steps (φ-parametrised)
   const float MAX_REVOLUTIONS = 1.8;    // max angle swept, in full turns
   // ---------------------------------------------------------------------

@@ -111,6 +111,9 @@ function App() {
     <SmoothScroll>
       <CustomCursor />
       <ScrollProgress />
+      <div className="hero-blackhole" aria-hidden="true">
+        <BlackHole />
+      </div>
       <ParticleField />
 
       <nav className="nav">
@@ -128,9 +131,6 @@ function App() {
       </nav>
 
       <header className="hero" id="top">
-        <div className="hero-blackhole" aria-hidden="true">
-          <BlackHole />
-        </div>
         {cornerLabels.map((group, gi) => (
           <motion.div
             key={group.key}
