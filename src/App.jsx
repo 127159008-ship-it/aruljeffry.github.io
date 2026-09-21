@@ -2,6 +2,7 @@ import { motion } from 'framer-motion'
 import gsap from 'gsap'
 import './App.css'
 import ParticleField from './ParticleField'
+import BlackHole from './BlackHole'
 import SmoothScroll from './SmoothScroll'
 import CustomCursor from './CustomCursor'
 import ScrollProgress from './ScrollProgress'
@@ -127,6 +128,9 @@ function App() {
       </nav>
 
       <header className="hero" id="top">
+        <div className="hero-blackhole" aria-hidden="true">
+          <BlackHole />
+        </div>
         {cornerLabels.map((group, gi) => (
           <motion.div
             key={group.key}

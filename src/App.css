@@ -236,6 +236,35 @@ main section {
   z-index: 1;
 }
 
+.hero-blackhole {
+  position: absolute;
+  top: 40%;
+  right: -6%;
+  transform: translateY(-50%);
+  width: min(52vw, 600px);
+  height: min(52vw, 600px);
+  pointer-events: none;
+  z-index: 0;
+  /* The canvas itself renders opaque (it has its own starfield), so a plain
+     rectangle would hard-clip the network layer behind it. Fade the edges
+     out with a mask so only the hole/disk/halo stays solid and the rest
+     blends into the existing cosmic-network background instead of showing
+     a box. */
+  mask-image: radial-gradient(circle at 50% 50%, #000 52%, transparent 82%);
+  -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 52%, transparent 82%);
+}
+
+@media (max-width: 760px) {
+  .hero-blackhole {
+    top: 30%;
+    width: 105vw;
+    height: 105vw;
+    right: 50%;
+    transform: translate(50%, -50%);
+    opacity: 0.55;
+  }
+}
+
 .corner-label {
   position: absolute;
   display: flex;
