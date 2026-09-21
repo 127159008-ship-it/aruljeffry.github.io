@@ -45,7 +45,7 @@ const FRAGMENT_SHADER = `
   // defensible, since the hottest plasma skews blue-white, not orange.
   const vec3  DISK_HOT        = vec3(0.729, 0.973, 1.0);  // near-ISCO: --accent-bright
   const vec3  DISK_COOL       = vec3(0.133, 0.827, 0.933); // outer edge: --accent
-  const int   RAY_STEPS       = 90;     // integration steps (φ-parametrised)
+  const int   RAY_STEPS       = 140;    // integration steps (φ-parametrised)
   const float MAX_REVOLUTIONS = 1.8;    // max angle swept, in full turns
   // ---------------------------------------------------------------------
 
@@ -170,7 +170,7 @@ const FRAGMENT_SHADER = `
       // Finer angular steps near the photon sphere, where deflection is
       // sharpest and the disk/halo "joining" cusp actually forms.
       float photonProximity = exp(-14.0 * (u - 0.6667) * (u - 0.6667));
-      float step = baseStep * (1.0 - 0.7 * photonProximity);
+      float step = baseStep * (1.0 - 0.93 * photonProximity);
 
       vec3 oldPos = pos;
       integrateStep(u, du, step);
@@ -194,8 +194,12 @@ const FRAGMENT_SHADER = `
       // range (a hard cutoff instead just traded speckle for a jagged
       // step edge, since the flip happens on a whole-step granularity).
       float uGate = smoothstep(1.1 / DISK_OUTER, 1.6 / DISK_OUTER, u);
-      if (uGate > 0.0) {
-        color += diskCrossingColor(oldPos, pos, diskNormal) * uGate;
+      // Also fade it out near the photon sphere itself — same chaotic-
+      // sensitivity problem, and this is exactly the region the smooth
+      // analytic halo below already covers, so nothing is lost.
+      float crossingGate = uGate * (1.0 - photonProximity);
+      if (crossingGate > 0.0) {
+        color += diskCrossingColor(oldPos, pos, diskNormal) * crossingGate;
       }
 
       if (u < 1.0 / 34.0) break; // escaped far enough — stop marching
@@ -209,6 +213,26 @@ const FRAGMENT_SHADER = `
     float ringDist = abs(minApproach - PHOTON_R);
     float ring = smoothstep(0.14, 0.0, ringDist) + 0.4 * smoothstep(0.4, 0.0, ringDist);
     color += vec3(0.95, 0.99, 1.0) * ring * BLOOM_INTENSITY;
+
+    // Lensed halo: light from every disk radius gets swept past the photon
+    // sphere and multiply-imaged into a wrapped arc above/below the horizon
+    // — the single most recognisable "Gargantua" cue. The per-crossing disk
+    // shading above can't render this reliably (that regime is where the
+    // u-shrinks-toward-escape speckle lives, so it's damped there by design),
+    // so this is a second, purely analytic term driven only by minApproach —
+    // continuous and identical on every side of the hole, so unlike a
+    // per-crossing accumulation it can't fade out on one side or show
+    // per-integration-step banding. Coloured like the hot inner disk, since
+    // it's dominated by light that grazed deep into the potential well.
+    // A Lorentzian-style falloff instead of smoothstep: no finite-width
+    // transition zone with a steep middle slope, so the same per-pixel
+    // noise in minApproach (still present near the photon sphere, just
+    // reduced) maps to a far smaller, smoother change in brightness —
+    // everywhere, not just at one particular distance.
+    float haloDist = max(minApproach - PHOTON_R, 0.0);
+    float haloBand = 1.0 / (1.0 + haloDist * haloDist * 0.5);
+    vec3 haloColor = mix(DISK_COOL, DISK_HOT, 0.75);
+    color += haloColor * haloBand * BLOOM_INTENSITY * 0.6;
 
     // Analytic exit direction from the Binet parametrisation — the exact
     // tangent to the geodesic where marching stopped — instead of a noisy
