@@ -824,19 +824,31 @@ const BH_DISK_FRAGMENT_SHADER = `
     float rn = clamp((r - uInner) / (uOuter - uInner), 0.0, 1.0);
     float ang = atan(vPos.y, vPos.x);
 
-    // Fine Keplerian shear streaks (high angular frequency) layered under a
-    // broader flow, closer to a smooth, fast-spinning disk than a nebula.
-    float flow = bhFbm(vec2(ang * 5.0, rn * 2.2 - uTime * 0.28)) * 0.55
-               + bhFbm(vec2(ang * 16.0 + uTime * 0.12, rn * 3.0)) * 0.45;
-    float density = mix(0.55, 1.05, smoothstep(0.15, 0.9, flow));
+    // Differential (Keplerian) rotation: material closer in orbits faster,
+    // so the turbulence pattern shears into a spiral rather than sitting
+    // in uniform concentric bands — what actually gives a real accretion
+    // disk its "combed" look. Three octaves (broad flow, fine streaks,
+    // grain) instead of two, layered so the inner region visibly spins
+    // faster than the outer.
+    float orbitalSpeed = 1.0 / (0.28 + rn * 0.9);
+    float shear = ang + rn * 2.4;
+    float flow = bhFbm(vec2(shear * 5.0, rn * 2.6 - uTime * 0.32 * orbitalSpeed)) * 0.5
+               + bhFbm(vec2(shear * 14.0 + uTime * 0.1 * orbitalSpeed, rn * 5.0)) * 0.34
+               + bhFbm(vec2(shear * 34.0 - uTime * 0.06, rn * 11.0)) * 0.16;
+    float density = mix(0.45, 1.15, smoothstep(0.22, 0.85, flow));
 
     // Strong relativistic Doppler beaming: the side spinning toward the
     // camera reads dramatically brighter than the receding side.
-    float beam = 0.35 + 1.35 * pow(max(0.0, cos(ang)), 1.1);
-    float innerGlow = (1.0 - smoothstep(0.0, 0.4, rn)) * 0.7;
+    float beam = 0.32 + 1.5 * pow(max(0.0, cos(ang)), 1.1);
 
-    vec3 color = mix(uColorHot, uColorCool, rn) * beam + uColorHot * innerGlow * beam * 0.5;
-    float edgeFade = smoothstep(0.0, 0.06, rn) * (1.0 - smoothstep(0.82, 1.0, rn));
+    // Shakura-Sunyaev-style temperature falloff (T ~ r^-3/4): a compact
+    // hot core that cools fast at first then levels off, rather than an
+    // even linear blend from hot to cool across the whole disk.
+    float tempMix = pow(rn, 0.42);
+    float innerGlow = (1.0 - smoothstep(0.0, 0.35, rn)) * 0.85;
+
+    vec3 color = mix(uColorHot, uColorCool, tempMix) * beam + uColorHot * innerGlow * beam * 0.6;
+    float edgeFade = smoothstep(0.0, 0.05, rn) * (1.0 - smoothstep(0.8, 1.0, rn));
     float alpha = density * edgeFade * uOpacity;
 
     gl_FragColor = vec4(color, alpha);
@@ -861,12 +873,13 @@ const BH_HALO_FRAGMENT_SHADER = `
     float rn = clamp((r - uInner) / (uOuter - uInner), 0.0, 1.0);
     float ang = atan(vPos.y, vPos.x);
 
-    float flow = bhFbm(vec2(ang * 6.0 - uTime * 0.45, rn * 4.0));
+    float flow = bhFbm(vec2(ang * 6.0 - uTime * 0.45, rn * 4.0)) * 0.7
+               + bhFbm(vec2(ang * 18.0 + uTime * 0.2, rn * 8.0)) * 0.3;
     float ring = smoothstep(0.0, 0.2, rn) * (1.0 - smoothstep(0.75, 1.0, rn));
-    float vertical = 0.12 + 1.6 * pow(abs(sin(ang)), 3.0);
+    float vertical = 0.1 + 1.7 * pow(abs(sin(ang)), 3.0);
 
-    vec3 color = mix(uColor, vec3(1.0), clamp(vertical * 0.35, 0.0, 0.6));
-    float alpha = ring * (0.4 + 0.6 * flow) * vertical * uOpacity;
+    vec3 color = mix(uColor, vec3(1.0), clamp(vertical * 0.4, 0.0, 0.65));
+    float alpha = ring * (0.35 + 0.65 * flow) * vertical * uOpacity;
     gl_FragColor = vec4(color, alpha);
   }
 `
