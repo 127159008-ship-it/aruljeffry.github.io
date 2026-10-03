@@ -1,0 +1,23 @@
+# Render blueprint: backend (Docker, needs >= 2 CPU / 2 GB for the MILP + OpenDSS runs) and static frontend.
+services:
+  - type: web
+    name: localflex-api
+    runtime: docker
+    dockerfilePath: ./Dockerfile
+    plan: standard
+    healthCheckPath: /api/health
+    envVars:
+      - key: CORS_ORIGINS
+        value: https://localflex-twin.onrender.com
+      - key: SIM_WORKERS
+        value: "2"
+    disk: { name: localflex-data, mountPath: /data, sizeGB: 2 }
+  - type: web
+    name: localflex-twin
+    runtime: static
+    rootDir: webapp/frontend
+    buildCommand: npm ci && npm run build
+    staticPublishPath: dist
+    envVars:
+      - key: VITE_API_URL
+        value: https://localflex-api.onrender.com

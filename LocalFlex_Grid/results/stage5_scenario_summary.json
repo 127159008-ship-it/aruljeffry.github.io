@@ -1,0 +1,573 @@
+{
+  "model_version": "stage5-v0.5",
+  "python": "3.13.15",
+  "network_seed": 7,
+  "profile_seeds": [
+    7,
+    11,
+    23,
+    42
+  ],
+  "scenarios": {
+    "clear": {
+      "demand_scale": 1.0,
+      "solar": "clear",
+      "description": "reference weather, per-home timing diversity"
+    },
+    "cloudy": {
+      "demand_scale": 1.0,
+      "solar": "cloudy",
+      "description": "time-varying cloud transients moving along the feeders"
+    },
+    "high_solar": {
+      "demand_scale": 0.75,
+      "solar": "clear",
+      "description": "clear sky on a low-demand day (demand x0.75); PV ratings unchanged"
+    },
+    "high_demand": {
+      "demand_scale": 1.25,
+      "solar": "overcast",
+      "description": "overcast (transmittance ~0.3) on a high-demand day (demand x1.25)"
+    }
+  },
+  "tests": {
+    "A0_A1_unchanged_vs_stage3_max_abs_diff": {
+      "A0": 2.842170943040401e-14,
+      "A1": 2.842170943040401e-14
+    },
+    "different_seeds_differ_mean_abs_kW": 0.1136,
+    "per_home_daily_energy_preserved_max_rel_err": 1.0108001171543744e-15,
+    "aggregate_demand_energy_ref_vs_diverse_kWh": [
+      1366.3,
+      1366.3
+    ],
+    "aggregate_peak_kW_ref_vs_diverse": [
+      161.8,
+      152.3
+    ],
+    "identical_seed_max_abs_diff_cloudy_A1": 0.0,
+    "max_power_balance_residual_kW_all_runs": 0.0023,
+    "total_convergence_failures": 0,
+    "total_inverter_iteration_limit_hits": 0,
+    "max_inverter_iterations_used": 46,
+    "curtailment_never_negative": true,
+    "runs": 32,
+    "ALL_PASS": true
+  },
+  "reference_seed7": [
+    {
+      "scenario": "clear",
+      "seed": 7,
+      "case": "A0",
+      "v_max_pu": 1.114,
+      "v_max_where": "a5/A@12.00h",
+      "v_min_pu": 0.885,
+      "v_min_where": "b5/A@20.00h",
+      "hours_any_overvoltage": 7.0,
+      "hours_any_undervoltage": 4.25,
+      "steps_fail": 44,
+      "overvoltage_node_phases": 6,
+      "undervoltage_node_phases": 14,
+      "peak_phase_current_A": 155.4,
+      "peak_phase_loading_pct": 77.7,
+      "peak_neutral_current_A": 83.2,
+      "peak_neutral_loading_pct": 83.2,
+      "peak_trafo_loading_pct": 65.6,
+      "reverse_flow_energy_kWh": 388.2,
+      "pv_available_kWh": 878.2,
+      "pv_delivered_kWh": 879.0,
+      "pv_curtailed_kWh": 0.0,
+      "pv_accounting_residual_kWh": -0.85,
+      "demand_kWh": 1359.6,
+      "peak_demand_kW": 147.2,
+      "max_power_balance_residual_kW": 0.0013,
+      "convergence_failures": 0,
+      "inverter_iteration_limit_hits": 0,
+      "max_inverter_iterations": 0
+    },
+    {
+      "scenario": "clear",
+      "seed": 7,
+      "case": "A1",
+      "v_max_pu": 1.076,
+      "v_max_where": "a5/A@12.00h",
+      "v_min_pu": 0.885,
+      "v_min_where": "b5/A@20.00h",
+      "hours_any_overvoltage": 7.0,
+      "hours_any_undervoltage": 4.0,
+      "steps_fail": 44,
+      "overvoltage_node_phases": 5,
+      "undervoltage_node_phases": 13,
+      "peak_phase_current_A": 155.4,
+      "peak_phase_loading_pct": 77.7,
+      "peak_neutral_current_A": 64.0,
+      "peak_neutral_loading_pct": 64.0,
+      "peak_trafo_loading_pct": 65.6,
+      "reverse_flow_energy_kWh": 363.5,
+      "pv_available_kWh": 878.2,
+      "pv_delivered_kWh": 848.1,
+      "pv_curtailed_kWh": 30.1,
+      "pv_accounting_residual_kWh": -0.0,
+      "demand_kWh": 1357.7,
+      "peak_demand_kW": 147.2,
+      "max_power_balance_residual_kW": 0.0012,
+      "convergence_failures": 0,
+      "inverter_iteration_limit_hits": 0,
+      "max_inverter_iterations": 35
+    },
+    {
+      "scenario": "cloudy",
+      "seed": 7,
+      "case": "A0",
+      "v_max_pu": 1.103,
+      "v_max_where": "a5/A@11.75h",
+      "v_min_pu": 0.885,
+      "v_min_where": "b5/A@20.00h",
+      "hours_any_overvoltage": 4.0,
+      "hours_any_undervoltage": 4.0,
+      "steps_fail": 32,
+      "overvoltage_node_phases": 3,
+      "undervoltage_node_phases": 13,
+      "peak_phase_current_A": 155.4,
+      "peak_phase_loading_pct": 77.7,
+      "peak_neutral_current_A": 75.9,
+      "peak_neutral_loading_pct": 75.9,
+      "peak_trafo_loading_pct": 65.6,
+      "reverse_flow_energy_kWh": 212.7,
+      "pv_available_kWh": 638.9,
+      "pv_delivered_kWh": 638.9,
+      "pv_curtailed_kWh": 0.0,
+      "pv_accounting_residual_kWh": -0.03,
+      "demand_kWh": 1357.5,
+      "peak_demand_kW": 147.2,
+      "max_power_balance_residual_kW": 0.0012,
+      "convergence_failures": 0,
+      "inverter_iteration_limit_hits": 0,
+      "max_inverter_iterations": 0
+    },
+    {
+      "scenario": "cloudy",
+      "seed": 7,
+      "case": "A1",
+      "v_max_pu": 1.074,
+      "v_max_where": "a5/A@11.75h",
+      "v_min_pu": 0.885,
+      "v_min_where": "b5/A@20.00h",
+      "hours_any_overvoltage": 4.0,
+      "hours_any_undervoltage": 4.0,
+      "steps_fail": 32,
+      "overvoltage_node_phases": 3,
+      "undervoltage_node_phases": 13,
+      "peak_phase_current_A": 155.4,
+      "peak_phase_loading_pct": 77.7,
+      "peak_neutral_current_A": 64.0,
+      "peak_neutral_loading_pct": 64.0,
+      "peak_trafo_loading_pct": 65.6,
+      "reverse_flow_energy_kWh": 202.6,
+      "pv_available_kWh": 638.9,
+      "pv_delivered_kWh": 626.3,
+      "pv_curtailed_kWh": 12.6,
+      "pv_accounting_residual_kWh": -0.0,
+      "demand_kWh": 1356.7,
+      "peak_demand_kW": 147.2,
+      "max_power_balance_residual_kW": 0.0012,
+      "convergence_failures": 0,
+      "inverter_iteration_limit_hits": 0,
+      "max_inverter_iterations": 18
+    },
+    {
+      "scenario": "high_solar",
+      "seed": 7,
+      "case": "A0",
+      "v_max_pu": 1.123,
+      "v_max_where": "a5/A@12.00h",
+      "v_min_pu": 0.91,
+      "v_min_where": "b5/A@20.00h",
+      "hours_any_overvoltage": 7.5,
+      "hours_any_undervoltage": 3.25,
+      "steps_fail": 42,
+      "overvoltage_node_phases": 7,
+      "undervoltage_node_phases": 7,
+      "peak_phase_current_A": 122.3,
+      "peak_phase_loading_pct": 61.1,
+      "peak_neutral_current_A": 86.0,
+      "peak_neutral_loading_pct": 86.0,
+      "peak_trafo_loading_pct": 49.5,
+      "reverse_flow_energy_kWh": 485.5,
+      "pv_available_kWh": 878.2,
+      "pv_delivered_kWh": 880.2,
+      "pv_curtailed_kWh": 0.0,
+      "pv_accounting_residual_kWh": -2.0,
+      "demand_kWh": 1025.3,
+      "peak_demand_kW": 112.6,
+      "max_power_balance_residual_kW": 0.001,
+      "convergence_failures": 0,
+      "inverter_iteration_limit_hits": 0,
+      "max_inverter_iterations": 0
+    },
+    {
+      "scenario": "high_solar",
+      "seed": 7,
+      "case": "A1",
+      "v_max_pu": 1.077,
+      "v_max_where": "a5/A@12.00h",
+      "v_min_pu": 0.91,
+      "v_min_where": "b5/A@20.00h",
+      "hours_any_overvoltage": 7.5,
+      "hours_any_undervoltage": 3.0,
+      "steps_fail": 42,
+      "overvoltage_node_phases": 5,
+      "undervoltage_node_phases": 6,
+      "peak_phase_current_A": 118.6,
+      "peak_phase_loading_pct": 59.3,
+      "peak_neutral_current_A": 62.6,
+      "peak_neutral_loading_pct": 62.6,
+      "peak_trafo_loading_pct": 49.5,
+      "reverse_flow_energy_kWh": 452.7,
+      "pv_available_kWh": 878.2,
+      "pv_delivered_kWh": 839.5,
+      "pv_curtailed_kWh": 38.6,
+      "pv_accounting_residual_kWh": -0.0,
+      "demand_kWh": 1023.3,
+      "peak_demand_kW": 112.6,
+      "max_power_balance_residual_kW": 0.001,
+      "convergence_failures": 0,
+      "inverter_iteration_limit_hits": 0,
+      "max_inverter_iterations": 45
+    },
+    {
+      "scenario": "high_demand",
+      "seed": 7,
+      "case": "A0",
+      "v_max_pu": 1.016,
+      "v_max_where": "a5/A@10.00h",
+      "v_min_pu": 0.862,
+      "v_min_where": "b5/A@20.00h",
+      "hours_any_overvoltage": 0.0,
+      "hours_any_undervoltage": 6.0,
+      "steps_fail": 24,
+      "overvoltage_node_phases": 0,
+      "undervoltage_node_phases": 17,
+      "peak_phase_current_A": 190.1,
+      "peak_phase_loading_pct": 95.1,
+      "peak_neutral_current_A": 75.4,
+      "peak_neutral_loading_pct": 75.4,
+      "peak_trafo_loading_pct": 81.3,
+      "reverse_flow_energy_kWh": 0.0,
+      "pv_available_kWh": 248.8,
+      "pv_delivered_kWh": 248.8,
+      "pv_curtailed_kWh": 0.0,
+      "pv_accounting_residual_kWh": -0.0,
+      "demand_kWh": 1684.2,
+      "peak_demand_kW": 179.9,
+      "max_power_balance_residual_kW": 0.0016,
+      "convergence_failures": 0,
+      "inverter_iteration_limit_hits": 0,
+      "max_inverter_iterations": 0
+    },
+    {
+      "scenario": "high_demand",
+      "seed": 7,
+      "case": "A1",
+      "v_max_pu": 1.016,
+      "v_max_where": "a5/A@10.00h",
+      "v_min_pu": 0.862,
+      "v_min_where": "b5/A@20.00h",
+      "hours_any_overvoltage": 0.0,
+      "hours_any_undervoltage": 6.0,
+      "steps_fail": 24,
+      "overvoltage_node_phases": 0,
+      "undervoltage_node_phases": 17,
+      "peak_phase_current_A": 190.1,
+      "peak_phase_loading_pct": 95.1,
+      "peak_neutral_current_A": 75.4,
+      "peak_neutral_loading_pct": 75.4,
+      "peak_trafo_loading_pct": 81.3,
+      "reverse_flow_energy_kWh": 0.0,
+      "pv_available_kWh": 248.8,
+      "pv_delivered_kWh": 248.8,
+      "pv_curtailed_kWh": 0.0,
+      "pv_accounting_residual_kWh": -0.0,
+      "demand_kWh": 1684.2,
+      "peak_demand_kW": 179.9,
+      "max_power_balance_residual_kW": 0.0015,
+      "convergence_failures": 0,
+      "inverter_iteration_limit_hits": 0,
+      "max_inverter_iterations": 1
+    }
+  ],
+  "robustness_min_max_across_seeds": {
+    "clear/A0": {
+      "v_max_pu": [
+        1.11,
+        1.116
+      ],
+      "v_min_pu": [
+        0.878,
+        0.885
+      ],
+      "hours_any_overvoltage": [
+        7.0,
+        7.25
+      ],
+      "hours_any_undervoltage": [
+        4.25,
+        5.0
+      ],
+      "peak_neutral_loading_pct": [
+        80.6,
+        84.2
+      ],
+      "peak_trafo_loading_pct": [
+        64.6,
+        67.1
+      ],
+      "reverse_flow_energy_kWh": [
+        386.0,
+        390.0
+      ],
+      "pv_curtailed_kWh": [
+        0.0,
+        0.0
+      ]
+    },
+    "clear/A1": {
+      "v_max_pu": [
+        1.075,
+        1.076
+      ],
+      "v_min_pu": [
+        0.878,
+        0.885
+      ],
+      "hours_any_overvoltage": [
+        7.0,
+        7.25
+      ],
+      "hours_any_undervoltage": [
+        3.75,
+        4.25
+      ],
+      "peak_neutral_loading_pct": [
+        64.0,
+        66.8
+      ],
+      "peak_trafo_loading_pct": [
+        64.6,
+        67.1
+      ],
+      "reverse_flow_energy_kWh": [
+        361.4,
+        364.5
+      ],
+      "pv_curtailed_kWh": [
+        29.8,
+        31.0
+      ]
+    },
+    "cloudy/A0": {
+      "v_max_pu": [
+        1.099,
+        1.11
+      ],
+      "v_min_pu": [
+        0.878,
+        0.885
+      ],
+      "hours_any_overvoltage": [
+        4.0,
+        5.25
+      ],
+      "hours_any_undervoltage": [
+        3.75,
+        4.5
+      ],
+      "peak_neutral_loading_pct": [
+        74.6,
+        81.3
+      ],
+      "peak_trafo_loading_pct": [
+        64.6,
+        67.1
+      ],
+      "reverse_flow_energy_kWh": [
+        207.7,
+        273.4
+      ],
+      "pv_curtailed_kWh": [
+        0.0,
+        0.0
+      ]
+    },
+    "cloudy/A1": {
+      "v_max_pu": [
+        1.073,
+        1.075
+      ],
+      "v_min_pu": [
+        0.878,
+        0.885
+      ],
+      "hours_any_overvoltage": [
+        4.0,
+        5.25
+      ],
+      "hours_any_undervoltage": [
+        3.75,
+        4.25
+      ],
+      "peak_neutral_loading_pct": [
+        64.0,
+        66.8
+      ],
+      "peak_trafo_loading_pct": [
+        64.6,
+        67.1
+      ],
+      "reverse_flow_energy_kWh": [
+        198.9,
+        258.0
+      ],
+      "pv_curtailed_kWh": [
+        10.9,
+        19.3
+      ]
+    },
+    "high_demand/A0": {
+      "v_max_pu": [
+        1.016,
+        1.023
+      ],
+      "v_min_pu": [
+        0.854,
+        0.862
+      ],
+      "hours_any_overvoltage": [
+        0.0,
+        0.0
+      ],
+      "hours_any_undervoltage": [
+        5.5,
+        6.0
+      ],
+      "peak_neutral_loading_pct": [
+        75.4,
+        78.5
+      ],
+      "peak_trafo_loading_pct": [
+        80.0,
+        82.9
+      ],
+      "reverse_flow_energy_kWh": [
+        0.0,
+        0.0
+      ],
+      "pv_curtailed_kWh": [
+        0.0,
+        0.0
+      ]
+    },
+    "high_demand/A1": {
+      "v_max_pu": [
+        1.016,
+        1.023
+      ],
+      "v_min_pu": [
+        0.854,
+        0.862
+      ],
+      "hours_any_overvoltage": [
+        0.0,
+        0.0
+      ],
+      "hours_any_undervoltage": [
+        5.5,
+        6.0
+      ],
+      "peak_neutral_loading_pct": [
+        75.4,
+        78.5
+      ],
+      "peak_trafo_loading_pct": [
+        80.0,
+        82.9
+      ],
+      "reverse_flow_energy_kWh": [
+        0.0,
+        0.0
+      ],
+      "pv_curtailed_kWh": [
+        0.0,
+        0.0
+      ]
+    },
+    "high_solar/A0": {
+      "v_max_pu": [
+        1.12,
+        1.124
+      ],
+      "v_min_pu": [
+        0.904,
+        0.91
+      ],
+      "hours_any_overvoltage": [
+        7.25,
+        7.5
+      ],
+      "hours_any_undervoltage": [
+        3.0,
+        3.25
+      ],
+      "peak_neutral_loading_pct": [
+        84.0,
+        86.9
+      ],
+      "peak_trafo_loading_pct": [
+        48.7,
+        50.7
+      ],
+      "reverse_flow_energy_kWh": [
+        483.8,
+        487.1
+      ],
+      "pv_curtailed_kWh": [
+        0.0,
+        0.0
+      ]
+    },
+    "high_solar/A1": {
+      "v_max_pu": [
+        1.077,
+        1.077
+      ],
+      "v_min_pu": [
+        0.904,
+        0.91
+      ],
+      "hours_any_overvoltage": [
+        7.25,
+        7.5
+      ],
+      "hours_any_undervoltage": [
+        3.0,
+        3.25
+      ],
+      "peak_neutral_loading_pct": [
+        61.8,
+        63.3
+      ],
+      "peak_trafo_loading_pct": [
+        48.7,
+        50.7
+      ],
+      "reverse_flow_energy_kWh": [
+        451.1,
+        453.7
+      ],
+      "pv_curtailed_kWh": [
+        38.4,
+        39.3
+      ]
+    }
+  }
+}

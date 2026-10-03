@@ -1,0 +1,7 @@
+tag,variant,scenario,run_s,planner_vars,planner_cons,mean_solve_s,wall_s,batt_node,batt_dV_per_kW_mean,batt_dV_per_kW_far_ends,hours_any_undervoltage,hours_any_overvoltage,under_pu_h,over_pu_h,peak_trafo_loading_pct,peak_neutral_loading_pct,reverse_flow_energy_kWh,curtailment_pct,ev_unmet_at_departure_kWh,unmet_water_m3,batt_throughput_kWh,batt_final_soc_pct,fallbacks_to_rules,solver_failures,convergence_failures,mip_time_limited_plans
+loc_a1,D,clear,45.2,10737,9621,0.346,46.8,a1,-0.0001281540908596,-0.0001278393187909,7.75,6.5,0.413,0.133,61.3,69.9,254.6,2.66,1.0,0.0,288.3,50.0,32,0,0,0
+loc_a3,D,clear,133.5,10737,9621,1.036,135.2,a3,-0.0002571988412463,-0.0003125854675931,11.0,6.25,0.368,0.124,58.8,66.6,286.1,2.49,1.68,0.0,196.9,50.0,26,0,0,94
+loc_b1,D,clear,50.3,10737,9621,0.386,52.2,b1,-0.0001292976744012,-0.000128813419118,8.75,6.25,0.389,0.136,58.8,65.7,255.1,2.75,1.06,0.0,346.6,50.0,32,0,0,0
+loc_a5,D,clear,141.7,10737,9621,1.101,143.5,a5,-0.0003132340752839,-0.0005006953646775,11.5,6.25,0.424,0.116,58.8,66.0,301.2,2.44,0.0,0.0,157.4,50.0,9,0,0,120
+loc_b3,D,clear,74.3,10737,9621,0.573,76.0,b3,-0.0002566955179951,-0.0003111559797239,9.5,6.75,0.322,0.138,54.4,70.8,258.6,2.81,0.0,0.0,325.3,50.0,30,0,0,14
+loc_b5,D,clear,97.8,10737,9621,0.757,99.5,b5,-0.0003119852340558,-0.0004963299582421,11.0,6.5,0.266,0.139,57.8,74.4,254.2,2.83,1.52,0.0,323.2,50.0,31,0,0,27

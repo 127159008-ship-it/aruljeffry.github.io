@@ -1,0 +1,43 @@
+{
+  "model_version": "stage2-v0.2",
+  "seed": 7,
+  "freq_hz": 50.0,
+  "python": "3.13.15",
+  "homes": 100,
+  "pv_units": 40,
+  "neutral_tests": {
+    "balanced_neutral_current_A": 0.0,
+    "balanced_phase_current_A": 22.7,
+    "single_phase_Ia_A": 22.08,
+    "single_phase_In_A": 22.08,
+    "neutral_end_voltage_sim_V": 14.24,
+    "neutral_end_voltage_hand_V": 14.24
+  },
+  "max_power_balance_residual_kW": 0.0012,
+  "converged_all_steps": true,
+  "v_max_pu": 1.113,
+  "v_min_pu": 0.88,
+  "hours_above_limit": 7.0,
+  "hours_below_limit": 4.75,
+  "peak_trafo_kVA": 173.7,
+  "peak_trafo_loading_pct": 69.5,
+  "reverse_flow_hours": 8.5,
+  "reverse_flow_energy_kWh": 392.8,
+  "peak_phase_current_A": 159.1,
+  "peak_phase_loading_pct": 79.5,
+  "peak_neutral_current_A": 82.4,
+  "peak_neutral_loading_pct": 82.4,
+  "peak_neutral_to_earth_V": 18.2,
+  "peak_neutral_to_earth_pct_of_phase": 7.6,
+  "total_demand_kWh": 1358.1,
+  "total_pv_kWh": 879.1,
+  "stage1_for_comparison": {
+    "v_max_pu": 1.082,
+    "v_min_pu": 0.895,
+    "hours_above_limit": 5.5,
+    "hours_below_limit": 3.25,
+    "peak_trafo_loading_pct": 70.0,
+    "reverse_flow_energy_kWh": 398.6,
+    "peak_line_loading_pct": 80.4
+  }
+}

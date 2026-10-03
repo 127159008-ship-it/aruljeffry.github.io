@@ -1,0 +1,38 @@
+{
+  "model_version": "stage1-v0.1",
+  "seed": 7,
+  "freq_hz": 50.0,
+  "opendssdirect": "0.9.4",
+  "python": "3.13.15",
+  "homes": 100,
+  "pv_units": 40,
+  "homes_by_phase": [
+    42,
+    33,
+    25
+  ],
+  "pv_by_phase": [
+    22,
+    12,
+    6
+  ],
+  "hand_calc": {
+    "drop_sim_V": 14.99,
+    "drop_hand_V": 14.45,
+    "rel_diff_pct": 3.7
+  },
+  "max_power_balance_residual_kW": 0.001,
+  "converged_all_steps": true,
+  "v_max_pu": 1.082,
+  "v_min_pu": 0.895,
+  "hours_above_limit": 5.5,
+  "hours_below_limit": 3.25,
+  "peak_trafo_kVA": 175.0,
+  "peak_trafo_loading_pct": 70.0,
+  "reverse_flow_hours": 8.5,
+  "reverse_flow_energy_kWh": 398.6,
+  "peak_line_current_A": 160.9,
+  "peak_line_loading_pct": 80.4,
+  "total_demand_kWh": 1358.8,
+  "total_pv_kWh": 878.2
+}

@@ -1,0 +1,1 @@
+{"environment":"synthetic","synthetic_scenario":"clear","latitude":null,"longitude":null,"date":null,"tz_offset_h":null,"irradiance_Wm2":null,"temp_C":null,"pv_penetration":40.0,"pv_kw_per_home":3.0,"homes":100,"battery_kwh":100.0,"battery_kw":50.0,"demand_scale":1.0,"pv_model":{},"scenario":"clear"}

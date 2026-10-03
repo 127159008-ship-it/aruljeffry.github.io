@@ -1,0 +1,120 @@
+[
+ {
+  "check": "feeder solves (all 96 steps converge)",
+  "passed": true,
+  "detail": "nonconv=0"
+ },
+ {
+  "check": "explicit neutral model (neutral current and neutral-earth voltage nonzero)",
+  "passed": true,
+  "detail": "max In=66.1 A, max Vn=13.9 V"
+ },
+ {
+  "check": "A0 frozen (re-run equals stored Stage 6 baseline)",
+  "passed": true,
+  "detail": "max diff 0.00e+00"
+ },
+ {
+  "check": "A1 frozen (re-run equals stored Stage 6 baseline)",
+  "passed": true,
+  "detail": "max diff 0.00e+00"
+ },
+ {
+  "check": "device ledgers & resource unit tests (Stage 6)",
+  "passed": true,
+  "detail": "26/26"
+ },
+ {
+  "check": "final A/B/C/D runs present (16 scenario-seed x 4 cases)",
+  "passed": true,
+  "detail": "64 runs"
+ },
+ {
+  "check": "identical initial state: battery initial SoC 50 % in every run",
+  "passed": true,
+  "detail": ""
+ },
+ {
+  "check": "battery exclusivity (no simultaneous charge/discharge in any MILP plan)",
+  "passed": true,
+  "detail": "plans=4096"
+ },
+ {
+  "check": "MPC feasibility (0 solver failures)",
+  "passed": true,
+  "detail": ""
+ },
+ {
+  "check": "OpenDSS validator active (gate checks > 0, fallbacks counted)",
+  "passed": true,
+  "detail": "fallbacks_to_rules total=431"
+ },
+ {
+  "check": "no OpenDSS convergence failures in any final run",
+  "passed": true,
+  "detail": ""
+ },
+ {
+  "check": "energy balance reconciles (|residual| < tolerance in every run)",
+  "passed": true,
+  "detail": "max |res| = 0.0070 kWh"
+ },
+ {
+  "check": "PV accounting: physical curtailment never negative; available = delivered + curtailed",
+  "passed": true,
+  "detail": "min raw curtail -0.00e+00 kW"
+ },
+ {
+  "check": "fairness tracking (per-group burden recorded for B/C/D, households only)",
+  "passed": true,
+  "detail": ""
+ },
+ {
+  "check": "sensitivity dimensions (30 node-phases x 9 resources, finite)",
+  "passed": true,
+  "detail": "(30, 9)"
+ },
+ {
+  "check": "sensitivity model RMSE(V_pred, V_OpenDSS) is lower than no-action forecast base",
+  "passed": true,
+  "detail": "[{'controller': 'C', 'rmse_pred_vs_opendss_pu': 0.0083, 'rmse_forecast_base_no_action_pu': 0.0103, 'steps': 128}, {'controller': 'D', 'rmse_pred_vs_opendss_pu': 0.0081, 'rmse_forecast_base_no_action_pu': 0.0095, 'steps': 128}]"
+ },
+ {
+  "check": "fallback ladder: all 7 injected faults ended with hard limits respected and safety maintained",
+  "passed": true,
+  "detail": "7/7"
+ },
+ {
+  "check": "DISCOM dispatch: every request answered accepted/partial/rejected/no_response with a reason (planner reply)",
+  "passed": true,
+  "detail": "{'accepted': np.int64(4), 'partial': np.int64(2), 'no_response': np.int64(1)}"
+ },
+ {
+  "check": "DISCOM outcome check (informational): requests whose simulated outcome met the request",
+  "passed": true,
+  "detail": "met 0 of 7; planner said accepted for 4, verified accepted for 0 (see FINAL_REPORT)"
+ },
+ {
+  "check": "communication loss: no solver / convergence failures during outages",
+  "passed": true,
+  "detail": ""
+ },
+ {
+  "check": "OpenPLC ST equivalence with Python rules",
+  "passed": true,
+  "detail": ""
+ },
+ {
+  "check": "reproducibility: no-control case A reruns bit-identical",
+  "passed": true,
+  "detail": "0 differing metrics []"
+ },
+ {
+  "check": "reproducibility: controlled case D rerun (KNOWN LIMITATION, measured not asserted: 1 s MILP limit makes plans load-dependent; check passes only if all rerun metrics are safe and within 25 %)",
+  "passed": true,
+  "detail": "23 of 86 metrics not bit-identical; headline rel diff max 0.8 %  {'under_pu_h': (0.395, 0.395), 'over_pu_h': (0.12, 0.121), 'peak_trafo_loading_pct': (58.9, 58.9), 'reverse_flow_energy_kWh': (299.4, 298.9)}  (140s)"
+ },
+ {
+  "final_status": "PASS"
+ }
+]

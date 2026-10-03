@@ -1,0 +1,5 @@
+tag,variant,scenario,run_s,wall_s,homes,planner_vars,planner_cons,mean_solve_s,hours_any_undervoltage,hours_any_overvoltage,under_pu_h,over_pu_h,peak_trafo_loading_pct,peak_neutral_loading_pct,reverse_flow_energy_kWh,curtailment_pct,ev_unmet_at_departure_kWh,unmet_water_m3,batt_throughput_kWh,batt_final_soc_pct,fallbacks_to_rules,solver_failures,convergence_failures,mip_time_limited_plans
+homes100,A,clear,0.3,142.3,100.0,,,,8.0,6.75,1.062,0.154,72.5,66.1,349.7,3.06,0.0,0.0,0.0,50.0,,,0.0,
+homes100,D,clear,140.4,142.3,100.0,10737.0,9621.0,1.09,11.75,6.25,0.398,0.123,58.9,66.8,300.8,2.47,0.0,0.0,161.8,46.6,9.0,0.0,0.0,108.0
+homes300,A,clear,3.5,168.2,300.0,,,,29.0,8.25,8.272,2.167,66.9,143.6,884.7,7.86,0.0,0.0,0.0,50.0,,,0.0,
+homes300,D,clear,150.7,168.2,300.0,11749.0,9645.0,1.099,28.5,10.25,9.517,1.791,69.8,204.3,764.0,8.75,18.16,0.0,936.0,10.0,70.0,84.0,7.0,44.0

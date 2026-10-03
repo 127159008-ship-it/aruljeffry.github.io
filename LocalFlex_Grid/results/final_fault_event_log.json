@@ -1,0 +1,106 @@
+{
+ "D_sup": [],
+ "D@F_solver_unavailable_sup": [
+  {
+   "k_start": 64,
+   "k_end": 67,
+   "hour": 16.0,
+   "cause": "solver_unavailable",
+   "action": "FALLBACK:previous_plan",
+   "duration_min": 60,
+   "safe": null
+  },
+  {
+   "k_start": 68,
+   "k_end": 75,
+   "hour": 17.0,
+   "cause": "solver_unavailable",
+   "action": "FALLBACK:rules",
+   "duration_min": 120,
+   "safe": null
+  }
+ ],
+ "D@F_opendss_convergence_failure_sup": [
+  {
+   "k_start": 64,
+   "k_end": 75,
+   "hour": 16.0,
+   "cause": "opendss_convergence_failure (trial solve rejected)",
+   "action": "FALLBACK:rules",
+   "duration_min": 180,
+   "safe": null
+  }
+ ],
+ "D@F_communication_lost_sup": [],
+ "D@F_stale_measurement_sup": [
+  {
+   "k_start": 64,
+   "k_end": 67,
+   "hour": 16.0,
+   "cause": "stale_measurement",
+   "action": "FALLBACK:previous_plan",
+   "duration_min": 60,
+   "safe": null
+  },
+  {
+   "k_start": 68,
+   "k_end": 75,
+   "hour": 17.0,
+   "cause": "stale_measurement",
+   "action": "FALLBACK:rules",
+   "duration_min": 120,
+   "safe": null
+  }
+ ],
+ "D@F_invalid_command_sup": [
+  {
+   "k_start": 64,
+   "k_end": 67,
+   "hour": 16.0,
+   "cause": "invalid_command",
+   "action": "FALLBACK:previous_plan",
+   "duration_min": 60,
+   "safe": null
+  },
+  {
+   "k_start": 68,
+   "k_end": 75,
+   "hour": 17.0,
+   "cause": "invalid_command",
+   "action": "FALLBACK:rules",
+   "duration_min": 120,
+   "safe": null
+  }
+ ],
+ "D@F_battery_unavailable_sup": [
+  {
+   "k_start": 72,
+   "k_end": 87,
+   "hour": 18.0,
+   "cause": "battery_unavailable",
+   "action": "REPLAN:battery=0",
+   "duration_min": 240,
+   "safe": null
+  }
+ ],
+ "D@F_forecast_missing_sup": [
+  {
+   "k_start": 64,
+   "k_end": 67,
+   "hour": 16.0,
+   "cause": "forecast_missing",
+   "action": "FALLBACK:previous_plan",
+   "duration_min": 60,
+   "safe": null
+  },
+  {
+   "k_start": 68,
+   "k_end": 75,
+   "hour": 17.0,
+   "cause": "forecast_missing",
+   "action": "FALLBACK:rules",
+   "duration_min": 120,
+   "safe": null
+  }
+ ]
+}

@@ -1,0 +1,210 @@
+[
+ {
+  "abs_step": 144,
+  "step": 48,
+  "hour": 12.0,
+  "constraint": "overvoltage",
+  "node_phase": "a5/A",
+  "V_forecast_no_action": 1.0766458621550676,
+  "V_pred_with_action": 1.06,
+  "candidates": [
+   {
+    "resource": "WH1",
+    "bus_phase": "a2/C",
+    "H_pu_per_kW": 0.0015450214021652808,
+    "natural_kW": 0.41791045619731787,
+    "planned_kW": -0.0,
+    "delta_kW": -0.41791045619731787,
+    "predicted_dV_at_node": -0.0006456805990135122,
+    "executed_kW": 0.0
+   },
+   {
+    "resource": "WH2",
+    "bus_phase": "a4/A",
+    "H_pu_per_kW": -0.0061484740594732745,
+    "natural_kW": 0.41791045619731787,
+    "planned_kW": 0.4837415706830657,
+    "delta_kW": 0.06583111448574785,
+    "predicted_dV_at_node": -0.000404760899721836,
+    "executed_kW": 0.4837415706830656
+   },
+   {
+    "resource": "WH3",
+    "bus_phase": "b3/B",
+    "H_pu_per_kW": -3.9044917888420017e-05,
+    "natural_kW": 0.41791045619731787,
+    "planned_kW": 0.4838968303157622,
+    "delta_kW": 0.06598637411844432,
+    "predicted_dV_at_node": -2.5764325592092223e-06,
+    "executed_kW": 0.4838968303157624
+   },
+   {
+    "resource": "WH4",
+    "bus_phase": "b5/A",
+    "H_pu_per_kW": -5.310917373324564e-05,
+    "natural_kW": 0.41791045619731787,
+    "planned_kW": 0.7442045038267299,
+    "delta_kW": 0.326294047629412,
+    "predicted_dV_at_node": -1.732920726367437e-05,
+    "executed_kW": 0.7442045038267298
+   },
+   {
+    "resource": "PUMP1",
+    "bus_phase": "a3/A",
+    "H_pu_per_kW": -0.005474946933647251,
+    "natural_kW": 0.0,
+    "planned_kW": 0.8530510777086187,
+    "delta_kW": 0.8530510777086187,
+    "predicted_dV_at_node": -0.0046704093821452845,
+    "executed_kW": 0.8800000000000001
+   },
+   {
+    "resource": "PUMP2",
+    "bus_phase": "b2/C",
+    "H_pu_per_kW": 2.3942596094395086e-05,
+    "natural_kW": 0.0,
+    "planned_kW": -0.0,
+    "delta_kW": -0.0,
+    "predicted_dV_at_node": -0.0,
+    "executed_kW": 0.0
+   },
+   {
+    "resource": "EV1",
+    "bus_phase": "a5/A",
+    "H_pu_per_kW": -0.008447597505775617,
+    "natural_kW": 0.0,
+    "planned_kW": -0.0,
+    "delta_kW": -0.0,
+    "predicted_dV_at_node": 0.0,
+    "executed_kW": 0.0
+   },
+   {
+    "resource": "EV2",
+    "bus_phase": "b4/B",
+    "H_pu_per_kW": -3.659366392438912e-05,
+    "natural_kW": 0.0,
+    "planned_kW": -0.0,
+    "delta_kW": -0.0,
+    "predicted_dV_at_node": 0.0,
+    "executed_kW": 0.0
+   },
+   {
+    "resource": "BATT",
+    "bus_phase": "a4/3-phase",
+    "H_pu_per_kW": -0.0008983179043204892,
+    "natural_kW": 0.0,
+    "planned_kW": 12.13947265429711,
+    "delta_kW": 12.13947265429711,
+    "predicted_dV_at_node": -0.010905105634364066,
+    "executed_kW": 12.13947265429711
+   }
+  ],
+  "regime": "midday",
+  "V_nonlinear_OpenDSS_after_execution": 1.0715674301732774,
+  "V_nonlinear_OpenDSS_no_control_A": 1.0752797245107062
+ },
+ {
+  "abs_step": 172,
+  "step": 76,
+  "hour": 19.0,
+  "constraint": "undervoltage",
+  "node_phase": "a5/A",
+  "V_forecast_no_action": 0.906003866856906,
+  "V_pred_with_action": 0.94,
+  "candidates": [
+   {
+    "resource": "WH1",
+    "bus_phase": "a2/C",
+    "H_pu_per_kW": 0.0010993801906364897,
+    "natural_kW": 2.144584055492455,
+    "planned_kW": 8.866477757965715,
+    "delta_kW": 6.72189370247326,
+    "predicted_dV_at_node": 0.007389916780063272,
+    "executed_kW": 0.0
+   },
+   {
+    "resource": "WH2",
+    "bus_phase": "a4/A",
+    "H_pu_per_kW": -0.005385752439019953,
+    "natural_kW": 2.144584055492455,
+    "planned_kW": -0.0,
+    "delta_kW": -2.144584055492455,
+    "predicted_dV_at_node": 0.011550198807551792,
+    "executed_kW": 0.0
+   },
+   {
+    "resource": "WH3",
+    "bus_phase": "b3/B",
+    "H_pu_per_kW": 3.4293917721028855e-05,
+    "natural_kW": 2.144584055492455,
+    "planned_kW": -0.0,
+    "delta_kW": -2.144584055492455,
+    "predicted_dV_at_node": -7.354618914488864e-05,
+    "executed_kW": 0.0
+   },
+   {
+    "resource": "WH4",
+    "bus_phase": "b5/A",
+    "H_pu_per_kW": -8.572456043121068e-05,
+    "natural_kW": 2.144584055492455,
+    "planned_kW": 0.13369617453477214,
+    "delta_kW": -2.010887880957683,
+    "predicted_dV_at_node": 0.0001723824796715461,
+    "executed_kW": 0.0
+   },
+   {
+    "resource": "PUMP1",
+    "bus_phase": "a3/A",
+    "H_pu_per_kW": -0.0048825234949657625,
+    "natural_kW": 0.0,
+    "planned_kW": -0.0,
+    "delta_kW": -0.0,
+    "predicted_dV_at_node": 0.0,
+    "executed_kW": 0.0
+   },
+   {
+    "resource": "PUMP2",
+    "bus_phase": "b2/C",
+    "H_pu_per_kW": -4.3294511971936345e-05,
+    "natural_kW": 0.0,
+    "planned_kW": -0.0,
+    "delta_kW": -0.0,
+    "predicted_dV_at_node": 0.0,
+    "executed_kW": 2.2
+   },
+   {
+    "resource": "EV1",
+    "bus_phase": "a5/A",
+    "H_pu_per_kW": -0.0074906099172122875,
+    "natural_kW": 1.9999999999999998,
+    "planned_kW": -0.0,
+    "delta_kW": -1.9999999999999998,
+    "predicted_dV_at_node": 0.014981219834424573,
+    "executed_kW": 0.0
+   },
+   {
+    "resource": "EV2",
+    "bus_phase": "b4/B",
+    "H_pu_per_kW": 2.747378899592423e-05,
+    "natural_kW": 2.400000000000001,
+    "planned_kW": 1.5250362490606848,
+    "delta_kW": -0.874963750939316,
+    "predicted_dV_at_node": -2.403856947238917e-05,
+    "executed_kW": 0.0
+   },
+   {
+    "resource": "BATT",
+    "bus_phase": "a4/3-phase",
+    "H_pu_per_kW": -0.0007863413205277947,
+    "natural_kW": 0.0,
+    "planned_kW": -0.0,
+    "delta_kW": -0.0,
+    "predicted_dV_at_node": 0.0,
+    "executed_kW": -21.467942914906583
+   }
+  ],
+  "regime": "evening",
+  "V_nonlinear_OpenDSS_after_execution": 0.9431071256663845,
+  "V_nonlinear_OpenDSS_no_control_A": 0.9016635497612129
+ }
+]

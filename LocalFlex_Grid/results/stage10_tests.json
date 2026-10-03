@@ -1,0 +1,38 @@
+{
+ "battery_exclusivity: simultaneous charge+discharge steps anywhere in C / D plans (C9raw for comparison)": [
+  0,
+  0,
+  0
+ ],
+ "plans solved C / D": [
+  2048,
+  2048
+ ],
+ "MILP plans stopped at 1 s limit (feasible incumbent, gap<=2% not proven) C / D": [
+  205,
+  1155
+ ],
+ "initial battery SoC (%) all runs": [
+  50.0
+ ],
+ "all_runs_convergence_failures": 0,
+ "max_power_balance_residual_kW": 0.0035,
+ "solver_failures C / D": [
+  0,
+  0
+ ],
+ "C battery final SoC min / D battery final SoC min (%)": [
+  50.0,
+  50.0
+ ],
+ "EV unmet at departure: max over runs C / D (kWh)": [
+  1.11,
+  3.1
+ ],
+ "unmet water max (m3)": 0.0,
+ "comm: every comm variant had 0 solver failures and 0 convergence failures": true,
+ "comm: dispatch_up peak import 18-22 vs D (kW)": [
+  139.5,
+  139.5
+ ]
+}

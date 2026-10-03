@@ -1,0 +1,5 @@
+variant,lam,worst_B,under_pu_h,over_pu_h,hours_any_undervoltage,pv_curtailed_kWh,ev_unmet_at_departure_kWh,batt_throughput_kWh,fallbacks_to_rules
+C,0.0,1.1629456171136392,0.352,0.121,12.5,22.1,0.0,206.1,11.0
+D@lam100,100.0,0.91760930309988,0.345,0.124,10.5,22.6,0.0,140.9,9.0
+D,500.0,0.9729879134387912,0.398,0.121,12.0,22.1,0.0,160.9,9.0
+D@lam2000,2000.0,0.6232727146951608,0.525,0.125,9.5,22.9,0.04,185.0,35.0

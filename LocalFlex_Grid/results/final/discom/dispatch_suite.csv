@@ -1,0 +1,8 @@
+request,status,reason,baseline_mean_import_kW,actual_mean_import_kW,mean_import_reduction_kW,min_step_reduction_kW,baseline_peak_export_kW,actual_peak_export_kW,ev_unmet_kWh,ev_unmet_baseline_kWh,undervolt_pu_h,undervolt_pu_h_baseline,fallbacks,solver_failures,convergence_failures,msgs_lost_up,requests_lost
+"R1 reduce import 20 kW, 18:30-19:30",accepted,plan meets the request within validator limits,109.4,103.1,6.3,-0.0,0.0,0.0,0.0,0.0,0.392,0.395,10,0,0,0,0
+"R2 reduce import 60 kW, 18:30-19:30",partial,"planner can deliver about 37 kW of the 60 kW requested; remaining shortfall 23 kW (EV deadlines, tank/heater service floors, battery reserve/limits)",109.4,70.0,39.4,19.4,0.0,0.0,0.0,0.0,0.402,0.394,6,0,0,0,0
+"R3 reduce import 150 kW, 18:30-19:30",partial,"planner can deliver about 49 kW of the 150 kW requested; remaining shortfall 101 kW (EV deadlines, tank/heater service floors, battery reserve/limits)",109.4,69.0,40.4,19.4,0.0,0.0,0.0,0.0,0.409,0.388,6,0,0,0,0
+"R4 import cap 120 kW, 18:00-22:00",accepted,plan meets the request within validator limits,108.8,106.8,2.0,-51.0,0.0,0.0,0.0,0.0,0.429,0.394,8,0,0,0,0
+"R5 export cap 5 kW, 11:00-14:00",accepted,plan meets the request within validator limits,0.0,0.0,0.0,0.0,58.4,57.3,1.97,2.72,0.354,0.343,23,0,0,0,0
+R6 = R1 with link lost before request (17:00-18:00),no_response,request lost: link down at issue time; DISCOM receives no acknowledgement and must time out,109.4,109.4,0.0,-0.0,0.0,0.0,0.0,2.72,0.39,0.343,9,0,0,4,1
+R7 = R1 with link lost after request (17:45-20:00),accepted,plan meets the request within validator limits,109.4,103.1,6.3,-0.0,0.0,0.0,1.99,0.0,0.349,0.397,24,0,0,9,0

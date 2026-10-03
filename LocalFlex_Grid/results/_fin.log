@@ -1,0 +1,97 @@
+                   hours_any_overvoltage  hours_any_undervoltage  under_pu_h  over_pu_h  v_min_pu  peak_trafo_loading_pct  reverse_flow_energy_kWh  pv_curtailed_kWh  ev_unmet_at_departure_kWh  batt_final_soc_pct  batt_throughput_kWh  fallbacks_to_rules
+clear       A                      6.850                   7.000       1.072      0.155     0.860                  72.600                  349.460            27.920                      0.000               50.00                0.000                 NaN
+            B                      6.062                   7.625       0.702      0.134     0.835                  66.175                  302.775            24.275                      1.210               10.00              128.100                 NaN
+            C8                     5.812                   6.500       0.532      0.131     0.878                  66.775                  286.875            24.150                      0.000               50.00              134.525               17.50
+            C9raw                  6.312                   6.438       0.300      0.119     0.882                  58.525                  300.850            21.750                      0.000               50.00              170.350                5.50
+            C                      6.375                   6.312       0.302      0.119     0.882                  58.525                  300.525            21.775                      0.000               50.00              173.700                5.75
+            D                      6.438                   6.375       0.316      0.122     0.883                  58.300                  301.800            22.125                      0.872               49.15              160.350               16.25
+cloudy      A                      4.625                   7.062       1.076      0.080     0.861                  72.625                  210.325            13.925                      0.000               50.00                0.000                 NaN
+            B                      3.875                   7.750       0.700      0.064     0.835                  66.300                  171.325            10.950                      1.210               10.00              128.100                 NaN
+            C8                     3.438                   5.625       0.554      0.057     0.877                  67.550                  149.450            10.000                      0.000               50.00              133.075               15.50
+            C9raw                  3.875                   6.062       0.296      0.055     0.882                  58.375                  159.000             9.525                      0.000               50.00              170.550                5.25
+            C                      3.750                   6.188       0.303      0.054     0.880                  57.700                  159.325             9.450                      0.000               50.00              170.550                7.00
+            D                      4.062                   5.875       0.324      0.056     0.882                  58.550                  177.475             9.750                      0.718               50.00              151.550               18.50
+high_solar  A                      7.062                   6.125       0.559      0.210     0.875                  56.825                  436.375            35.950                      0.000               50.00                0.000                 NaN
+            B                      6.750                   6.188       0.395      0.184     0.856                  53.950                  390.375            31.850                      0.710               10.00              128.100                 NaN
+            C8                     6.562                   4.562       0.160      0.190     0.903                  49.750                  379.200            32.525                      0.000               50.00              126.900                9.50
+            C9raw                  6.625                   4.438       0.068      0.166     0.913                  44.775                  381.950            28.675                      0.000               50.00              186.750                7.00
+            C                      6.750                   4.812       0.070      0.170     0.913                  44.825                  380.225            29.300                      0.000               50.00              207.300               12.00
+            D                      6.750                   5.312       0.077      0.172     0.915                  45.675                  390.625            29.850                      0.528               50.00              191.375               22.50
+high_demand A                      0.000                   8.938       1.803      0.000     0.845                  87.975                    0.000             0.000                      0.000               50.00                0.000                 NaN
+            B                      0.000                   8.125       1.372      0.000     0.812                  85.050                    0.000             0.000                      1.612               10.00               38.000                 NaN
+            C8                     0.000                   7.688       1.160      0.000     0.842                  80.600                    0.000             0.000                      0.000               50.00              238.950                4.75
+            C9raw                  0.000                   8.438       0.782      0.000     0.852                  73.975                    0.000             0.000                      0.832               50.00              291.550                5.50
+            C                      0.000                   9.062       0.789      0.000     0.852                  74.225                    0.000             0.000                      0.663               50.00              286.850                8.25
+            D                      0.000                   9.188       0.808      0.000     0.853                  74.800                    0.000             0.000                      0.327               50.00              266.225               15.50
+                     worst_B  mean_B  max_over_mean   jain  worst_B_incl_curtail
+scenario    variant                                                             
+clear       A          0.000   0.000          0.000  1.000                 0.286
+            B          1.122   0.431          2.596  0.519                 1.358
+            C          1.162   0.924          1.257  0.942                 1.339
+            C8         0.932   0.775          1.205  0.987                 1.167
+            C9raw      1.176   0.919          1.279  0.937                 1.333
+            D          1.293   0.651          2.009  0.811                 1.508
+cloudy      A          0.000   0.000          0.000  1.000                 0.142
+            B          1.122   0.438          2.551  0.533                 1.229
+            C          1.199   0.927          1.293  0.930                 1.264
+            C8         0.931   0.793          1.178  0.991                 1.029
+            C9raw      1.160   0.919          1.262  0.935                 1.228
+            D          1.235   0.646          1.901  0.838                 1.330
+high_demand A          0.000   0.000          0.000  1.000                 0.000
+            B          1.284   0.536          2.387  0.618                 1.284
+            C          1.486   0.942          1.582  0.873                 1.486
+            C8         1.545   1.223          1.263  0.935                 1.545
+            C9raw      1.489   1.032          1.449  0.907                 1.489
+            D          1.129   0.818          1.395  0.917                 1.129
+high_solar  A          0.000   0.000          0.000  1.000                 0.368
+            B          0.908   0.377          2.406  0.514                 1.218
+            C          1.304   1.007          1.292  0.914                 1.436
+            C8         1.102   1.005          1.096  0.988                 1.404
+            C9raw      1.315   1.002          1.312  0.909                 1.408
+            D          0.917   0.340          2.687  0.624                 1.207
+  variant    lam  worst_B  under_pu_h  hours_any_undervoltage  pv_curtailed_kWh  ev_unmet_at_departure_kWh  fallbacks_to_rules
+        C    0.0 1.163265       0.322                    6.75              22.1                       0.00                11.0
+ D@lam100  100.0 0.942212       0.314                    5.75              22.1                       0.00                 9.0
+        D  500.0 0.965823       0.321                    6.25              22.1                       0.00                 9.0
+D@lam2000 2000.0 0.526839       0.524                    6.25              22.9                       0.05                35.0
+               variant  import_peak_18_22_kW  peak_trafo_loading_pct  peak_phase_loading_pct  v_min_pu  under_pu_h  ev_unmet_at_departure_kWh  batt_final_soc_pct  msgs_lost_to_discom  requests_lost_from_discom  steps_with_dispatch_cap  solver_failures  convergence_failures
+                     D                 139.5                    58.9                    78.0     0.884       0.321                        0.0                46.6                  NaN                        NaN                      NaN              0.0                     0
+         D@dispatch_up                 139.5                    58.9                    78.0     0.886       0.317                        2.0                41.1                  0.0                        0.0                     29.0              0.0                     0
+D@dispatch_lost_before                 139.5                    58.9                    78.0     0.884       0.322                        0.0                40.6                 26.0                        1.0                      0.0              0.0                     0
+ D@dispatch_lost_after                 139.5                    58.9                    78.0     0.886       0.322                        0.0                50.0                 22.0                        0.0                     29.0              0.0                     0
+{
+ "battery_exclusivity: simultaneous charge+discharge steps anywhere in C / D plans (C9raw for comparison)": [
+  0,
+  0,
+  0
+ ],
+ "plans solved C / D": [
+  2048,
+  2048
+ ],
+ "MILP plans stopped at 1 s limit (feasible incumbent, gap<=2% not proven) C / D": [
+  214,
+  1174
+ ],
+ "initial battery SoC (%)": "50.0 for every case: all cases are deep copies of ONE state snapshot (the csv column batt_initial_soc_pct is the SoC after the first 15-min step, not the initial value)",
+ "all_runs_convergence_failures": 0,
+ "max_power_balance_residual_kW": 0.003,
+ "solver_failures C / D": [
+  0,
+  0
+ ],
+ "C battery final SoC min / D battery final SoC min (%)": [
+  50.0,
+  46.6
+ ],
+ "EV unmet at departure: max over runs C / D (kWh)": [
+  1.11,
+  2.87
+ ],
+ "unmet water max (m3)": 0.0,
+ "comm: every comm variant had 0 solver failures and 0 convergence failures": true,
+ "comm: dispatch_up peak import 18-22 vs D (kW)": [
+  139.5,
+  139.5
+ ]
+}

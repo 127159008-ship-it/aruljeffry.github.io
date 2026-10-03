@@ -1,0 +1,17 @@
+scenario,variant,reverse_flow_hours,reverse_flow_energy_kWh,peak_export_kW,export_energy_kWh
+clear,A,8.0,349.4,59.28,349.398
+clear,B,7.875,302.775,59.137,302.777
+clear,C,7.938,300.5,63.827,300.516
+clear,D,7.875,300.375,63.462,300.394
+cloudy,A,6.75,210.325,52.786,210.347
+cloudy,B,6.25,171.325,49.876,171.332
+cloudy,C,6.0,159.1,46.866,159.11
+cloudy,D,6.125,166.7,52.015,166.706
+high_demand,A,0.0,0.0,0.0,0.0
+high_demand,B,0.0,0.0,0.0,0.0
+high_demand,C,0.0,0.0,0.0,0.0
+high_demand,D,0.0,0.0,0.0,0.0
+high_solar,A,8.5,436.375,69.148,436.378
+high_solar,B,8.562,390.375,69.165,390.369
+high_solar,C,8.5,380.15,80.338,380.134
+high_solar,D,8.438,388.5,75.362,388.502

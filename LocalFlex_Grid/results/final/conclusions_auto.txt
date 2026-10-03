@@ -1,0 +1,16 @@
+[clear] voltage violation magnitude (pu-h, under+over): A 1.237, B 0.970, C 0.463, D 0.484; C vs A -63%, D vs C +5%.
+[clear] hours with any under-voltage: A 7.94, B 11.38, C 11.94, D 11.06.
+[clear] transformer peak loading %: A 72.6, B 66.2, C 58.5, D 58.5; reverse-flow energy kWh: A 349.4, C 300.5, D 300.4; PV curtailed %: A 3.08, C 2.40, D 2.43.
+[clear] EV unmet kWh: A 0.00, B 1.21, C 0.00, D 1.28; D vs C worst-group burden 1.16 -> 1.43, fairness index 0.94 -> 0.78.
+[cloudy] voltage violation magnitude (pu-h, under+over): A 1.164, B 0.905, C 0.404, D 0.425; C vs A -65%, D vs C +5%.
+[cloudy] hours with any under-voltage: A 8.06, B 11.50, C 11.56, D 10.38.
+[cloudy] transformer peak loading %: A 72.6, B 66.3, C 57.7, D 61.4; reverse-flow energy kWh: A 210.3, C 159.1, D 166.7; PV curtailed %: A 1.97, C 1.34, D 1.35.
+[cloudy] EV unmet kWh: A 0.00, B 1.21, C 0.00, D 1.31; D vs C worst-group burden 1.20 -> 1.46, fairness index 0.93 -> 0.81.
+[high_solar] voltage violation magnitude (pu-h, under+over): A 0.769, B 0.663, C 0.265, D 0.268; C vs A -66%, D vs C +1%.
+[high_solar] hours with any under-voltage: A 6.38, B 9.44, C 8.44, D 8.06.
+[high_solar] transformer peak loading %: A 56.8, B 54.0, C 44.8, D 46.5; reverse-flow energy kWh: A 436.4, C 380.1, D 388.5; PV curtailed %: A 3.96, C 3.22, D 3.25.
+[high_solar] EV unmet kWh: A 0.00, B 0.71, C 0.00, D 0.34; D vs C worst-group burden 1.31 -> 0.85, fairness index 0.91 -> 0.63.
+[high_demand] voltage violation magnitude (pu-h, under+over): A 1.868, B 1.605, C 0.865, D 0.890; C vs A -54%, D vs C +3%.
+[high_demand] hours with any under-voltage: A 11.19, B 13.62, C 16.25, D 16.00.
+[high_demand] transformer peak loading %: A 88.0, B 85.0, C 74.2, D 75.2; reverse-flow energy kWh: A 0.0, C 0.0, D 0.0; PV curtailed %: A 0.00, C 0.00, D 0.00.
+[high_demand] EV unmet kWh: A 0.00, B 1.61, C 0.66, D 0.21; D vs C worst-group burden 1.49 -> 1.08, fairness index 0.87 -> 0.92.

@@ -1,0 +1,7 @@
+services:
+  api:
+    build: .
+    ports: ["8000:8000"]
+    environment: { CORS_ORIGINS: "http://localhost:5173", LOCALFLEX_DATA_DIR: /data }
+    volumes: ["lfdata:/data"]
+volumes: { lfdata: {} }

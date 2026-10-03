@@ -1,0 +1,434 @@
+[
+ {
+  "abs_step": 144,
+  "step": 48,
+  "hour": 12.0,
+  "constraint": "overvoltage",
+  "node_phase": "a5/A",
+  "V_forecast_no_action": 1.0766458621550676,
+  "V_pred_with_action": 1.0672831103849276,
+  "candidates": [
+   {
+    "resource": "WH1",
+    "bus_phase": "a2/C",
+    "H_pu_per_kW": 0.0015450214021652808,
+    "natural_kW": 0.41791045619731787,
+    "planned_kW": 0.0,
+    "delta_kW": -0.41791045619731787,
+    "predicted_dV_at_node": -0.0006456805990135122
+   },
+   {
+    "resource": "WH2",
+    "bus_phase": "a4/A",
+    "H_pu_per_kW": -0.0061484740594732745,
+    "natural_kW": 0.41791045619731787,
+    "planned_kW": 0.4835206570457258,
+    "delta_kW": 0.0656102008484079,
+    "predicted_dV_at_node": -0.00040340261795326747
+   },
+   {
+    "resource": "WH3",
+    "bus_phase": "b3/B",
+    "H_pu_per_kW": -3.9044917888420017e-05,
+    "natural_kW": 0.41791045619731787,
+    "planned_kW": 0.11203417814193367,
+    "delta_kW": -0.3058762780553842,
+    "predicted_dV_at_node": 1.1942914160688005e-05
+   },
+   {
+    "resource": "WH4",
+    "bus_phase": "b5/A",
+    "H_pu_per_kW": -5.310917373324564e-05,
+    "natural_kW": 0.41791045619731787,
+    "planned_kW": 0.7443163745286119,
+    "delta_kW": 0.326405918331294,
+    "predicted_dV_at_node": -1.7335148624216283e-05
+   },
+   {
+    "resource": "PUMP1",
+    "bus_phase": "a3/A",
+    "H_pu_per_kW": -0.005474946933647251,
+    "natural_kW": 0.0,
+    "planned_kW": 0.0,
+    "delta_kW": 0.0,
+    "predicted_dV_at_node": -0.0
+   },
+   {
+    "resource": "PUMP2",
+    "bus_phase": "b2/C",
+    "H_pu_per_kW": 2.3942596094395086e-05,
+    "natural_kW": 0.0,
+    "planned_kW": 0.0,
+    "delta_kW": 0.0,
+    "predicted_dV_at_node": 0.0
+   },
+   {
+    "resource": "EV1",
+    "bus_phase": "a5/A",
+    "H_pu_per_kW": -0.008447597505775617,
+    "natural_kW": 0.0,
+    "planned_kW": 0.0,
+    "delta_kW": 0.0,
+    "predicted_dV_at_node": -0.0
+   },
+   {
+    "resource": "EV2",
+    "bus_phase": "b4/B",
+    "H_pu_per_kW": -3.659366392438912e-05,
+    "natural_kW": 0.0,
+    "planned_kW": 0.0,
+    "delta_kW": 0.0,
+    "predicted_dV_at_node": -0.0
+   },
+   {
+    "resource": "BATT",
+    "bus_phase": "a4/3-phase",
+    "H_pu_per_kW": -0.0008983179043204892,
+    "natural_kW": 0.0,
+    "planned_kW": 9.248703915118202,
+    "delta_kW": 9.248703915118202,
+    "predicted_dV_at_node": -0.008308276318709687
+   }
+  ],
+  "regime": "midday",
+  "executed": {
+   "WH1": 0.0,
+   "WH2": 0.04029338808714381,
+   "WH3": 0.009336181511827807,
+   "WH4": 0.06202636454405099,
+   "PUMP1": 0.0,
+   "PUMP2": 0.0,
+   "EV1": 0,
+   "EV2": 0,
+   "BATT": 9.248703915118202
+  },
+  "V_OpenDSS_after_execution": 1.0733883594879843,
+  "V_OpenDSS_no_control_A": 1.0752797245107062,
+  "validator": "executed command was gated by the OpenDSS trial solve; per-step verdict not logged (run-level fallback count in final_summary.csv)",
+  "controller": "C"
+ },
+ {
+  "abs_step": 172,
+  "step": 76,
+  "hour": 19.0,
+  "constraint": "undervoltage",
+  "node_phase": "a5/A",
+  "V_forecast_no_action": 0.906003866856906,
+  "V_pred_with_action": 0.94,
+  "candidates": [
+   {
+    "resource": "WH1",
+    "bus_phase": "a2/C",
+    "H_pu_per_kW": 0.0010993801906364897,
+    "natural_kW": 2.144584055492455,
+    "planned_kW": 8.866477757965715,
+    "delta_kW": 6.72189370247326,
+    "predicted_dV_at_node": 0.007389916780063272
+   },
+   {
+    "resource": "WH2",
+    "bus_phase": "a4/A",
+    "H_pu_per_kW": -0.005385752439019953,
+    "natural_kW": 2.144584055492455,
+    "planned_kW": -0.0,
+    "delta_kW": -2.144584055492455,
+    "predicted_dV_at_node": 0.011550198807551792
+   },
+   {
+    "resource": "WH3",
+    "bus_phase": "b3/B",
+    "H_pu_per_kW": 3.4293917721028855e-05,
+    "natural_kW": 2.144584055492455,
+    "planned_kW": 0.0,
+    "delta_kW": -2.144584055492455,
+    "predicted_dV_at_node": -7.354618914488864e-05
+   },
+   {
+    "resource": "WH4",
+    "bus_phase": "b5/A",
+    "H_pu_per_kW": -8.572456043121068e-05,
+    "natural_kW": 2.144584055492455,
+    "planned_kW": 0.13369617453477214,
+    "delta_kW": -2.010887880957683,
+    "predicted_dV_at_node": 0.0001723824796715461
+   },
+   {
+    "resource": "PUMP1",
+    "bus_phase": "a3/A",
+    "H_pu_per_kW": -0.0048825234949657625,
+    "natural_kW": 0.0,
+    "planned_kW": 0.0,
+    "delta_kW": 0.0,
+    "predicted_dV_at_node": -0.0
+   },
+   {
+    "resource": "PUMP2",
+    "bus_phase": "b2/C",
+    "H_pu_per_kW": -4.3294511971936345e-05,
+    "natural_kW": 0.0,
+    "planned_kW": 0.0,
+    "delta_kW": 0.0,
+    "predicted_dV_at_node": -0.0
+   },
+   {
+    "resource": "EV1",
+    "bus_phase": "a5/A",
+    "H_pu_per_kW": -0.0074906099172122875,
+    "natural_kW": 1.9999999999999998,
+    "planned_kW": 0.0,
+    "delta_kW": -1.9999999999999998,
+    "predicted_dV_at_node": 0.014981219834424573
+   },
+   {
+    "resource": "EV2",
+    "bus_phase": "b4/B",
+    "H_pu_per_kW": 2.747378899592423e-05,
+    "natural_kW": 2.400000000000001,
+    "planned_kW": 1.5250362490606848,
+    "delta_kW": -0.874963750939316,
+    "predicted_dV_at_node": -2.403856947238917e-05
+   },
+   {
+    "resource": "BATT",
+    "bus_phase": "a4/3-phase",
+    "H_pu_per_kW": -0.0007863413205277947,
+    "natural_kW": 0.0,
+    "planned_kW": -0.0,
+    "delta_kW": -0.0,
+    "predicted_dV_at_node": 0.0
+   }
+  ],
+  "regime": "evening",
+  "executed": {
+   "WH1": 0.7388731464971429,
+   "WH2": 0.0,
+   "WH3": 0.0,
+   "WH4": 0.01114134787789768,
+   "PUMP1": 0.0,
+   "PUMP2": 0.0,
+   "EV1": 0.0,
+   "EV2": 1.5250362490606848,
+   "BATT": 0.0
+  },
+  "V_OpenDSS_after_execution": 0.9432027932781412,
+  "V_OpenDSS_no_control_A": 0.9016635497612129,
+  "validator": "executed command was gated by the OpenDSS trial solve; per-step verdict not logged (run-level fallback count in final_summary.csv)",
+  "controller": "C"
+ },
+ {
+  "abs_step": 144,
+  "step": 48,
+  "hour": 12.0,
+  "constraint": "overvoltage",
+  "node_phase": "a5/A",
+  "V_forecast_no_action": 1.0766458621550676,
+  "V_pred_with_action": 1.073603455113511,
+  "candidates": [
+   {
+    "resource": "WH1",
+    "bus_phase": "a2/C",
+    "H_pu_per_kW": 0.0015450214021652808,
+    "natural_kW": 0.41791045619731787,
+    "planned_kW": 0.0,
+    "delta_kW": -0.41791045619731787,
+    "predicted_dV_at_node": -0.0006456805990135122
+   },
+   {
+    "resource": "WH2",
+    "bus_phase": "a4/A",
+    "H_pu_per_kW": -0.0061484740594732745,
+    "natural_kW": 0.41791045619731787,
+    "planned_kW": 0.48353695341420655,
+    "delta_kW": 0.06562649721688868,
+    "predicted_dV_at_node": -0.0004035028157521351
+   },
+   {
+    "resource": "WH3",
+    "bus_phase": "b3/B",
+    "H_pu_per_kW": -3.9044917888420017e-05,
+    "natural_kW": 0.41791045619731787,
+    "planned_kW": 0.42641580368559423,
+    "delta_kW": 0.00850534748827636,
+    "predicted_dV_at_node": -3.320905942922299e-07
+   },
+   {
+    "resource": "WH4",
+    "bus_phase": "b5/A",
+    "H_pu_per_kW": -5.310917373324564e-05,
+    "natural_kW": 0.41791045619731787,
+    "planned_kW": 0.8404949653825099,
+    "delta_kW": 0.422584509185192,
+    "predicted_dV_at_node": -2.2443114115294703e-05
+   },
+   {
+    "resource": "PUMP1",
+    "bus_phase": "a3/A",
+    "H_pu_per_kW": -0.005474946933647251,
+    "natural_kW": 0.0,
+    "planned_kW": 0.35990274352646595,
+    "delta_kW": 0.35990274352646595,
+    "predicted_dV_at_node": -0.001970448422081458
+   },
+   {
+    "resource": "PUMP2",
+    "bus_phase": "b2/C",
+    "H_pu_per_kW": 2.3942596094395086e-05,
+    "natural_kW": 0.0,
+    "planned_kW": 0.0,
+    "delta_kW": 0.0,
+    "predicted_dV_at_node": 0.0
+   },
+   {
+    "resource": "EV1",
+    "bus_phase": "a5/A",
+    "H_pu_per_kW": -0.008447597505775617,
+    "natural_kW": 0.0,
+    "planned_kW": 0.0,
+    "delta_kW": 0.0,
+    "predicted_dV_at_node": -0.0
+   },
+   {
+    "resource": "EV2",
+    "bus_phase": "b4/B",
+    "H_pu_per_kW": -3.659366392438912e-05,
+    "natural_kW": 0.0,
+    "planned_kW": 0.0,
+    "delta_kW": 0.0,
+    "predicted_dV_at_node": -0.0
+   },
+   {
+    "resource": "BATT",
+    "bus_phase": "a4/3-phase",
+    "H_pu_per_kW": -0.0008983179043204892,
+    "natural_kW": 0.0,
+    "planned_kW": 0.0,
+    "delta_kW": 0.0,
+    "predicted_dV_at_node": -0.0
+   }
+  ],
+  "regime": "midday",
+  "executed": {
+   "WH1": 0.0,
+   "WH2": 0.04029474611785055,
+   "WH3": 0.035534650307132855,
+   "WH4": 0.07004124711520916,
+   "PUMP1": 0.1635921561483936,
+   "PUMP2": 0.0,
+   "EV1": 0,
+   "EV2": 0,
+   "BATT": -0.0
+  },
+  "V_OpenDSS_after_execution": 1.0746523079374768,
+  "V_OpenDSS_no_control_A": 1.0752797245107062,
+  "validator": "executed command was gated by the OpenDSS trial solve; per-step verdict not logged (run-level fallback count in final_summary.csv)",
+  "controller": "D"
+ },
+ {
+  "abs_step": 172,
+  "step": 76,
+  "hour": 19.0,
+  "constraint": "undervoltage",
+  "node_phase": "a5/A",
+  "V_forecast_no_action": 0.906003866856906,
+  "V_pred_with_action": 0.94,
+  "candidates": [
+   {
+    "resource": "WH1",
+    "bus_phase": "a2/C",
+    "H_pu_per_kW": 0.0010993801906364897,
+    "natural_kW": 2.144584055492455,
+    "planned_kW": 8.866477757965715,
+    "delta_kW": 6.72189370247326,
+    "predicted_dV_at_node": 0.007389916780063272
+   },
+   {
+    "resource": "WH2",
+    "bus_phase": "a4/A",
+    "H_pu_per_kW": -0.005385752439019953,
+    "natural_kW": 2.144584055492455,
+    "planned_kW": 0.0,
+    "delta_kW": -2.144584055492455,
+    "predicted_dV_at_node": 0.011550198807551792
+   },
+   {
+    "resource": "WH3",
+    "bus_phase": "b3/B",
+    "H_pu_per_kW": 3.4293917721028855e-05,
+    "natural_kW": 2.144584055492455,
+    "planned_kW": 0.0,
+    "delta_kW": -2.144584055492455,
+    "predicted_dV_at_node": -7.354618914488864e-05
+   },
+   {
+    "resource": "WH4",
+    "bus_phase": "b5/A",
+    "H_pu_per_kW": -8.572456043121068e-05,
+    "natural_kW": 2.144584055492455,
+    "planned_kW": 0.13369617453477206,
+    "delta_kW": -2.010887880957683,
+    "predicted_dV_at_node": 0.0001723824796715461
+   },
+   {
+    "resource": "PUMP1",
+    "bus_phase": "a3/A",
+    "H_pu_per_kW": -0.0048825234949657625,
+    "natural_kW": 0.0,
+    "planned_kW": 0.0,
+    "delta_kW": 0.0,
+    "predicted_dV_at_node": -0.0
+   },
+   {
+    "resource": "PUMP2",
+    "bus_phase": "b2/C",
+    "H_pu_per_kW": -4.3294511971936345e-05,
+    "natural_kW": 0.0,
+    "planned_kW": 0.0,
+    "delta_kW": 0.0,
+    "predicted_dV_at_node": -0.0
+   },
+   {
+    "resource": "EV1",
+    "bus_phase": "a5/A",
+    "H_pu_per_kW": -0.0074906099172122875,
+    "natural_kW": 1.9999999999999998,
+    "planned_kW": 0.0,
+    "delta_kW": -1.9999999999999998,
+    "predicted_dV_at_node": 0.014981219834424573
+   },
+   {
+    "resource": "EV2",
+    "bus_phase": "b4/B",
+    "H_pu_per_kW": 2.747378899592423e-05,
+    "natural_kW": 2.400000000000001,
+    "planned_kW": 1.5250362490606848,
+    "delta_kW": -0.874963750939316,
+    "predicted_dV_at_node": -2.403856947238917e-05
+   },
+   {
+    "resource": "BATT",
+    "bus_phase": "a4/3-phase",
+    "H_pu_per_kW": -0.0007863413205277947,
+    "natural_kW": 0.0,
+    "planned_kW": 0.0,
+    "delta_kW": 0.0,
+    "predicted_dV_at_node": -0.0
+   }
+  ],
+  "regime": "evening",
+  "executed": {
+   "WH1": 0.7388731464971429,
+   "WH2": 0.0,
+   "WH3": 0.0,
+   "WH4": 0.011141347877897672,
+   "PUMP1": 0.0,
+   "PUMP2": 0.0,
+   "EV1": 0.0,
+   "EV2": 1.5250362490606848,
+   "BATT": 0.0
+  },
+  "V_OpenDSS_after_execution": 0.9374319663558556,
+  "V_OpenDSS_no_control_A": 0.9016635497612129,
+  "validator": "executed command was gated by the OpenDSS trial solve; per-step verdict not logged (run-level fallback count in final_summary.csv)",
+  "controller": "D"
+ }
+]

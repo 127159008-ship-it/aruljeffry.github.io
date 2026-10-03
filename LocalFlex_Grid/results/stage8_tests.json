@@ -1,0 +1,26 @@
+{
+ "engine_regression_vs_stage6_max_abs_diff": 2.842170943040401e-14,
+ "forecast_differs_from_actual: demand MAPE %": 6.5,
+ "forecast_differs_from_actual: PV MAPE % (daylight)": 11.1,
+ "common_start_SoC_all_cases_pct": [
+  50.0
+ ],
+ "C_battery_end_SoC_min_pct": 50.0,
+ "C_ev_unmet_max_kWh": 0.0,
+ "C_unmet_water_max_m3": 0.0,
+ "C_solver_failures_total": 0,
+ "C_simultaneous_battery_charge_discharge_steps": 0,
+ "all_runs_convergence_failures": 0,
+ "C_fallback_steps_share_pct": 10.5,
+ "C_mean_solve_s": 0.036375000000000005,
+ "voltage_model": {
+  "a_hi": 1.03282,
+  "b_hi": -0.00034,
+  "r2_hi": 0.59501,
+  "rmse_hi": 0.01724,
+  "a_lo": 0.95905,
+  "b_lo": -0.00038,
+  "r2_lo": 0.55152,
+  "rmse_lo": 0.02098
+ }
+}

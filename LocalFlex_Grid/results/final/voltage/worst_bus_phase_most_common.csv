@@ -1,0 +1,17 @@
+scenario,variant,v_max_where,v_min_where
+clear,A,a5/A@11.00h,a5/A@20.25h
+clear,B,a5/A@12.00h,b5/A@19.50h
+clear,C,a5/A@11.75h,b5/A@20.00h
+clear,D,a5/A@11.25h,b5/A@19.75h
+cloudy,A,a5/A@12.50h,a5/A@20.25h
+cloudy,B,a5/A@12.50h,b5/A@19.50h
+cloudy,C,a5/A@11.75h,b5/A@20.00h
+cloudy,D,a5/A@11.75h,b5/A@20.00h
+high_demand,A,a5/A@12.50h,a5/A@20.25h
+high_demand,B,a5/C@23.50h,b5/A@19.25h
+high_demand,C,a5/C@0.00h,b5/A@20.00h
+high_demand,D,a5/C@0.00h,b5/A@20.00h
+high_solar,A,a5/A@12.00h,a5/A@20.25h
+high_solar,B,a5/A@12.00h,b5/A@19.50h
+high_solar,C,a5/A@11.25h,b5/A@20.00h
+high_solar,D,a5/A@11.75h,b5/A@20.00h

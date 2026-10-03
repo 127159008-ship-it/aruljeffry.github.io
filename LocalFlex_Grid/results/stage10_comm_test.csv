@@ -1,0 +1,5 @@
+variant,import_peak_18_22_kW,peak_trafo_loading_pct,peak_phase_loading_pct,v_min_pu,under_pu_h,ev_unmet_at_departure_kWh,batt_final_soc_pct,msgs_lost_to_discom,requests_lost_from_discom,steps_with_dispatch_cap,solver_failures,convergence_failures
+D,139.5,58.9,78.0,0.884,0.398,0.0,52.1,,,,0.0,0
+D@dispatch_up,139.5,58.9,77.9,0.885,0.369,1.77,50.0,0.0,0.0,29.0,0.0,0
+D@dispatch_lost_before,139.5,58.9,77.9,0.885,0.394,0.0,50.0,26.0,1.0,0.0,0.0,0
+D@dispatch_lost_after,139.5,58.9,77.9,0.885,0.351,1.69,50.0,22.0,0.0,29.0,0.0,0

@@ -1,0 +1,41 @@
+{
+ "matrix_shape_midday / evening (monitored x resources)": [
+  [
+   30,
+   9
+  ],
+  [
+   30,
+   9
+  ],
+  "30 node-phases x 9 resources"
+ ],
+ "reproducible_build_max_abs_diff": 0.0,
+ "own_node_phase_sensitivity_all_negative (load up -> own voltage down)": true,
+ "own_node_phase_H_range_pu_per_kW": [
+  -0.00845,
+  -0.00352
+ ],
+ "battery_H_all_negative": true,
+ "offphase_positive_entries_share_pct (neutral-shift coupling; physical)": [
+  44.4,
+  44.4
+ ],
+ "linearity_max_abs_err_pu_by_dP": {
+  "1.0": 7e-05,
+  "5.0": 0.00329,
+  "10.0": 0.01072
+ },
+ "C8_unchanged_vs_stage8_max_abs_diff": 0.0,
+ "all_runs_convergence_failures": 0,
+ "max_power_balance_residual_kW": 0.0034,
+ "C9_solver_failures": 0,
+ "C9_simultaneous_battery_steps": 347,
+ "C9_battery_end_SoC_min_pct": 50.0,
+ "C9_fallback_steps_share_pct": 5.9,
+ "prediction_error_V_pred_vs_OpenDSS (all node-phases, day 2, executed first step): rmse / max (pu)": [
+  0.0039,
+  0.1047
+ ],
+ "prediction_error_forecast_base_only (no H action term) rmse (pu)": 0.0114
+}

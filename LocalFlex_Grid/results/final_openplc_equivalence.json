@@ -1,0 +1,29 @@
+{
+ "vectors_per_block": 20000,
+ "skipped_near_threshold": 280,
+ "blocks": {
+  "WH": {
+   "n": 19943,
+   "mismatches": 0,
+   "max_abs_diff": 0.0
+  },
+  "PUMP": {
+   "n": 19937,
+   "mismatches": 0,
+   "max_abs_diff": 0.0
+  },
+  "EV": {
+   "n": 19944,
+   "mismatches": 0,
+   "max_abs_diff": 2.384185793236071e-08
+  },
+  "BATT": {
+   "n": 19896,
+   "mismatches": 0,
+   "max_abs_diff": 0.00018493614619785603
+  }
+ },
+ "pass_": true,
+ "compiler": "matiec iec2c (OpenPLC ST->C), gcc",
+ "scope": "per-group rule logic; not hardware"
+}

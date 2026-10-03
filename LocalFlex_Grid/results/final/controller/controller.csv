@@ -1,0 +1,17 @@
+scenario,variant,plans,mip_time_limited_plans,solver_failures,gate_checks,fallbacks_to_rules,convergence_failures,sup_events
+clear,A,,,,,,0.0,
+clear,B,,,,,,0.0,
+clear,C,128.0,23.0,0.0,128.0,5.75,0.0,0.0
+clear,D,128.0,97.0,0.0,128.0,17.25,0.0,0.0
+cloudy,A,,,,,,0.0,
+cloudy,B,,,,,,0.0,
+cloudy,C,128.0,3.5,0.0,128.0,7.0,0.0,0.0
+cloudy,D,128.0,69.5,0.0,128.0,21.25,0.0,0.0
+high_demand,A,,,,,,0.0,
+high_demand,B,,,,,,0.0,
+high_demand,C,128.0,1.5,0.0,128.0,8.25,0.0,0.0
+high_demand,D,128.0,7.75,0.0,128.0,15.5,0.0,0.0
+high_solar,A,,,,,,0.0,
+high_solar,B,,,,,,0.0,
+high_solar,C,128.0,20.0,0.0,128.0,10.5,0.0,0.0
+high_solar,D,128.0,105.25,0.0,128.0,22.25,0.0,0.0

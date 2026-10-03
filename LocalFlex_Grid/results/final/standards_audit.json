@@ -1,0 +1,86 @@
+[
+ {
+  "item": "LV voltage band 0.94-1.06 pu",
+  "status": "PARTIAL",
+  "finding": "Indian Electricity Rules 1956, Rule 54 (text read via Indian Kanoon): LV/MV supply voltage may not vary by more than 6 % from the declared voltage; HV +6/-9 %; EHV +10/-12.5 %. Rule 54 applies at the point where supply commences to the consumer; the model applies the band at every feeder node (conservative). Not checked: whether Rule 54 has been superseded or restated in the CEA safety/supply regulations, and the state-commission supply-code limits that actually bind a DISCOM.",
+  "source": "https://indiankanoon.org/doc/68250522/",
+  "action": "Keep as design band; cite as 'consistent with +/-6 % in IE Rule 54'; confirm current instrument + state supply code before claiming compliance."
+ },
+ {
+  "item": "Nominal voltage 415 V (3-ph) / 239.6 V (ph-n)",
+  "status": "PARTIAL",
+  "finding": "IS 1180 (Part 1):2014 presentation (ITMA) gives distribution-transformer secondary rated voltage as 433 V, 3-phase (250 V single-phase) at no load. The model uses 415 V nominal at the load side, which is the usual declared LV voltage; the 433 V no-load rating is not modelled (no tap/no-load rise).",
+  "source": "https://www.itma.org.in/presentations/Presentation%20on%20IS%201180-1%20-%20Distribution%20Transformers%20(1).pdf",
+  "action": "State that tap setting / no-load voltage rise is not modelled."
+ },
+ {
+  "item": "Transformer 250 kVA, 11/0.415 kV, delta-wye, 4.5 % impedance",
+  "status": "PARTIAL",
+  "finding": "250 kVA is a standard IS 1180 (Part 1):2014 three-phase rating (list 6.3...2500 kVA, read in the same source). The source states %impedance values are 'recommended values' but the figure for 250 kVA was not extracted; vector group (Dyn11) not confirmed in the text read. 4.5 % and 1 % load loss remain assumptions.",
+  "source": "https://www.itma.org.in/presentations/Presentation%20on%20IS%201180-1%20-%20Distribution%20Transformers%20(1).pdf",
+  "action": "Check IS 1180 Part 1 table for %Z and load-loss at 250 kVA and the vector group before quoting."
+ },
+ {
+  "item": "PV inverter volt-watt curve (v1 1.06, v2 1.10, p2 0.20)",
+  "status": "NOT VERIFIED",
+  "finding": "The curve is an IEEE 1547-2018-style placeholder. Could not retrieve IEEE 1547 numeric defaults from an accessible primary source this session (one US utility document read states volt-watt is OFF by default). The CEA draft 'Technical Standards for Connectivity to the Grid' Regulations, 2026 apply only at 33 kV and above (so not to LV rooftop PV); a 2018 CEA draft amendment for DG below 33 kV, as summarised by Mercom, covers protection, harmonics and DC injection and no volt-watt/volt-var requirement was found in what was read.",
+  "source": "https://cea.nic.in/wp-content/uploads/notification/2026/08/Draft_Central_Electricity_Authority_Technical_Standards_for_Connectivity_to_the_Grid_Regulations_2026.pdf ; https://www.mercomindia.com/cea-regulations-charging-rooftop",
+  "action": "Keep labelled 'prototype assumption (IEEE 1547-style)'. Do NOT call it an Indian requirement."
+ },
+ {
+  "item": "Cable / conductor / neutral parameters (r1 0.32, x1 0.08 ohm/km; neutral 0.64; ampacity 200 A phase, 100 A neutral)",
+  "status": "NOT VERIFIED",
+  "finding": "Generic LV four-wire placeholders; not matched to a specific IS cable datasheet (e.g. LT AB cable / XLPE). Neutral sized at half phase ampacity is a deliberate stress assumption.",
+  "source": "-",
+  "action": "Replace with datasheet values; the assumption-sensitivity study varies impedance and neutral parameters."
+ },
+ {
+  "item": "Protection (fuses, relays, earthing, short-circuit)",
+  "status": "NOT MODELLED",
+  "finding": "No protection coordination, fault-level or earthing study is performed; only steady-state voltage/current/loading limits are monitored.",
+  "source": "-",
+  "action": "State as out of scope."
+ },
+ {
+  "item": "Voltage unbalance / harmonics / flicker limits",
+  "status": "NOT MODELLED",
+  "finding": "Per-phase voltages are reported; no unbalance factor limit, THD or flicker assessment.",
+  "source": "-",
+  "action": "State as out of scope."
+ },
+ {
+  "item": "CO2 factor 0.710 tCO2/MWh",
+  "status": "PARTIAL",
+  "finding": "Value and source (CEA CO2 Baseline Database for the Indian Power Sector V21.0, FY 2024-25) are as stated in the submission; not re-fetched in this session. Grid-average factor applied to the change in net import after losses; a marginal factor would give a different result.",
+  "source": "submission text",
+  "action": "Configurable in final/economics.py; re-verify against the database before final claims."
+ },
+ {
+  "item": "All cost inputs (battery, converter, switches, comms, installation, transformer upgrade, second-life)",
+  "status": "NOT VERIFIED",
+  "finding": "Placeholders chosen to exercise the cost model (INR). They are not quotes or sourced market prices.",
+  "source": "-",
+  "action": "Replace with vendor quotes / tariff orders; report cost as scenario, not result."
+ },
+ {
+  "item": "Battery parameters (95 % each way, SoC 10-95 %, 100 kWh / 50 kW)",
+  "status": "NOT VERIFIED",
+  "finding": "Prototype assumptions; the battery-size and power sweeps treat size as an output.",
+  "source": "-",
+  "action": "Keep as assumption."
+ },
+ {
+  "item": "Demand, PV and weather profiles",
+  "status": "NOT VERIFIED",
+  "finding": "Synthetic, seeded; no measured feeder or irradiance data used in the reference experiments. CSV / NASA POWER input modes are provided but only validated on synthetic and user-supplied data.",
+  "source": "-",
+  "action": "State 'simulation results on synthetic profiles' everywhere."
+ },
+ {
+  "item": "Forecast errors",
+  "status": "NOT VERIFIED",
+  "finding": "Synthetic AR(1) error model (sigma PV 15 %, demand 8 %, rho 0.9); metrics describe the error model, not a real forecaster.",
+  "source": "-",
+  "action": "Do not claim forecast accuracy."
+ }
+]

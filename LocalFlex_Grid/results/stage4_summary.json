@@ -1,0 +1,73 @@
+{
+  "validator_self_test": "PASS",
+  "self_test_detail": {
+    "overvoltage b3/B (expect 0.75 h, 1.2)": "(0.75, 1.2)",
+    "undervoltage a2/C (expect 0.25 h, 0.85)": "(0.25, 0.85)",
+    "neutral F2_b2/N (expect 1.0 h, 150)": "(1.0, 150.0)",
+    "transformer (expect 0.5 h, 105)": "(0.5, 105.0)",
+    "step 50 decision (expect FALLBACK)": "FALLBACK",
+    "step 10 where (expect b3/B)": "b3/B"
+  },
+  "limits": {
+    "v_hi": 1.06,
+    "v_lo": 0.94,
+    "phase_ampacity_A": 200.0,
+    "neutral_ampacity_A": 100.0,
+    "transformer_pct": 100,
+    "note": "all limits are assumptions"
+  },
+  "A0": {
+    "steps_pass": 53,
+    "steps_fail": 43,
+    "decisions": {
+      "PASS": 53,
+      "REPAIR": 43
+    },
+    "overvoltage_node_phases": 6,
+    "undervoltage_node_phases": 14,
+    "worst_overvoltage": {
+      "location": "a5/A",
+      "pu": 1.113
+    },
+    "worst_undervoltage": {
+      "location": "b5/A",
+      "pu": 0.88
+    },
+    "phase_current_events": 0,
+    "neutral_current_events": 0,
+    "transformer_overload_events": 0,
+    "reverse_flow_hours": 8.5,
+    "pv_available_kWh": 878.2,
+    "pv_delivered_kWh": 879.1,
+    "pv_curtailed_kWh_clamped": 0.0,
+    "pv_accounting_residual_kWh": -0.87,
+    "max_power_balance_residual_kW": 0.0012
+  },
+  "A1": {
+    "steps_pass": 53,
+    "steps_fail": 43,
+    "decisions": {
+      "PASS": 53,
+      "REPAIR": 43
+    },
+    "overvoltage_node_phases": 5,
+    "undervoltage_node_phases": 13,
+    "worst_overvoltage": {
+      "location": "a5/A",
+      "pu": 1.075
+    },
+    "worst_undervoltage": {
+      "location": "b5/A",
+      "pu": 0.88
+    },
+    "phase_current_events": 0,
+    "neutral_current_events": 0,
+    "transformer_overload_events": 0,
+    "reverse_flow_hours": 8.5,
+    "pv_available_kWh": 878.2,
+    "pv_delivered_kWh": 848.0,
+    "pv_curtailed_kWh_clamped": 30.2,
+    "pv_accounting_residual_kWh": -0.0,
+    "max_power_balance_residual_kW": 0.0012
+  }
+}

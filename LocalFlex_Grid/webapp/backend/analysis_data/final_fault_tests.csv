@@ -1,0 +1,11 @@
+variant,win_under_pu_h,win_over_pu_h,win_trafo_max_pct,win_phase_max_A,win_neutral_max_A,win_all_converged,events,event_summary,fallbacks_to_rules,ev_unmet_kWh,hard_limits_ok,safety_maintained
+A,1.041,0.0,72.482,163.985,66.14,True,0,,,0.0,True,True
+B,0.517,0.0,64.13,175.767,85.212,True,0,,,1.6,True,True
+D,0.404,0.0,58.938,155.942,82.71,True,0,,30.0,2.95,True,True
+D@F_solver_unavailable,0.354,0.0,67.279,160.208,62.473,True,2,solver_unavailable->FALLBACK:previous_plan 60min; solver_unavailable->FALLBACK:rules 120min,27.0,1.8,True,True
+D@F_opendss_convergence_failure,0.334,0.0,62.36,159.986,73.286,True,1,opendss_convergence_failure (trial solve rejected)->FALLBACK:rules 180min,32.0,1.89,True,True
+D@F_communication_lost,0.313,0.0,58.938,155.947,64.747,True,0,,9.0,0.0,True,True
+D@F_stale_measurement,0.375,0.0,61.153,160.23,62.343,True,2,stale_measurement->FALLBACK:previous_plan 60min; stale_measurement->FALLBACK:rules 120min,11.0,0.0,True,True
+D@F_invalid_command,0.333,0.0,62.359,160.139,68.126,True,2,invalid_command->FALLBACK:previous_plan 60min; invalid_command->FALLBACK:rules 120min,14.0,0.0,True,True
+D@F_battery_unavailable,0.458,0.0,68.325,155.534,62.704,True,1,battery_unavailable->REPLAN:battery=0 240min,19.0,0.42,True,True
+D@F_forecast_missing,0.354,0.0,67.28,160.265,62.473,True,2,forecast_missing->FALLBACK:previous_plan 60min; forecast_missing->FALLBACK:rules 120min,19.0,1.3,True,True

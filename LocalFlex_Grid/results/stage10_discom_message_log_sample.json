@@ -1,0 +1,2522 @@
+{
+ "D@dispatch_up": [
+  {
+   "step": 96,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 0.0,
+    "net_import_forecast_kW_next_4": null,
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 97,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 0.25,
+    "net_import_forecast_kW_next_4": [
+     57.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 98,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 0.5,
+    "net_import_forecast_kW_next_4": [
+     41.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 99,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 0.75,
+    "net_import_forecast_kW_next_4": [
+     40.3
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 100,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 1.0,
+    "net_import_forecast_kW_next_4": [
+     39.0
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 101,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 1.25,
+    "net_import_forecast_kW_next_4": [
+     38.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 102,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 1.5,
+    "net_import_forecast_kW_next_4": [
+     35.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 103,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 1.75,
+    "net_import_forecast_kW_next_4": [
+     33.5
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 104,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 2.0,
+    "net_import_forecast_kW_next_4": [
+     31.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 105,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 2.25,
+    "net_import_forecast_kW_next_4": [
+     30.0
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 106,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 2.5,
+    "net_import_forecast_kW_next_4": [
+     29.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 107,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 2.75,
+    "net_import_forecast_kW_next_4": [
+     29.7
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 108,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 3.0,
+    "net_import_forecast_kW_next_4": [
+     28.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 109,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 3.25,
+    "net_import_forecast_kW_next_4": [
+     28.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 110,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 3.5,
+    "net_import_forecast_kW_next_4": [
+     29.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 111,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 3.75,
+    "net_import_forecast_kW_next_4": [
+     28.5
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 112,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 4.0,
+    "net_import_forecast_kW_next_4": [
+     30.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 113,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 4.25,
+    "net_import_forecast_kW_next_4": [
+     31.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 114,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 4.5,
+    "net_import_forecast_kW_next_4": [
+     32.3
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 115,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 4.75,
+    "net_import_forecast_kW_next_4": [
+     33.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 116,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 5.0,
+    "net_import_forecast_kW_next_4": [
+     35.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 117,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 5.25,
+    "net_import_forecast_kW_next_4": [
+     36.9
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 118,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 5.5,
+    "net_import_forecast_kW_next_4": [
+     37.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 119,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 5.75,
+    "net_import_forecast_kW_next_4": [
+     39.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 120,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 6.0,
+    "net_import_forecast_kW_next_4": [
+     43.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 121,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 6.25,
+    "net_import_forecast_kW_next_4": [
+     45.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 122,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 6.5,
+    "net_import_forecast_kW_next_4": [
+     48.9
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 123,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 6.75,
+    "net_import_forecast_kW_next_4": [
+     53.8
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 124,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 7.0,
+    "net_import_forecast_kW_next_4": [
+     55.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 125,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 7.25,
+    "net_import_forecast_kW_next_4": [
+     50.0
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 126,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 7.5,
+    "net_import_forecast_kW_next_4": [
+     40.7
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 127,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 7.75,
+    "net_import_forecast_kW_next_4": [
+     33.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 128,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 8.0,
+    "net_import_forecast_kW_next_4": [
+     17.9
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 129,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 8.25,
+    "net_import_forecast_kW_next_4": [
+     3.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 130,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 8.5,
+    "net_import_forecast_kW_next_4": [
+     0.0
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 131,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 8.75,
+    "net_import_forecast_kW_next_4": [
+     -0.0
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 132,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 9.0,
+    "net_import_forecast_kW_next_4": [
+     -10.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 133,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 9.25,
+    "net_import_forecast_kW_next_4": [
+     -51.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 134,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 9.5,
+    "net_import_forecast_kW_next_4": [
+     -91.3
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 135,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 9.75,
+    "net_import_forecast_kW_next_4": [
+     -94.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 136,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 10.0,
+    "net_import_forecast_kW_next_4": [
+     -54.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 137,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 10.25,
+    "net_import_forecast_kW_next_4": [
+     -47.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 138,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 10.5,
+    "net_import_forecast_kW_next_4": [
+     -54.3
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 139,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 10.75,
+    "net_import_forecast_kW_next_4": [
+     -51.9
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 140,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 11.0,
+    "net_import_forecast_kW_next_4": [
+     -59.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 141,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 11.25,
+    "net_import_forecast_kW_next_4": [
+     -57.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 142,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 11.5,
+    "net_import_forecast_kW_next_4": [
+     -61.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 143,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 11.75,
+    "net_import_forecast_kW_next_4": [
+     -48.9
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 144,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 12.0,
+    "net_import_forecast_kW_next_4": [
+     -62.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 145,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 12.25,
+    "net_import_forecast_kW_next_4": [
+     -76.7
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 146,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 12.5,
+    "net_import_forecast_kW_next_4": [
+     -86.7
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 147,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 12.75,
+    "net_import_forecast_kW_next_4": [
+     -90.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 148,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 13.0,
+    "net_import_forecast_kW_next_4": [
+     -77.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 149,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 13.25,
+    "net_import_forecast_kW_next_4": [
+     -63.3
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 150,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 13.5,
+    "net_import_forecast_kW_next_4": [
+     -49.5
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 151,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 13.75,
+    "net_import_forecast_kW_next_4": [
+     -50.9
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 152,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 14.0,
+    "net_import_forecast_kW_next_4": [
+     -41.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 153,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 14.25,
+    "net_import_forecast_kW_next_4": [
+     -40.5
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 154,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 14.5,
+    "net_import_forecast_kW_next_4": [
+     -41.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 155,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 14.75,
+    "net_import_forecast_kW_next_4": [
+     -33.8
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  }
+ ],
+ "D@dispatch_lost_before": [
+  {
+   "step": 96,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 0.0,
+    "net_import_forecast_kW_next_4": null,
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 97,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 0.25,
+    "net_import_forecast_kW_next_4": [
+     57.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 98,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 0.5,
+    "net_import_forecast_kW_next_4": [
+     41.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 99,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 0.75,
+    "net_import_forecast_kW_next_4": [
+     40.3
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 100,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 1.0,
+    "net_import_forecast_kW_next_4": [
+     39.0
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 101,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 1.25,
+    "net_import_forecast_kW_next_4": [
+     38.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 102,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 1.5,
+    "net_import_forecast_kW_next_4": [
+     35.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 103,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 1.75,
+    "net_import_forecast_kW_next_4": [
+     33.5
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 104,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 2.0,
+    "net_import_forecast_kW_next_4": [
+     31.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 105,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 2.25,
+    "net_import_forecast_kW_next_4": [
+     30.0
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 106,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 2.5,
+    "net_import_forecast_kW_next_4": [
+     29.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 107,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 2.75,
+    "net_import_forecast_kW_next_4": [
+     29.7
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 108,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 3.0,
+    "net_import_forecast_kW_next_4": [
+     28.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 109,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 3.25,
+    "net_import_forecast_kW_next_4": [
+     28.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 110,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 3.5,
+    "net_import_forecast_kW_next_4": [
+     29.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 111,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 3.75,
+    "net_import_forecast_kW_next_4": [
+     28.5
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 112,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 4.0,
+    "net_import_forecast_kW_next_4": [
+     30.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 113,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 4.25,
+    "net_import_forecast_kW_next_4": [
+     31.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 114,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 4.5,
+    "net_import_forecast_kW_next_4": [
+     32.3
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 115,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 4.75,
+    "net_import_forecast_kW_next_4": [
+     33.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 116,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 5.0,
+    "net_import_forecast_kW_next_4": [
+     35.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 117,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 5.25,
+    "net_import_forecast_kW_next_4": [
+     36.9
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 118,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 5.5,
+    "net_import_forecast_kW_next_4": [
+     37.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 119,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 5.75,
+    "net_import_forecast_kW_next_4": [
+     39.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 120,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 6.0,
+    "net_import_forecast_kW_next_4": [
+     43.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 121,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 6.25,
+    "net_import_forecast_kW_next_4": [
+     45.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 122,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 6.5,
+    "net_import_forecast_kW_next_4": [
+     48.9
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 123,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 6.75,
+    "net_import_forecast_kW_next_4": [
+     53.8
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 124,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 7.0,
+    "net_import_forecast_kW_next_4": [
+     55.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 125,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 7.25,
+    "net_import_forecast_kW_next_4": [
+     50.0
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 126,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 7.5,
+    "net_import_forecast_kW_next_4": [
+     40.7
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 127,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 7.75,
+    "net_import_forecast_kW_next_4": [
+     33.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 128,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 8.0,
+    "net_import_forecast_kW_next_4": [
+     17.9
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 129,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 8.25,
+    "net_import_forecast_kW_next_4": [
+     3.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 130,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 8.5,
+    "net_import_forecast_kW_next_4": [
+     0.0
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 131,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 8.75,
+    "net_import_forecast_kW_next_4": [
+     -0.0
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 132,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 9.0,
+    "net_import_forecast_kW_next_4": [
+     -30.0
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 133,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 9.25,
+    "net_import_forecast_kW_next_4": [
+     -51.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 134,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 9.5,
+    "net_import_forecast_kW_next_4": [
+     -91.3
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 135,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 9.75,
+    "net_import_forecast_kW_next_4": [
+     -94.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 136,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 10.0,
+    "net_import_forecast_kW_next_4": [
+     -54.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 137,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 10.25,
+    "net_import_forecast_kW_next_4": [
+     -47.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 138,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 10.5,
+    "net_import_forecast_kW_next_4": [
+     -54.3
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 139,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 10.75,
+    "net_import_forecast_kW_next_4": [
+     -51.9
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 140,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 11.0,
+    "net_import_forecast_kW_next_4": [
+     -59.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 141,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 11.25,
+    "net_import_forecast_kW_next_4": [
+     -57.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 142,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 11.5,
+    "net_import_forecast_kW_next_4": [
+     -61.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 143,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 11.75,
+    "net_import_forecast_kW_next_4": [
+     -48.9
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 144,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 12.0,
+    "net_import_forecast_kW_next_4": [
+     -62.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 145,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 12.25,
+    "net_import_forecast_kW_next_4": [
+     -76.7
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 146,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 12.5,
+    "net_import_forecast_kW_next_4": [
+     -86.7
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 147,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 12.75,
+    "net_import_forecast_kW_next_4": [
+     -90.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 148,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 13.0,
+    "net_import_forecast_kW_next_4": [
+     -77.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 149,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 13.25,
+    "net_import_forecast_kW_next_4": [
+     -63.3
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 150,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 13.5,
+    "net_import_forecast_kW_next_4": [
+     -49.5
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 151,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 13.75,
+    "net_import_forecast_kW_next_4": [
+     -50.9
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 152,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 14.0,
+    "net_import_forecast_kW_next_4": [
+     -41.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 153,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 14.25,
+    "net_import_forecast_kW_next_4": [
+     -40.5
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 154,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 14.5,
+    "net_import_forecast_kW_next_4": [
+     -41.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 155,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 14.75,
+    "net_import_forecast_kW_next_4": [
+     -33.8
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  }
+ ],
+ "D@dispatch_lost_after": [
+  {
+   "step": 96,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 0.0,
+    "net_import_forecast_kW_next_4": null,
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 97,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 0.25,
+    "net_import_forecast_kW_next_4": [
+     57.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 98,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 0.5,
+    "net_import_forecast_kW_next_4": [
+     41.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 99,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 0.75,
+    "net_import_forecast_kW_next_4": [
+     40.3
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 100,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 1.0,
+    "net_import_forecast_kW_next_4": [
+     39.0
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 101,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 1.25,
+    "net_import_forecast_kW_next_4": [
+     38.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 102,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 1.5,
+    "net_import_forecast_kW_next_4": [
+     35.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 103,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 1.75,
+    "net_import_forecast_kW_next_4": [
+     33.5
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 104,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 2.0,
+    "net_import_forecast_kW_next_4": [
+     31.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 105,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 2.25,
+    "net_import_forecast_kW_next_4": [
+     30.0
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 106,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 2.5,
+    "net_import_forecast_kW_next_4": [
+     29.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 107,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 2.75,
+    "net_import_forecast_kW_next_4": [
+     29.7
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 108,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 3.0,
+    "net_import_forecast_kW_next_4": [
+     28.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 109,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 3.25,
+    "net_import_forecast_kW_next_4": [
+     28.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 110,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 3.5,
+    "net_import_forecast_kW_next_4": [
+     29.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 111,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 3.75,
+    "net_import_forecast_kW_next_4": [
+     28.5
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 112,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 4.0,
+    "net_import_forecast_kW_next_4": [
+     30.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 113,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 4.25,
+    "net_import_forecast_kW_next_4": [
+     31.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 114,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 4.5,
+    "net_import_forecast_kW_next_4": [
+     32.3
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 115,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 4.75,
+    "net_import_forecast_kW_next_4": [
+     33.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 116,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 5.0,
+    "net_import_forecast_kW_next_4": [
+     35.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 117,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 5.25,
+    "net_import_forecast_kW_next_4": [
+     36.9
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 118,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 5.5,
+    "net_import_forecast_kW_next_4": [
+     37.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 119,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 5.75,
+    "net_import_forecast_kW_next_4": [
+     39.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 120,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 6.0,
+    "net_import_forecast_kW_next_4": [
+     42.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 121,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 6.25,
+    "net_import_forecast_kW_next_4": [
+     45.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 122,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 6.5,
+    "net_import_forecast_kW_next_4": [
+     52.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 123,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 6.75,
+    "net_import_forecast_kW_next_4": [
+     54.5
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 124,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 7.0,
+    "net_import_forecast_kW_next_4": [
+     55.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 125,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 7.25,
+    "net_import_forecast_kW_next_4": [
+     50.7
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 126,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 7.5,
+    "net_import_forecast_kW_next_4": [
+     40.7
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 127,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 7.75,
+    "net_import_forecast_kW_next_4": [
+     33.0
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 128,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 8.0,
+    "net_import_forecast_kW_next_4": [
+     17.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 129,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 8.25,
+    "net_import_forecast_kW_next_4": [
+     2.8
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 130,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 8.5,
+    "net_import_forecast_kW_next_4": [
+     0.0
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 131,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 8.75,
+    "net_import_forecast_kW_next_4": [
+     -0.0
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 132,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 9.0,
+    "net_import_forecast_kW_next_4": [
+     -10.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 133,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 9.25,
+    "net_import_forecast_kW_next_4": [
+     -72.3
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 134,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 9.5,
+    "net_import_forecast_kW_next_4": [
+     -91.3
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 135,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 9.75,
+    "net_import_forecast_kW_next_4": [
+     -94.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 136,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 10.0,
+    "net_import_forecast_kW_next_4": [
+     -54.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 137,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 10.25,
+    "net_import_forecast_kW_next_4": [
+     -47.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 138,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 10.5,
+    "net_import_forecast_kW_next_4": [
+     -54.3
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 139,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 10.75,
+    "net_import_forecast_kW_next_4": [
+     -51.9
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 140,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 11.0,
+    "net_import_forecast_kW_next_4": [
+     -59.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 141,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 11.25,
+    "net_import_forecast_kW_next_4": [
+     -57.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 142,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 11.5,
+    "net_import_forecast_kW_next_4": [
+     -61.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 143,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 11.75,
+    "net_import_forecast_kW_next_4": [
+     -48.9
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 144,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 12.0,
+    "net_import_forecast_kW_next_4": [
+     -62.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 145,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 12.25,
+    "net_import_forecast_kW_next_4": [
+     -76.9
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 146,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 12.5,
+    "net_import_forecast_kW_next_4": [
+     -87.1
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 147,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 12.75,
+    "net_import_forecast_kW_next_4": [
+     -86.4
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 148,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 13.0,
+    "net_import_forecast_kW_next_4": [
+     -83.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 149,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 13.25,
+    "net_import_forecast_kW_next_4": [
+     -62.0
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 150,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 13.5,
+    "net_import_forecast_kW_next_4": [
+     -50.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 151,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 13.75,
+    "net_import_forecast_kW_next_4": [
+     -49.6
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 152,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 14.0,
+    "net_import_forecast_kW_next_4": [
+     -43.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 153,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 14.25,
+    "net_import_forecast_kW_next_4": [
+     -40.5
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 154,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 14.5,
+    "net_import_forecast_kW_next_4": [
+     -41.2
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  },
+  {
+   "step": 155,
+   "dir": "LocalFlex->DISCOM",
+   "msg": {
+    "step_time_h": 14.75,
+    "net_import_forecast_kW_next_4": [
+     -33.8
+    ],
+    "flexibility_up_kW": 102.4,
+    "flexibility_down_kW": 50.0,
+    "envelope_import_cap_kW": 200.0,
+    "events": []
+   }
+  }
+ ]
+}
