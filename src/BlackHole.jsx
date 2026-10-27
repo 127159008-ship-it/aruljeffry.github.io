@@ -27,6 +27,7 @@ const FRAGMENT_SHADER = `
 
   uniform vec2 uResolution;
   uniform float uTime;
+  uniform float uScrollProgress;
 
   // ---------------------------------------------------------------------
   // Tunables — adjust the look here without touching the logic below.
@@ -284,7 +285,10 @@ const FRAGMENT_SHADER = `
     vec3 right = normalize(cross(forward, worldUp));
     vec3 up = cross(right, forward);
 
-    float fov = 1.15;
+    // As the visitor scrolls through the portfolio, narrow the field of view
+    // to create a real shader-level zoom toward the black hole (not a moving overlay).
+    float zoomProgress = smoothstep(0.0, 1.0, uScrollProgress);
+    float fov = mix(1.15, 0.76, zoomProgress);
     vec3 rd = normalize(forward + uv.x * fov * right + uv.y * fov * up);
 
     // The disk sits near the camera's orbital (X-Z) plane, tilted slightly
@@ -371,6 +375,7 @@ export default function BlackHole({ className = '', style }) {
     const aPosition = gl.getAttribLocation(program, 'aPosition')
     const uResolution = gl.getUniformLocation(program, 'uResolution')
     const uTime = gl.getUniformLocation(program, 'uTime')
+    const uScrollProgress = gl.getUniformLocation(program, 'uScrollProgress')
 
     gl.enableVertexAttribArray(aPosition)
     gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0)
@@ -383,6 +388,7 @@ export default function BlackHole({ className = '', style }) {
     let inViewport = true
     let startTime = performance.now()
     let pauseStarted = pageVisible ? null : startTime
+    let scrollProgress = 0
 
     const drawFrame = (now) => {
       if (disposed || gl.isContextLost()) return
@@ -390,6 +396,7 @@ export default function BlackHole({ className = '', style }) {
       gl.useProgram(program)
       gl.uniform2f(uResolution, width, height)
       gl.uniform1f(uTime, elapsed)
+      gl.uniform1f(uScrollProgress, scrollProgress)
       gl.drawArrays(gl.TRIANGLES, 0, 3)
     }
 
@@ -407,6 +414,14 @@ export default function BlackHole({ className = '', style }) {
       } else if (rafId === null) {
         rafId = requestAnimationFrame(tick)
       }
+    }
+
+    // Scroll progress is used only as a camera zoom control; the black hole
+    // remains fixed behind the particle network while its apparent size grows.
+    const onScroll = () => {
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight
+      scrollProgress = maxScroll > 0 ? Math.min(Math.max(window.scrollY / maxScroll, 0), 1) : 0
+      scheduleRender()
     }
 
     const resize = () => {
@@ -476,7 +491,9 @@ export default function BlackHole({ className = '', style }) {
       intersectionObserver.observe(canvas.parentElement || canvas)
     }
     window.addEventListener('resize', resize, { passive: true })
+    window.addEventListener('scroll', onScroll, { passive: true })
     document.addEventListener('visibilitychange', onVisibilityChange)
+    onScroll()
     canvas.addEventListener('webglcontextlost', onContextLost, false)
     syncActivity()
 
@@ -484,6 +501,7 @@ export default function BlackHole({ className = '', style }) {
       disposed = true
       if (rafId !== null) cancelAnimationFrame(rafId)
       window.removeEventListener('resize', resize)
+      window.removeEventListener('scroll', onScroll)
       document.removeEventListener('visibilitychange', onVisibilityChange)
       canvas.removeEventListener('webglcontextlost', onContextLost, false)
       if (resizeObserver) resizeObserver.disconnect()
