@@ -886,7 +886,10 @@ function useTier() {
       timer = setTimeout(compute, 200)
     }
     window.addEventListener('resize', onResize, { passive: true })
-    return () => window.removeEventListener('resize', onResize)
+    return () => {
+      window.removeEventListener('resize', onResize)
+      if (timer !== null) clearTimeout(timer)
+    }
   }, [])
   return tier
 }
@@ -904,16 +907,14 @@ export default function ParticleField() {
 
   return (
     <div className="particle-canvas" aria-hidden="true">
-      {visible && (
-        <Canvas
-          camera={{ position: [0, 0, 8], fov: 58, near: 0.1, far: 90 }}
-          dpr={[1, tier === 'mobile' ? 1 : 1.3]}
-          gl={{ antialias: false, powerPreference: 'high-performance' }}
-          frameloop={visible ? 'always' : 'never'}
-        >
-          <Scene tier={tier} reduced={reduced} bloomEnabled={tier !== 'mobile'} />
-        </Canvas>
-      )}
+      <Canvas
+        camera={{ position: [0, 0, 8], fov: 58, near: 0.1, far: 90 }}
+        dpr={[1, tier === 'mobile' ? 1 : 1.3]}
+        gl={{ antialias: false, powerPreference: 'high-performance' }}
+        frameloop={visible ? 'always' : 'never'}
+      >
+        <Scene tier={tier} reduced={reduced} bloomEnabled={tier !== 'mobile'} />
+      </Canvas>
     </div>
   )
 }
