@@ -4,7 +4,7 @@
 .particle-canvas {
   position: fixed;
   inset: 0;
-  z-index: 0;
+  z-index: 1;
   pointer-events: none;
 }
 
@@ -233,7 +233,8 @@ main section {
   justify-content: center;
   text-align: center;
   padding: 110px 24px 60px;
-  z-index: 1;
+  /* Do not create a stacking context here: the black hole must sit below
+     the fixed particle-network canvas, while hero copy sits above both. */
 }
 
 .hero-blackhole {
@@ -245,6 +246,7 @@ main section {
   height: min(52vw, 600px);
   pointer-events: none;
   z-index: 0;
+  /* Background layer: the fixed network canvas (z-index: 1) paints over it. */
   /* Fade the WebGL canvas edges into the existing particle-network background. */
   mask-image: radial-gradient(circle at 50% 50%, #000 52%, transparent 82%);
   -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 52%, transparent 82%);
@@ -252,7 +254,7 @@ main section {
 
 .hero > :not(.hero-blackhole):not(.corner-label) {
   position: relative;
-  z-index: 1;
+  z-index: 2;
 }
 
 .corner-label {
