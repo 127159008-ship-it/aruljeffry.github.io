@@ -250,10 +250,10 @@ main section {
 .blackhole-background {
   position: fixed;
   top: 43%;
-  right: -6%;
+  right: 2%;
   transform: translateY(-50%);
-  width: min(52vw, 600px);
-  height: min(52vw, 600px);
+  width: min(46vw, 520px);
+  height: min(46vw, 520px);
   pointer-events: none;
   z-index: 0;
   /* Screen blending makes the black hole recede into the dark space while
@@ -277,11 +277,11 @@ main section {
 
 @media (max-width: 760px) {
   .blackhole-background {
-    top: 34%;
-    width: 105vw;
-    height: 105vw;
-    right: 50%;
-    transform: translate(50%, -50%);
+    top: 36%;
+    width: min(80vw, 340px);
+    height: min(80vw, 340px);
+    right: 5%;
+    transform: translateY(-50%);
     opacity: 0.72;
   }
 }
