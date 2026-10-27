@@ -34,7 +34,8 @@ const FRAGMENT_SHADER = `
   // HORIZON_R and PHOTON_R are physical constants of the Schwarzschild
   // solution in these units (r_s = 1), not stylistic knobs.
   // ---------------------------------------------------------------------
-  const float INCLINATION     = 0.16;   // keep the disk nearly edge-on, with a slight diagonal tilt
+  const float INCLINATION     = 0.16;   // keep the disk nearly edge-on
+  const float DISK_ROLL       = 0.35;   // tilt the disk across the shadow, matching the reference composition
   const float ROTATION_SPEED  = 0.045;  // camera drift speed
   const float DISK_INNER      = 2.6;    // inner radius, in horizon radii (~ISCO)
   const float DISK_OUTER      = 8.4;    // concentrated outer edge for a tighter, brighter disk
@@ -281,6 +282,12 @@ const FRAGMENT_SHADER = `
 
   void main() {
     vec2 uv = (gl_FragCoord.xy - 0.5 * uResolution) / uResolution.y;
+    // Roll the view in screen space: the black shadow stays circular while
+    // the accretion disk and its lensed arcs sweep diagonally across it.
+    float rollCos = cos(DISK_ROLL);
+    float rollSin = sin(DISK_ROLL);
+    vec2 rolledUv = vec2(rollCos * uv.x - rollSin * uv.y,
+                         rollSin * uv.x + rollCos * uv.y);
 
     // Slow orbital drift — alive, never a spinning-logo kind of motion.
     float camDist = 23.0;
@@ -299,7 +306,7 @@ const FRAGMENT_SHADER = `
     // to create a real shader-level zoom toward the black hole (not a moving overlay).
     float zoomProgress = smoothstep(0.0, 1.0, uScrollProgress);
     float fov = mix(1.15, 0.76, zoomProgress);
-    vec3 rd = normalize(forward + uv.x * fov * right + uv.y * fov * up);
+    vec3 rd = normalize(forward + rolledUv.x * fov * right + rolledUv.y * fov * up);
 
     // The disk sits near the camera's orbital (X-Z) plane, tilted slightly
     // by INCLINATION, so the default framing is naturally near edge-on.
