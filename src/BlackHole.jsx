@@ -35,7 +35,7 @@ const FRAGMENT_SHADER = `
   // ---------------------------------------------------------------------
   const float INCLINATION      = 0.16;  // small angle above the disk plane: near edge-on
   const float DISK_ROLL        = 0.35;  // rotate the full lensing view ~20 degrees
-  const float SCREEN_TO_WORLD  = 8.4;   // keeps the shadow large enough to read, like the reference
+  const float SCREEN_TO_WORLD  = 19.0;  // fits the full lensed disk inside the viewport
   const float CAMERA_DISTANCE  = 16.0;  // fixed distant camera: no fake camera orbit or scroll zoom
   const float DISK_INNER       = 1.9;   // inner edge of the luminous plasma
   const float DISK_OUTER       = 8.0;   // outer radius of the disk
