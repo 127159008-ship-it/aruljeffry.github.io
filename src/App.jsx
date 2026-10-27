@@ -117,6 +117,9 @@ function App() {
       <CustomCursor />
       <ScrollProgress />
       <ParticleField />
+      <div className="blackhole-background" aria-hidden="true">
+        <BlackHole />
+      </div>
 
       <nav className="nav">
         <div className="nav-inner">
@@ -133,7 +136,6 @@ function App() {
       </nav>
 
       <header className="hero" id="top">
-        <div className="hero-blackhole" aria-hidden="true"><BlackHole /></div>
         {cornerLabels.map((group, gi) => (
           <motion.div
             key={group.key}
