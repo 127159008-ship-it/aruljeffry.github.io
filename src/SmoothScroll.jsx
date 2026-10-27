@@ -21,6 +21,9 @@ export default function SmoothScroll({ children }) {
 
     lenis.on('scroll', onScroll)
     gsap.ticker.add(tick)
+    // Lenis and ScrollTrigger share this ticker; disabling lag smoothing avoids
+    // them disagreeing about elapsed scroll time after a dropped frame.
+    gsap.ticker.lagSmoothing(0)
 
     return () => {
       gsap.ticker.remove(tick)
