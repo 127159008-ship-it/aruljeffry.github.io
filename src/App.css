@@ -249,9 +249,9 @@ main section {
   z-index: 0;
   /* Screen blending makes the black hole recede into the dark space while
      the higher-layer particle network remains visibly in front. */
-  opacity: 0.78;
+  opacity: 0.92;
   mix-blend-mode: screen;
-  filter: saturate(0.86);
+  filter: saturate(1.08) brightness(1.12);
   mask-image: radial-gradient(circle at 50% 50%, #000 48%, transparent 82%);
   -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 48%, transparent 82%);
 }
@@ -272,7 +272,7 @@ main section {
     height: 105vw;
     right: 50%;
     transform: translate(50%, -50%);
-    opacity: 0.5;
+    opacity: 0.72;
   }
 }
 
