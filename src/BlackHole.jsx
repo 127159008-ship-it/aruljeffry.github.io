@@ -107,8 +107,12 @@ const FRAGMENT_SHADER = `
       v += acceleration * (0.5 * dt);
       x += v * dt;
 
+      // The drift can cross the horizon in a single adaptive step. Stop
+      // before evaluating the singular force inside r = 1, avoiding NaNs
+      // or bright speckles at the silhouette edge.
       r2 = dot(x, x);
-      r = sqrt(max(r2, 1e-5));
+      if (r2 < HORIZON_R * HORIZON_R) break;
+      r = sqrt(r2);
       acceleration = -1.5 * h2 * x / (r2 * r2 * r);
       v += acceleration * (0.5 * dt);
 
