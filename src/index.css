@@ -72,3 +72,15 @@ img {
     cursor: auto !important;
   }
 }
+
+/* Keep every CSS-driven effect quiet when the visitor requests less motion. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+    scroll-behavior: auto !important;
+  }
+}
