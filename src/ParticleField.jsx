@@ -721,6 +721,7 @@ function CrystalDebrisField({ count, reduced }) {
   const fillRef = useRef()
   const wireRef = useRef()
   const elapsedRef = useRef(0)
+  const invalidate = useThree((state) => state.invalidate)
   const dummy = useMemo(() => new THREE.Object3D(), [])
 
   const items = useMemo(() => {
@@ -763,7 +764,9 @@ function CrystalDebrisField({ count, reduced }) {
   useEffect(() => {
     elapsedRef.current = 0
     applyTransforms(0)
-  }, [items])
+    // Matrix edits are imperative; request one static frame in demand mode.
+    invalidate()
+  }, [items, invalidate])
 
   useFrame((state, delta) => {
     if (reduced) return
