@@ -42,6 +42,7 @@ export default function ParticleTextIntro({ text, className, as: Tag = 'h1' }) {
 
     let cancelled = false
     let rafId = null
+    let visibilityHandler = null
     const onResize = () => {
       if (cancelled) return
       // The particle mask is measured from text metrics. If layout changes
@@ -51,6 +52,7 @@ export default function ParticleTextIntro({ text, className, as: Tag = 'h1' }) {
       if (rafId !== null) cancelAnimationFrame(rafId)
       rafId = null
       window.removeEventListener('resize', onResize)
+      if (visibilityHandler) document.removeEventListener('visibilitychange', visibilityHandler)
       setRevealed(true)
       setCanvasVisible(false)
     }
@@ -169,8 +171,30 @@ export default function ParticleTextIntro({ text, className, as: Tag = 'h1' }) {
     let previousFrame = performance.now()
     let sparks = []
     const start = performance.now()
+    let pauseStarted = document.hidden ? start : null
+    let pausedDuration = 0
     const assembleEnd = 2.15
     const outroEnd = 2.7
+
+    visibilityHandler = () => {
+      const now = performance.now()
+      if (document.hidden) {
+        if (pauseStarted === null) pauseStarted = now
+        if (rafId !== null) cancelAnimationFrame(rafId)
+        rafId = null
+        return
+      }
+      if (pauseStarted !== null) {
+        pausedDuration += now - pauseStarted
+        pauseStarted = null
+      }
+      // Reset frame timing after returning from a hidden tab so the intro
+      // resumes smoothly instead of fast-forwarding to its end.
+      previousFrame = now
+      if (rafId !== null) cancelAnimationFrame(rafId)
+      rafId = requestAnimationFrame(frame)
+    }
+    document.addEventListener('visibilitychange', visibilityHandler)
 
     function spawnSparks() {
       const count = isSmall ? 8 : 16
@@ -191,9 +215,11 @@ export default function ParticleTextIntro({ text, className, as: Tag = 'h1' }) {
     }
 
     function frame(now) {
+      rafId = null
+      if (cancelled || document.hidden) return
       const frameDelta = Math.min(Math.max((now - previousFrame) / 1000, 0), 0.05)
       previousFrame = now
-      const elapsed = (now - start) / 1000
+      const elapsed = (now - start - pausedDuration) / 1000
       ctx.clearRect(0, 0, width, height)
 
       for (const p of particles) {
@@ -287,6 +313,7 @@ export default function ParticleTextIntro({ text, className, as: Tag = 'h1' }) {
     return () => {
       cancelled = true
       window.removeEventListener('resize', onResize)
+      if (visibilityHandler) document.removeEventListener('visibilitychange', visibilityHandler)
       if (rafId !== null) cancelAnimationFrame(rafId)
     }
   }, [prefersReducedMotion, text])
