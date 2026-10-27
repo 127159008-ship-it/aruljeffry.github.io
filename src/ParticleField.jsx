@@ -511,7 +511,7 @@ function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactiv
     for (let i = 0; i < points.length; i++) {
       const p = points[i]
       if (!reduced) {
-        p.phase += delta * p.speed
+        p.phase += frameDelta * p.speed
         const baseFlareChance = Math.min(CONFIG.twinkleChance * 0.6 + scrollEnergy * 0.01, 0.99)
         const flareChance = 1 - Math.pow(1 - baseFlareChance, frameDelta * 60)
         if (Math.random() < flareChance) {
