@@ -133,9 +133,7 @@ function App() {
       </nav>
 
       <header className="hero" id="top">
-        <div className="hero-blackhole" aria-hidden="true">
-          <BlackHole />
-        </div>
+        <div className="hero-blackhole" aria-hidden="true"><BlackHole /></div>
         {cornerLabels.map((group, gi) => (
           <motion.div
             key={group.key}
