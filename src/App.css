@@ -252,7 +252,6 @@ main section {
   opacity: 0.78;
   mix-blend-mode: screen;
   filter: saturate(0.86);
-  will-change: contents;
   mask-image: radial-gradient(circle at 50% 50%, #000 48%, transparent 82%);
   -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 48%, transparent 82%);
 }
