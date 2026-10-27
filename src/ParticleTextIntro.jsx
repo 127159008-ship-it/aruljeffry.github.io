@@ -34,10 +34,24 @@ export default function ParticleTextIntro({ text, className, as: Tag = 'h1' }) {
   const [canvasVisible, setCanvasVisible] = useState(!prefersReducedMotion)
 
   useEffect(() => {
-    if (prefersReducedMotion) return
-    const el = textRef.current
-    const canvas = canvasRef.current
-    if (!el || !canvas) return
+    if (prefersReducedMotion) {
+      setRevealed(true)
+      setCanvasVisible(false)
+      return undefined
+    }
+
+    let cancelled = false
+    let rafId = null
+
+    const initialise = () => {
+      if (cancelled) return
+      const el = textRef.current
+      const canvas = canvasRef.current
+      if (!el || !canvas) {
+        setRevealed(true)
+        setCanvasVisible(false)
+        return
+      }
 
     const rect = el.getBoundingClientRect()
     const width = Math.ceil(rect.width)
@@ -52,6 +66,11 @@ export default function ParticleTextIntro({ text, className, as: Tag = 'h1' }) {
     canvas.width = width * dpr
     canvas.height = height * dpr
     const ctx = canvas.getContext('2d')
+    if (!ctx) {
+      setRevealed(true)
+      setCanvasVisible(false)
+      return
+    }
     ctx.scale(dpr, dpr)
 
     const computed = getComputedStyle(el)
@@ -63,6 +82,11 @@ export default function ParticleTextIntro({ text, className, as: Tag = 'h1' }) {
     sample.width = width
     sample.height = height
     const sctx = sample.getContext('2d')
+    if (!sctx) {
+      setRevealed(true)
+      setCanvasVisible(false)
+      return
+    }
     sctx.fillStyle = '#fff'
     sctx.font = `${computed.fontWeight} ${computed.fontSize} ${computed.fontFamily}`
     sctx.textBaseline = 'alphabetic'
@@ -117,8 +141,8 @@ export default function ParticleTextIntro({ text, className, as: Tag = 'h1' }) {
       }
     })
 
-    let rafId = null
     let sparksSpawned = false
+    let previousFrame = performance.now()
     let sparks = []
     const start = performance.now()
     const assembleEnd = 2.15
@@ -143,6 +167,8 @@ export default function ParticleTextIntro({ text, className, as: Tag = 'h1' }) {
     }
 
     function frame(now) {
+      const frameDelta = Math.min(Math.max((now - previousFrame) / 1000, 0), 0.05)
+      previousFrame = now
       const elapsed = (now - start) / 1000
       ctx.clearRect(0, 0, width, height)
 
@@ -201,10 +227,10 @@ export default function ParticleTextIntro({ text, className, as: Tag = 'h1' }) {
         ctx.globalAlpha = 1
         sparks = sparks.filter((s) => s.life < s.maxLife)
         for (const s of sparks) {
-          s.life += 1 / 60
-          s.x += s.vx / 60
-          s.y += s.vy / 60
-          s.vy += 22 / 60
+          s.life += frameDelta
+          s.x += s.vx * frameDelta
+          s.y += s.vy * frameDelta
+          s.vy += 22 * frameDelta
           const a = 1 - s.life / s.maxLife
           ctx.globalAlpha = Math.max(a, 0)
           ctx.fillStyle = s.color
@@ -224,8 +250,19 @@ export default function ParticleTextIntro({ text, className, as: Tag = 'h1' }) {
     }
 
     rafId = requestAnimationFrame(frame)
+    }
+
+    // Text metrics are only stable after web fonts finish loading. Measuring
+    // before that point creates a shifted particle mask on the first visit.
+    if (document.fonts?.ready) {
+      document.fonts.ready.then(initialise)
+    } else {
+      initialise()
+    }
+
     return () => {
-      if (rafId) cancelAnimationFrame(rafId)
+      cancelled = true
+      if (rafId !== null) cancelAnimationFrame(rafId)
     }
   }, [prefersReducedMotion, text])
 
