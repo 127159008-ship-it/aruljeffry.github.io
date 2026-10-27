@@ -6,9 +6,9 @@ import usePrefersReducedMotion from './usePrefersReducedMotion'
 export default function MagneticButton({ as: Tag = 'a', className, strength = 0.25, children, ...props }) {
   const ref = useRef(null)
   const originRef = useRef(null)
-  const wasActiveRef = useRef(isDesktop && !prefersReducedMotion)
   const isDesktop = useIsDesktop()
   const prefersReducedMotion = usePrefersReducedMotion()
+  const wasActiveRef = useRef(isDesktop && !prefersReducedMotion)
 
   useEffect(() => {
     const active = isDesktop && !prefersReducedMotion
