@@ -27,7 +27,7 @@ function Reveal({ children, delay = 0, className = '', onMouseMove, onMouseLeave
       onMouseLeave={onMouseLeave}
       initial={{ opacity: 0, y: 36, scale: 0.94, filter: 'blur(4px)' }}
       whileInView={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
-      viewport={{ once: false, amount: 0.3, margin: '-60px' }}
+      viewport={{ once: true, amount: 0.2, margin: '-40px' }}
       transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
@@ -43,7 +43,7 @@ function SplitWords({ text, stagger = 0.05 }) {
         className="word-inner"
         initial={{ y: '105%', opacity: 0, rotateZ: 6 }}
         whileInView={{ y: '0%', opacity: 1, rotateZ: 0 }}
-        viewport={{ once: false, amount: 0.7 }}
+        viewport={{ once: true, amount: 0.7 }}
         transition={{ duration: 0.5, delay: i * stagger, ease: [0.22, 1, 0.36, 1] }}
       >
         {word}
@@ -88,16 +88,21 @@ function App() {
 
     if (!isDesktop || prefersReducedMotion) return
     gsap.to(el, {
-      rotateX: (0.5 - py) * 6,
-      rotateY: (px - 0.5) * 6,
+      rotateX: (0.5 - py) * 5,
+      rotateY: (px - 0.5) * 5,
       transformPerspective: 1000,
-      duration: 0.4,
+      duration: 0.35,
       ease: 'power3.out',
+      overwrite: 'auto',
     })
   }
 
   const handleRowLeave = (e) => {
-    gsap.to(e.currentTarget, { rotateX: 0, rotateY: 0, duration: 0.6, ease: 'power3.out' })
+    if (!isDesktop || prefersReducedMotion) {
+      gsap.set(e.currentTarget, { rotateX: 0, rotateY: 0 })
+      return
+    }
+    gsap.to(e.currentTarget, { rotateX: 0, rotateY: 0, duration: 0.35, ease: 'power3.out', overwrite: 'auto' })
   }
 
   const handleGlowMove = (e) => {
