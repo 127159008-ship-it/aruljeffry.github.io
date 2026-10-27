@@ -438,7 +438,11 @@ export default function BlackHole({ className = '', style }) {
     // remains fixed behind the particle network while its apparent size grows.
     const onScroll = () => {
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight
-      scrollProgress = maxScroll > 0 ? Math.min(Math.max(window.scrollY / maxScroll, 0), 1) : 0
+      // Keep the scroll zoom for normal motion settings, but make the shader
+      // fully static when the visitor asks the OS to reduce motion.
+      scrollProgress = !reducedMotion && maxScroll > 0
+        ? Math.min(Math.max(window.scrollY / maxScroll, 0), 1)
+        : 0
       scheduleRender()
     }
 
@@ -457,6 +461,9 @@ export default function BlackHole({ className = '', style }) {
         canvas.height = height
         gl.viewport(0, 0, width, height)
       }
+      // Layout changes can alter total document height, so refresh progress
+      // before redrawing the scroll-linked camera zoom.
+      onScroll()
       scheduleRender()
     }
 
