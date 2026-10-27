@@ -1,4 +1,4 @@
-import { useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { motion } from 'framer-motion'
 import gsap from 'gsap'
 import './App.css'
@@ -84,6 +84,16 @@ function App() {
   const isDesktop = useIsDesktop()
   const prefersReducedMotion = usePrefersReducedMotion()
   const rowOriginsRef = useRef(new WeakMap())
+
+  useEffect(() => {
+    if (!isDesktop || prefersReducedMotion) {
+      document.querySelectorAll('.project-row').forEach((el) => {
+        gsap.killTweensOf(el)
+        gsap.set(el, { clearProps: 'transform' })
+        rowOriginsRef.current.delete(el)
+      })
+    }
+  }, [isDesktop, prefersReducedMotion])
 
   const handleRowEnter = (e) => {
     if (!isDesktop || prefersReducedMotion) return
