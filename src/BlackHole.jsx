@@ -154,9 +154,11 @@ const FRAGMENT_SHADER = `
     // moving plasma filaments, rather than a perfectly regular flat texture.
     float bandPhase = rad * 7.6 + (broadFlow - 0.5) * 1.7 + fineGrain * 0.75;
     float radialBands = 0.5 + 0.5 * cos(bandPhase);
-    float bandContrast = mix(0.56, 1.58, smoothstep(0.14, 0.88, radialBands));
-    float filamentContrast = mix(0.62, 1.42, smoothstep(0.20, 0.82, filaments));
-    float density = mix(0.55, 1.72, smoothstep(0.24, 0.68, turbulence));
+    // Keep the nested bands legible but avoid deep dark stripes that make
+    // one half of the disk appear to switch off as the camera gently orbits.
+    float bandContrast = mix(0.80, 1.24, smoothstep(0.14, 0.88, radialBands));
+    float filamentContrast = mix(0.86, 1.16, smoothstep(0.20, 0.82, filaments));
+    float density = mix(0.78, 1.38, smoothstep(0.24, 0.68, turbulence));
     density *= bandContrast * filamentContrast;
     float hotFilament = smoothstep(0.48, 0.82, filaments) * (1.0 - rn);
 
@@ -164,17 +166,20 @@ const FRAGMENT_SHADER = `
     // of a uniformly colored flat ring.
     diskCol += vec3(0.015, 0.13, 0.17) * hotFilament;
 
-    // Relativistic Doppler beaming: the approaching side appears brighter.
+    // Mild Doppler-like asymmetry: one side should be brighter, but the far
+    // side must still emit visible cyan light rather than falling to black.
     vec3 rayDir = normalize(b - a);
     vec3 tangentAtHit = normalize(cross(diskNormal, hit));
     float beam = dot(tangentAtHit, -rayDir);
-    float beamFactor = pow(clamp(0.68 + beam * 0.78, 0.08, 2.0), 2.0);
+    float beamFactor = pow(clamp(0.90 + beam * 0.28, 0.55, 1.22), 1.35);
 
     float innerCut = smoothstep(0.0, 0.025, rn);
     float outerCut = 1.0 - smoothstep(0.82, 1.0, rn);
     float edge = innerCut * outerCut;
-    return (diskCol * density + vec3(0.012, 0.12, 0.16) * hotFilament)
-      * beamFactor * edge * BLOOM_INTENSITY * 0.60;
+    // A small, continuous cyan emission floor preserves the far-side arc
+    // while edge fades still keep the disk physically thin.
+    return (diskCol * density + diskCol * 0.16 + vec3(0.012, 0.10, 0.13) * hotFilament)
+      * beamFactor * edge * BLOOM_INTENSITY * 0.58;
   }
 
   vec3 traceRay(vec3 ro, vec3 rd, vec3 diskNormal) {
