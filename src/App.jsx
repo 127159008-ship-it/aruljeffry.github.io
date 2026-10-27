@@ -1,3 +1,4 @@
+import { useRef } from 'react'
 import { motion } from 'framer-motion'
 import gsap from 'gsap'
 import './App.css'
@@ -80,12 +81,26 @@ function SectionFrame({ index, eyebrow, heading, children, className = '' }) {
 function App() {
   const isDesktop = useIsDesktop()
   const prefersReducedMotion = usePrefersReducedMotion()
+  const rowOriginsRef = useRef(new WeakMap())
+
+  const handleRowEnter = (e) => {
+    if (!isDesktop || prefersReducedMotion) return
+    const el = e.currentTarget
+    // Stop an unfinished reset before measuring, so every pointer move uses
+    // the row's unrotated geometry instead of feeding transformed bounds back
+    // into the next rotation angle.
+    gsap.killTweensOf(el)
+    gsap.set(el, { rotateX: 0, rotateY: 0 })
+    const rect = el.getBoundingClientRect()
+    rowOriginsRef.current.set(el, { left: rect.left, top: rect.top, width: rect.width, height: rect.height })
+  }
 
   const handleRowMove = (e) => {
     const el = e.currentTarget
     const rect = el.getBoundingClientRect()
-    const px = (e.clientX - rect.left) / rect.width
-    const py = (e.clientY - rect.top) / rect.height
+    const origin = rowOriginsRef.current.get(el) || { left: rect.left, top: rect.top, width: rect.width, height: rect.height }
+    const px = (e.clientX - origin.left) / origin.width
+    const py = (e.clientY - origin.top) / origin.height
     el.style.setProperty('--mx', `${px * 100}%`)
     el.style.setProperty('--my', `${py * 100}%`)
 
@@ -101,11 +116,13 @@ function App() {
   }
 
   const handleRowLeave = (e) => {
+    const el = e.currentTarget
+    rowOriginsRef.current.delete(el)
     if (!isDesktop || prefersReducedMotion) {
-      gsap.set(e.currentTarget, { rotateX: 0, rotateY: 0 })
+      gsap.set(el, { rotateX: 0, rotateY: 0 })
       return
     }
-    gsap.to(e.currentTarget, { rotateX: 0, rotateY: 0, duration: 0.35, ease: 'power3.out', overwrite: 'auto' })
+    gsap.to(el, { rotateX: 0, rotateY: 0, duration: 0.35, ease: 'power3.out', overwrite: 'auto' })
   }
 
   const handleGlowMove = (e) => {
@@ -260,6 +277,7 @@ function App() {
                 <Reveal key={p.title} delay={i * 0.06}>
                   <article
                     className={`project-row ${i % 2 === 1 ? 'project-row-reverse' : ''}`}
+                    onMouseEnter={handleRowEnter}
                     onMouseMove={handleRowMove}
                     onMouseLeave={handleRowLeave}
                   >
