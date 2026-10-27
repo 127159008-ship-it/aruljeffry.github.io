@@ -377,6 +377,35 @@ export default function BlackHole({ className = '', style }) {
 
     let width = 0
     let height = 0
+    let rafId = null
+    let disposed = false
+    let pageVisible = !document.hidden
+    const startTime = performance.now()
+
+    const drawFrame = (now) => {
+      if (disposed || gl.isContextLost()) return
+      const elapsed = reducedMotion ? 0 : (now - startTime) / 1000
+      gl.useProgram(program)
+      gl.uniform2f(uResolution, width, height)
+      gl.uniform1f(uTime, elapsed)
+      gl.drawArrays(gl.TRIANGLES, 0, 3)
+    }
+
+    const tick = (now) => {
+      rafId = null
+      if (disposed || !pageVisible) return
+      drawFrame(now)
+      if (!reducedMotion) rafId = requestAnimationFrame(tick)
+    }
+
+    const scheduleRender = () => {
+      if (disposed || !pageVisible) return
+      if (reducedMotion) {
+        drawFrame(performance.now())
+      } else if (rafId === null) {
+        rafId = requestAnimationFrame(tick)
+      }
+    }
 
     const resize = () => {
       const parent = canvas.parentElement
@@ -384,47 +413,58 @@ export default function BlackHole({ className = '', style }) {
       const cssHeight = parent ? parent.clientHeight : window.innerHeight
       const longEdge = Math.max(cssWidth, cssHeight, 1)
       const scale = Math.min(1, MAX_INTERNAL_LONG_EDGE / longEdge)
-      width = Math.max(1, Math.round(cssWidth * scale))
-      height = Math.max(1, Math.round(cssHeight * scale))
-      if (canvas.width !== width || canvas.height !== height) {
+      const nextWidth = Math.max(1, Math.round(cssWidth * scale))
+      const nextHeight = Math.max(1, Math.round(cssHeight * scale))
+      if (canvas.width !== nextWidth || canvas.height !== nextHeight) {
+        width = nextWidth
+        height = nextHeight
         canvas.width = width
         canvas.height = height
         gl.viewport(0, 0, width, height)
       }
+      scheduleRender()
     }
 
-    resize()
-    const resizeObserver = new ResizeObserver(resize)
-    if (canvas.parentElement) resizeObserver.observe(canvas.parentElement)
-    window.addEventListener('resize', resize)
-
-    let rafId = null
-    const startTime = performance.now()
-
-    const render = (now) => {
-      const elapsed = reducedMotion ? 0 : (now - startTime) / 1000
-
-      gl.useProgram(program)
-      gl.uniform2f(uResolution, width, height)
-      gl.uniform1f(uTime, elapsed)
-      gl.drawArrays(gl.TRIANGLES, 0, 3)
-
-      if (!reducedMotion) {
-        rafId = requestAnimationFrame(render)
+    const onVisibilityChange = () => {
+      pageVisible = !document.hidden
+      if (!pageVisible && rafId !== null) {
+        cancelAnimationFrame(rafId)
+        rafId = null
+      } else {
+        scheduleRender()
       }
     }
 
-    rafId = requestAnimationFrame(render)
+    const onContextLost = (event) => {
+      event.preventDefault()
+      disposed = true
+      if (rafId !== null) cancelAnimationFrame(rafId)
+      rafId = null
+      setSupported(false)
+    }
+
+    resize()
+    let resizeObserver = null
+    if (typeof ResizeObserver !== 'undefined') {
+      resizeObserver = new ResizeObserver(resize)
+      if (canvas.parentElement) resizeObserver.observe(canvas.parentElement)
+    }
+    window.addEventListener('resize', resize, { passive: true })
+    document.addEventListener('visibilitychange', onVisibilityChange)
+    canvas.addEventListener('webglcontextlost', onContextLost, false)
+    scheduleRender()
 
     return () => {
-      if (rafId) cancelAnimationFrame(rafId)
+      disposed = true
+      if (rafId !== null) cancelAnimationFrame(rafId)
       window.removeEventListener('resize', resize)
-      resizeObserver.disconnect()
+      document.removeEventListener('visibilitychange', onVisibilityChange)
+      canvas.removeEventListener('webglcontextlost', onContextLost, false)
+      if (resizeObserver) resizeObserver.disconnect()
       gl.deleteBuffer(positionBuffer)
       gl.deleteProgram(program)
-      const loseContext = gl.getExtension('WEBGL_lose_context')
-      if (loseContext) loseContext.loseContext()
-    }
+      // Keep the canvas context alive between React effect cleanups. Explicitly
+      // losing it here breaks StrictMode re-mounts and preference changes.
   }, [reducedMotion])
 
   if (!supported) {
