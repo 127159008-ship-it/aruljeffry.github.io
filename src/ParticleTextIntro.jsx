@@ -294,6 +294,9 @@ export default function ParticleTextIntro({ text, className, as: Tag = 'h1' }) {
 
       if (elapsed >= outroEnd) {
         setCanvasVisible(false)
+        cancelled = true
+        window.removeEventListener('resize', onResize)
+        if (visibilityHandler) document.removeEventListener('visibilitychange', visibilityHandler)
         return
       }
       rafId = requestAnimationFrame(frame)
