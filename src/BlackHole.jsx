@@ -33,18 +33,23 @@ const FRAGMENT_SHADER = `
   // HORIZON_R and PHOTON_R are physical constants of the Schwarzschild
   // solution in these units (r_s = 1), not stylistic knobs.
   // ---------------------------------------------------------------------
-  const float INCLINATION     = 0.16;   // keep the disk nearly edge-on
-  const float DISK_ROLL       = 0.35;   // tilt the disk across the shadow, matching the reference composition
-  const float ROTATION_SPEED  = 0.045;  // camera drift speed
-  const float DISK_INNER      = 2.6;    // inner radius, in horizon radii (~ISCO)
-  const float DISK_OUTER      = 8.4;    // concentrated outer edge for a tighter, brighter disk
-  const float BLOOM_INTENSITY = 2.15;   // luminous but color-preserving cyan glow
-  const float HORIZON_R       = 1.0;     // event horizon radius (= r_s)
-  const float PHOTON_R        = 1.5;     // photon sphere radius -> the bright ring
-  const vec3  DISK_HOT        = vec3(0.73, 0.97, 1.00); // ice-cyan highlight: #baf8ff
-  const vec3  DISK_COOL       = vec3(0.13, 0.68, 0.78); // theme cyan/teal: #22d3ee family
-  const int   RAY_STEPS       = 120;    // finer integration for cleaner photon-ring detail
-  const float MAX_REVOLUTIONS = 2.15;   // retain additional higher-order lensed images
+  const float INCLINATION      = 0.16;  // small angle above the disk plane: near edge-on
+  const float DISK_ROLL        = 0.35;  // rotate the full lensing view ~20 degrees
+  const float SCREEN_TO_WORLD  = 8.4;   // keeps the shadow large enough to read, like the reference
+  const float CAMERA_DISTANCE  = 16.0;  // fixed distant camera: no fake camera orbit or scroll zoom
+  const float DISK_INNER       = 1.9;   // inner edge of the luminous plasma
+  const float DISK_OUTER       = 8.0;   // outer radius of the disk
+  const float DISK_GAIN        = 2.4;   // disk emission
+  const float DISK_OPACITY     = 0.20;  // low opacity lets multiple lensed disk images remain visible
+  const float DISK_SPEED       = 1.15;  // slow plasma pattern motion
+  const float DISK_WIND        = 5.7;   // spiral filament winding
+  const float DISK_CONTRAST    = 1.35;  // visible filaments without black bands
+  const float DOPPLER_MIX      = 0.23;  // subtle relativistic asymmetry; don't blacken the far side
+  const float EXPOSURE         = 1.20;  // final glow exposure
+  const float HORIZON_R        = 1.0;   // Schwarzschild event-horizon radius
+  const vec3  DISK_HOT         = vec3(0.73, 0.97, 1.00); // ice-cyan highlight: #baf8ff
+  const vec3  DISK_COOL        = vec3(0.10, 0.61, 0.72); // outer plasma: saturated theme cyan
+  const int   RAY_STEPS        = 64;    // adaptive 3D ray integration steps
   // ---------------------------------------------------------------------
 
   float hash21(vec2 p) {
@@ -53,274 +58,142 @@ const FRAGMENT_SHADER = `
     return fract(p.x * p.y);
   }
 
-  float valueNoise(vec2 p) {
+  // Periodic value-noise field. Wrapping the angular coordinate avoids a
+  // visible seam where the disk texture crosses the atan() branch cut.
+  float vnoiseWrapY(vec2 p, float period) {
     vec2 i = floor(p);
     vec2 f = fract(p);
     f = f * f * (3.0 - 2.0 * f);
-    float a = hash21(i);
-    float b = hash21(i + vec2(1.0, 0.0));
-    float c = hash21(i + vec2(0.0, 1.0));
-    float d = hash21(i + vec2(1.0, 1.0));
+    float y0 = mod(i.y, period);
+    float y1 = mod(i.y + 1.0, period);
+    float a = hash21(vec2(i.x, y0));
+    float b = hash21(vec2(i.x + 1.0, y0));
+    float c = hash21(vec2(i.x, y1));
+    float d = hash21(vec2(i.x + 1.0, y1));
     return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
   }
 
-  float fbm2(vec2 p) {
-    float value = 0.0;
-    float amplitude = 0.5;
-    for (int i = 0; i < 4; i++) {
-      value += amplitude * valueNoise(p);
-      p = p * 2.03 + vec2(7.1, 3.7);
-      amplitude *= 0.5;
-    }
-    return value;
-  }
+  // 3D Schwarzschild photon tracing. Unlike a painted ring or a screen-space
+  // ellipse, every pixel follows its own curved ray. A ray may cross the
+  // accretion disk several times, so the far side is naturally lensed above
+  // and below the black shadow. The adaptive leapfrog trace follows the
+  // approach used by the MIT-licensed s13k/ghostty-blackhole shader; see
+  // THIRD_PARTY_NOTICES.md for attribution and license.
+  vec3 traceRay(vec3 x, vec3 initialV, float time) {
+    vec3 v = initialV;
+    float h2 = dot(cross(x, v), cross(x, v));
 
-  // Procedural starfield sampled straight from a ray direction — no texture.
-  vec3 starField(vec3 dir) {
-    vec2 uv = dir.xy / (1.0 + abs(dir.z)) * 420.0;
-    vec2 cell = floor(uv);
-    vec2 f = fract(uv);
-    float h = hash21(cell);
-    float star = 0.0;
-    if (h > 0.985) {
-      vec2 starPos = vec2(hash21(cell + 1.0), hash21(cell + 7.0));
-      float d = length(f - starPos);
-      float size = mix(0.02, 0.09, hash21(cell + 3.0));
-      star = (1.0 - smoothstep(0.0, size, d)) * mix(0.35, 1.0, hash21(cell + 9.0));
-    }
-    vec3 tint = mix(vec3(0.38, 0.75, 1.0), vec3(0.80, 0.98, 1.0), hash21(cell + 13.0));
-    return vec3(star) * tint;
-  }
+    // Disk plane is almost edge-on to the fixed camera. e2 is the second
+    // in-plane basis vector, used for seamless angular streak coordinates.
+    vec3 n = normalize(vec3(0.0, cos(INCLINATION), sin(INCLINATION)));
+    vec3 e2 = vec3(0.0, -sin(INCLINATION), cos(INCLINATION));
 
-  // The exact Schwarzschild Binet acceleration: d²u/dφ² = -u + 1.5u².
-  float geodesicAccel(float u) {
-    return -u + 1.5 * u * u;
-  }
-
-  // Classic RK4 step for the (u, du/dφ) system, one φ-increment at a time.
-  void integrateStep(inout float u, inout float du, float h) {
-    float k1u = du;
-    float k1du = geodesicAccel(u);
-
-    float u2 = u + 0.5 * h * k1u;
-    float du2 = du + 0.5 * h * k1du;
-    float k2u = du2;
-    float k2du = geodesicAccel(u2);
-
-    float u3 = u + 0.5 * h * k2u;
-    float du3 = du + 0.5 * h * k2du;
-    float k3u = du3;
-    float k3du = geodesicAccel(u3);
-
-    float u4 = u + h * k3u;
-    float du4 = du + h * k3du;
-    float k4u = du4;
-    float k4du = geodesicAccel(u4);
-
-    u += (h / 6.0) * (k1u + 2.0 * k2u + 2.0 * k3u + k4u);
-    du += (h / 6.0) * (k1du + 2.0 * k2du + 2.0 * k3du + k4du);
-  }
-
-  // Shades a single disk-plane crossing between two nearby path points, or
-  // returns black if the segment doesn't cross the disk / falls outside its
-  // radii. Factored out so the photon-sphere region can call it several
-  // times per step on sub-segments (see below) instead of once on the
-  // whole step.
-  vec3 diskCrossingColor(vec3 a, vec3 b, vec3 diskNormal, float time) {
-    float d0 = dot(a, diskNormal);
-    float d1 = dot(b, diskNormal);
-    if (d0 * d1 >= 0.0) return vec3(0.0);
-    float t = d0 / (d0 - d1);
-    vec3 hit = mix(a, b, t);
-    float rad = length(hit);
-    if (rad <= DISK_INNER || rad >= DISK_OUTER) return vec3(0.0);
-
-    float rn = clamp((rad - DISK_INNER) / (DISK_OUTER - DISK_INNER), 0.0, 1.0);
-    vec3 diskCol = mix(DISK_HOT, DISK_COOL, pow(rn, 0.48));
-
-    // Coordinates in the tilted disk plane. Differential rotation gives
-    // the inner plasma a faster flow rate than the outer edge.
-    vec3 diskTangent = normalize(cross(diskNormal, vec3(1.0, 0.0, 0.0)));
-    float angle = atan(dot(hit, diskTangent), hit.x);
-    float orbitalSpeed = mix(1.8, 0.28, rn);
-    float shear = angle + rn * 4.2;
-    float broadFlow = fbm2(vec2(shear * 3.2, rn * 6.0 - time * orbitalSpeed));
-    float filaments = fbm2(vec2(shear * 12.0 + time * 0.08, rn * 22.0));
-    float fineGrain = fbm2(vec2(shear * 30.0 - time * 0.035, rn * 46.0));
-    float turbulence = clamp(broadFlow * 0.52 + filaments * 0.33 + fineGrain * 0.15, 0.0, 1.0);
-
-    // Narrow, nested radial striations recreate the bright multi-band disk
-    // seen in edge-on lensing renders. Noise bends the bands so they feel like
-    // moving plasma filaments, rather than a perfectly regular flat texture.
-    float bandPhase = rad * 7.6 + (broadFlow - 0.5) * 1.7 + fineGrain * 0.75;
-    float radialBands = 0.5 + 0.5 * cos(bandPhase);
-    // Keep the nested bands legible but avoid deep dark stripes that make
-    // one half of the disk appear to switch off as the camera gently orbits.
-    float bandContrast = mix(0.80, 1.24, smoothstep(0.14, 0.88, radialBands));
-    float filamentContrast = mix(0.86, 1.16, smoothstep(0.20, 0.82, filaments));
-    float density = mix(0.78, 1.38, smoothstep(0.24, 0.68, turbulence));
-    density *= bandContrast * filamentContrast;
-    float hotFilament = smoothstep(0.48, 0.82, filaments) * (1.0 - rn);
-
-    // A compact, hotter inner region with thin turbulent filaments instead
-    // of a uniformly colored flat ring.
-    diskCol += vec3(0.015, 0.13, 0.17) * hotFilament;
-
-    // Mild Doppler-like asymmetry: one side should be brighter, but the far
-    // side must still emit visible cyan light rather than falling to black.
-    vec3 rayDir = normalize(b - a);
-    vec3 tangentAtHit = normalize(cross(diskNormal, hit));
-    float beam = dot(tangentAtHit, -rayDir);
-    float beamFactor = pow(clamp(0.90 + beam * 0.28, 0.55, 1.22), 1.35);
-
-    float innerCut = smoothstep(0.0, 0.025, rn);
-    float outerCut = 1.0 - smoothstep(0.82, 1.0, rn);
-    float edge = innerCut * outerCut;
-    // A small, continuous cyan emission floor preserves the far-side arc
-    // while edge fades still keep the disk physically thin.
-    return (diskCol * density + diskCol * 0.16 + vec3(0.012, 0.10, 0.13) * hotFilament)
-      * beamFactor * edge * BLOOM_INTENSITY * 0.58;
-  }
-
-  vec3 traceRay(vec3 ro, vec3 rd, vec3 diskNormal) {
-    float r0 = length(ro);
-    float u = 1.0 / r0;
-    vec3 normalVec = ro / r0;
-
-    // The orbit plane is spanned by normalVec (radial at the camera) and
-    // the component of the ray direction perpendicular to it — a photon's
-    // path around a non-spinning hole always stays in this one plane.
-    vec3 rdPerp = rd - normalVec * dot(rd, normalVec);
-    float rdPerpLen = length(rdPerp);
-    vec3 tangentVec;
-    if (rdPerpLen > 1e-6) {
-      tangentVec = rdPerp / rdPerpLen;
-    } else {
-      tangentVec = abs(normalVec.y) < 0.9
-        ? normalize(cross(normalVec, vec3(0.0, 1.0, 0.0)))
-        : normalize(cross(normalVec, vec3(1.0, 0.0, 0.0)));
-    }
-
-    // Initial du/dφ from the ray's radial vs. tangential direction cosines.
-    float radialComp = dot(rd, normalVec);
-    float tangComp = dot(rd, tangentVec);
-    float du = (abs(tangComp) > 1e-6) ? -radialComp / tangComp * u : -sign(radialComp) * u * 200.0;
-    du = clamp(du, -200.0, 200.0);
-
-    float phi = 0.0;
-    float baseStep = MAX_REVOLUTIONS * 6.28318530718 / float(RAY_STEPS);
-
-    vec3 color = vec3(0.0);
-    vec3 pos = ro;
-    float minApproach = r0;
-    bool captured = false;
+    vec3 emitted = vec3(0.0);
+    float transmittance = 1.0;
+    float previousSide = dot(x, n);
+    vec3 previousPosition = x;
 
     for (int i = 0; i < RAY_STEPS; i++) {
-      // Finer angular steps near the photon sphere, where deflection is
-      // sharpest and the disk/halo "joining" cusp actually forms.
-      float photonProximity = exp(-14.0 * (u - 0.6667) * (u - 0.6667));
-      float step = baseStep * (1.0 - 0.7 * photonProximity);
+      float r2 = dot(x, x);
+      if (r2 < HORIZON_R * HORIZON_R) break;
+      if (x.z < -CAMERA_DISTANCE && v.z < 0.0) break;
+      if (r2 > 4.0 * CAMERA_DISTANCE * CAMERA_DISTANCE) break;
 
-      vec3 oldPos = pos;
-      integrateStep(u, du, step);
-      phi += step;
+      float r = sqrt(r2);
+      // Adaptive step length: finer in the strongly curved region, cheaper
+      // in the weak-field region far from the event horizon.
+      float dt = clamp(0.16 * r, 0.03, 1.5);
+      vec3 acceleration = -1.5 * h2 * x / (r2 * r2 * r);
+      v += acceleration * (0.5 * dt);
+      x += v * dt;
 
-      if (u >= 1.0 / HORIZON_R) {
-        captured = true;
-        break; // swallowed — whatever light was gathered en route, nothing more
+      r2 = dot(x, x);
+      r = sqrt(max(r2, 1e-5));
+      acceleration = -1.5 * h2 * x / (r2 * r2 * r);
+      v += acceleration * (0.5 * dt);
+
+      // The curved ray pierced the thin disk plane; interpolate the crossing
+      // for a clean hit point instead of sampling a whole integration step.
+      float side = dot(x, n);
+      if (side * previousSide < 0.0 && transmittance > 0.015) {
+        float crossingT = previousSide / (previousSide - side);
+        vec3 hit = mix(previousPosition, x, crossingT);
+        float radius = length(hit);
+
+        if (radius > DISK_INNER && radius < DISK_OUTER) {
+          float band = smoothstep(DISK_INNER, DISK_INNER * 1.22, radius)
+                     * (1.0 - smoothstep(DISK_OUTER * 0.72, DISK_OUTER, radius));
+
+          float phi = atan(dot(hit, e2), hit.x);
+          float turns = phi / 6.2831853;
+          float kep = pow(DISK_INNER / radius, 1.5);
+          float gravitationalShift = sqrt(max(1.0 - 1.5 / radius, 0.02));
+          float swirl = radius * DISK_WIND * 0.12
+                      - time * kep * DISK_SPEED * gravitationalShift;
+
+          float streaks =
+              vnoiseWrapY(vec2(radius * 2.8, turns * 19.0 + swirl * 3.0), 19.0) * 0.65
+            + vnoiseWrapY(vec2(radius * 1.0, turns * 9.0 + swirl * 1.5 + 7.0), 9.0) * 0.35;
+          streaks = 0.42 + DISK_CONTRAST * streaks * streaks;
+
+          // A restrained relativistic brightness shift adds depth without
+          // allowing the receding/far side to collapse into a black stripe.
+          vec3 gasDirection = normalize(cross(n, hit));
+          float beta = clamp(inversesqrt(max(2.0 * (radius - 1.0), 0.2)), 0.0, 0.72);
+          float gRaw = gravitationalShift
+                     / max(1.0 + beta * dot(gasDirection, normalize(v)), 0.10);
+          float g = mix(1.0, gRaw, DOPPLER_MIX);
+          float boost = pow(clamp(g, 0.80, 1.24), 1.35);
+
+          // Shakura–Sunyaev radial temperature profile, remapped only into the
+          // portfolio's cyan palette. The center remains black; the inner
+          // disk is icy cyan-white and the outer disk keeps a richer teal tone.
+          float xpr = max(1.0 - sqrt(DISK_INNER / radius), 0.0);
+          float temperatureProfile =
+            pow(DISK_INNER / radius, 0.75) * pow(xpr, 0.25) / 0.488;
+          float hotness = clamp(pow(max(temperatureProfile, 0.0), 0.45), 0.0, 1.0);
+          vec3 diskColor = mix(DISK_COOL, DISK_HOT, hotness);
+
+          float density = band * streaks;
+          float emissivity = DISK_GAIN * density
+                           * pow(max(temperatureProfile, 0.0), 1.65) * boost;
+          emitted += transmittance * diskColor * emissivity;
+
+          // Modest absorption allows the far-side disk to shine through each
+          // nearer crossing, giving the layered, lensed arcs in the reference.
+          transmittance *= 1.0 - clamp(DISK_OPACITY * density, 0.0, 0.48);
+        }
       }
 
-      // Avoid reconstructing a position at infinity if a coarse step reaches
-      // the asymptotic escape region; dividing by a near-zero u causes NaNs.
-      if (u <= 1.0 / 34.0) break;
-      pos = (cos(phi) * normalVec + sin(phi) * tangentVec) / u;
-      minApproach = min(minApproach, 1.0 / u);
-
-      // Thin-disk intersection: did we cross the tilted equatorial plane?
-      // pos is reconstructed as (...)/u, so as u shrinks toward the escape
-      // threshold any tiny per-pixel difference upstream gets divided back
-      // up into a large positional error — exactly the regime a ray is in
-      // right after a strong deflection, on its way back out. That shows
-      // up as speckle no smooth damping fixes without supersampling/TAA.
-      // Fade the crossing test out smoothly as u drops toward that unsafe
-      // range (a hard cutoff instead just traded speckle for a jagged
-      // step edge, since the flip happens on a whole-step granularity).
-      float uGate = smoothstep(1.1 / DISK_OUTER, 1.6 / DISK_OUTER, u);
-      if (uGate > 0.0) {
-        color += diskCrossingColor(oldPos, pos, diskNormal, uTime) * uGate;
-      }
-
+      previousSide = side;
+      previousPosition = x;
     }
 
-    if (captured) return color;
-
-    // Photon ring: a thin, bright rim wherever the path's closest approach
-    // hugs the photon sphere. With a true geodesic this also naturally
-    // catches higher-order lensed images that wind close to r = 1.5.
-    float ringDist = abs(minApproach - PHOTON_R);
-    // Gaussian falloffs avoid reversed smoothstep edges (undefined by GLSL)
-    // and keep the photon ring narrow, smooth and high contrast.
-    float ring = exp(-pow(ringDist / 0.047, 2.0))
-               + 0.42 * exp(-pow(ringDist / 0.15, 2.0))
-               + 0.12 * exp(-pow(ringDist / 0.30, 2.0));
-    color += vec3(0.58, 0.93, 1.00) * ring * BLOOM_INTENSITY;
-
-    // Analytic exit direction from the Binet parametrisation — the exact
-    // tangent to the geodesic where marching stopped — instead of a noisy
-    // finite difference of the last two positions.
-    vec3 rHat = cos(phi) * normalVec + sin(phi) * tangentVec;
-    vec3 phiHat = -sin(phi) * normalVec + cos(phi) * tangentVec;
-    vec3 exitDir = phiHat / max(u, 1e-4) - rHat * du / max(u * u, 1e-6);
-
-    // Strongly-lensed rays (large total deflection) pack many stars into a
-    // few pixels — genuine gravitational magnification, but at a finite
-    // step budget without supersampling/TAA it aliases into speckle rather
-    // than a clean smear. Fade the raw star sample out as deflection grows,
-    // letting the smooth ring/disk glow (unaffected — it's geometry, not a
-    // per-pixel noise sample) dominate that band instead.
-    float deflection = 1.0 - dot(normalize(exitDir), rd);
-    float lensDamp = smoothstep(0.15, 0.6, deflection);
-    color += starField(normalize(exitDir)) * (1.0 - lensDamp);
-    return color;
+    // The surrounding background is deliberately black; the luminous rings
+    // arise from the ray crossing the disk at different lensed image orders.
+    return emitted;
   }
 
   void main() {
+    // Pixel coordinates are mapped to a fixed impact-parameter plane. The
+    // viewpoint does not orbit or zoom; only the plasma pattern evolves.
     vec2 uv = (gl_FragCoord.xy - 0.5 * uResolution) / uResolution.y;
-    // Roll the view in screen space: the black shadow stays circular while
-    // the accretion disk and its lensed arcs sweep diagonally across it.
     float rollCos = cos(DISK_ROLL);
     float rollSin = sin(DISK_ROLL);
-    vec2 rolledUv = vec2(rollCos * uv.x - rollSin * uv.y,
-                         rollSin * uv.x + rollCos * uv.y);
+    vec2 rolledUv = vec2(
+      rollCos * uv.x - rollSin * uv.y,
+      rollSin * uv.x + rollCos * uv.y
+    );
 
-    // Slow orbital drift — alive, never a spinning-logo kind of motion.
-    float camDist = 23.0;
-    float az = uTime * ROTATION_SPEED;
-    // Kept low so the camera sits close to the disk's plane — near edge-on,
-    // like the reference framing — rather than looking down on it face-on.
-    float el = 0.14 + 0.03 * sin(uTime * 0.07);
+    vec2 impact = rolledUv * SCREEN_TO_WORLD;
+    vec3 cameraPosition = vec3(impact, CAMERA_DISTANCE);
+    vec3 rayDirection = vec3(0.0, 0.0, -1.0);
+    vec3 emission = traceRay(cameraPosition, rayDirection, uTime);
 
-    vec3 camPos = camDist * vec3(cos(el) * sin(az), sin(el), cos(el) * cos(az));
-    vec3 forward = normalize(-camPos);
-    vec3 worldUp = vec3(0.0, 1.0, 0.0);
-    vec3 right = normalize(cross(forward, worldUp));
-    vec3 up = cross(right, forward);
-
-    // Keep a constant field of view: scrolling moves the page, not the black hole.
-    float fov = 1.15;
-    vec3 rd = normalize(forward + rolledUv.x * fov * right + rolledUv.y * fov * up);
-
-    // The disk sits near the camera's orbital (X-Z) plane, tilted slightly
-    // by INCLINATION, so the default framing is naturally near edge-on.
-    vec3 diskNormal = normalize(vec3(0.0, cos(INCLINATION), sin(INCLINATION)));
-
-    vec3 col = traceRay(camPos, rd, diskNormal);
-
-    // Lift the whole emission before tone mapping so the disk and photon ring
-    // stay luminous against the dark space without clipping their highlights.
-    col *= 1.35;
-    col = col / (col + vec3(0.88));
-    col = pow(col, vec3(1.02));
+    // Exponential tone mapping and display gamma keep luminous areas bright
+    // while preserving cyan saturation and the truly black event horizon.
+    vec3 col = 1.0 - exp(-emission * EXPOSURE);
+    col = pow(clamp(col, 0.0, 1.0), vec3(0.72));
 
     gl_FragColor = vec4(col, 1.0);
   }
