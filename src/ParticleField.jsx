@@ -253,15 +253,17 @@ function StarField({ count, glowTexture, reduced }) {
   const sizes = useMemo(() => new Float32Array(stars.length), [stars])
 
   useFrame((state, delta) => {
+    const frameDelta = Math.min(Math.max(delta, 0), 0.05)
     const geo = pointsRef.current?.geometry
     if (!geo) return
     const sizeAttr = geo.attributes.aSize
     for (let i = 0; i < stars.length; i++) {
       const s = stars[i]
       if (!reduced) {
-        s.phase += delta * s.speed
-        if (Math.random() < s.flareChance) s.flare = 1
-        s.flare *= 0.9
+        s.phase += frameDelta * s.speed
+        const flareChance = 1 - Math.pow(1 - s.flareChance, frameDelta * 60)
+        if (Math.random() < flareChance) s.flare = 1
+        s.flare *= Math.pow(0.9, frameDelta * 60)
       }
       const twinkle = 0.5 + Math.sin(s.phase) * 0.35 + s.flare * 2.4
       sizeAttr.array[i] = s.size * Math.max(twinkle, 0.1)
@@ -304,14 +306,16 @@ function SparkleField({ count, sparkleTexture, reduced }) {
   const refs = useRef([])
 
   useFrame((state, delta) => {
+    const frameDelta = Math.min(Math.max(delta, 0), 0.05)
     items.forEach((it, i) => {
       const mesh = refs.current[i]
       if (!mesh) return
       if (!reduced) {
-        it.phase += delta * it.speed
-        if (Math.random() < 0.01) it.flare = 1
-        it.flare *= 0.92
-        it.rot += delta * 0.12
+        it.phase += frameDelta * it.speed
+        const flareChance = 1 - Math.pow(0.99, frameDelta * 60)
+        if (Math.random() < flareChance) it.flare = 1
+        it.flare *= Math.pow(0.92, frameDelta * 60)
+        it.rot += frameDelta * 0.12
       }
       const twinkle = 0.35 + Math.sin(it.phase) * 0.3 + it.flare * 1.9
       const s = it.baseScale * Math.max(twinkle, 0.18)
@@ -413,6 +417,7 @@ function DustLayer({ count, glowTexture, reduced }) {
   const sizes = useMemo(() => new Float32Array(points.length), [points])
 
   useFrame((state, delta) => {
+    const frameDelta = Math.min(Math.max(delta, 0), 0.05)
     const geo = pointsRef.current?.geometry
     if (!geo) return
     const posAttr = geo.attributes.position
@@ -421,7 +426,7 @@ function DustLayer({ count, glowTexture, reduced }) {
     for (let i = 0; i < points.length; i++) {
       const p = points[i]
       if (!reduced) {
-        p.phase += delta * p.speed
+        p.phase += frameDelta * p.speed
         if (p.z > camera.position.z + 4) {
           p.z = camera.position.z - 60 - Math.random() * 15
           p.baseX = (Math.random() - 0.5) * 46
@@ -429,8 +434,9 @@ function DustLayer({ count, glowTexture, reduced }) {
           p.x = p.baseX
           p.y = p.baseY
         }
-        if (Math.random() < CONFIG.twinkleChance) p.flare = 1
-        p.flare *= 0.94
+        const flareChance = 1 - Math.pow(1 - CONFIG.twinkleChance, frameDelta * 60)
+        if (Math.random() < flareChance) p.flare = 1
+        p.flare *= Math.pow(0.94, frameDelta * 60)
       }
       const tw = 0.7 + Math.sin(p.phase) * 0.3 + p.flare * 1.4
       posAttr.array[i * 3] = p.x
@@ -493,6 +499,7 @@ function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactiv
   }, [cursorReactive])
 
   useFrame((state, delta) => {
+    const frameDelta = Math.min(Math.max(delta, 0), 0.05)
     const fovRad = (camera.fov * Math.PI) / 180
 
     // Scrolling makes the network feel briefly more energetic — a subtle
@@ -505,7 +512,9 @@ function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactiv
       const p = points[i]
       if (!reduced) {
         p.phase += delta * p.speed
-        if (Math.random() < CONFIG.twinkleChance * 0.6 + scrollEnergy * 0.01) {
+        const baseFlareChance = Math.min(CONFIG.twinkleChance * 0.6 + scrollEnergy * 0.01, 0.99)
+        const flareChance = 1 - Math.pow(1 - baseFlareChance, frameDelta * 60)
+        if (Math.random() < flareChance) {
           p.flare = 1
           // Energy pulse: a flaring node briefly lights up one of its
           // existing connections' neighbors too, so brightness appears
@@ -516,7 +525,7 @@ function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactiv
             points[n].flare = Math.max(points[n].flare, 0.55)
           }
         }
-        p.flare *= 0.95
+        p.flare *= Math.pow(0.95, frameDelta * 60)
       }
       let x = p.baseX + Math.sin(p.phase) * p.amp
       let y = p.baseY + Math.cos(p.phase * 0.8) * p.amp
@@ -545,7 +554,7 @@ function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactiv
           const intensity = 0.35 + scrollRef.current * 1.1
           const pull = Math.pow(1 - dist / BLACK_HOLE.pullRadius, 2) * BLACK_HOLE.gravityStrength * intensity
           // Keep the attraction rate independent of monitor refresh rate.
-          const frameScale = Math.min(delta, 0.05) * 60
+          const frameScale = frameDelta * 60
           p.gx += (dx / dist) * pull * frameScale
           p.gy += (dy / dist) * pull * frameScale
           p.gz += (dz / dist) * pull * frameScale
@@ -655,12 +664,13 @@ function Debris({ enabled }) {
 
   useFrame((state, delta) => {
     if (!enabled) return
+    const frameDelta = Math.min(Math.max(delta, 0), 0.05)
     slots.forEach((s, i) => {
       const mesh = meshRefs.current[i]
       if (!mesh) return
 
       if (!s.active) {
-        s.nextSpawn -= delta
+        s.nextSpawn -= frameDelta
         if (s.nextSpawn <= 0) {
           s.active = true
           s.t = 0
@@ -673,7 +683,7 @@ function Debris({ enabled }) {
         return
       }
 
-      s.t += delta / s.duration
+      s.t += frameDelta / s.duration
       if (s.t >= 1) {
         s.active = false
         s.nextSpawn = CONFIG.debrisMinDelay + Math.random() * (CONFIG.debrisMaxDelay - CONFIG.debrisMinDelay)
@@ -686,8 +696,8 @@ function Debris({ enabled }) {
       mesh.position.lerpVectors(s.start, s.end, eased)
       const scale = 0.12 + eased * eased * 1.6
       mesh.scale.setScalar(scale)
-      mesh.rotation.x += delta * s.rotSpeed
-      mesh.rotation.y += delta * s.rotSpeed * 0.7
+      mesh.rotation.x += frameDelta * s.rotSpeed
+      mesh.rotation.y += frameDelta * s.rotSpeed * 0.7
 
       const fadeIn = Math.min(s.t / 0.12, 1)
       const fadeOut = 1 - Math.max((s.t - 0.82) / 0.18, 0)
@@ -710,6 +720,7 @@ function Debris({ enabled }) {
 function CrystalDebrisField({ count, reduced }) {
   const fillRef = useRef()
   const wireRef = useRef()
+  const elapsedRef = useRef(0)
   const dummy = useMemo(() => new THREE.Object3D(), [])
 
   const items = useMemo(() => {
@@ -749,14 +760,19 @@ function CrystalDebrisField({ count, reduced }) {
     wireRef.current.instanceMatrix.needsUpdate = true
   }
 
-  useEffect(() => applyTransforms(0), [items])
+  useEffect(() => {
+    elapsedRef.current = 0
+    applyTransforms(0)
+  }, [items])
 
   useFrame((state, delta) => {
     if (reduced) return
+    const frameDelta = Math.min(Math.max(delta, 0), 0.05)
+    elapsedRef.current += frameDelta
     items.forEach((it) => {
-      it.ry += it.spin * delta
+      it.ry += it.spin * frameDelta
     })
-    applyTransforms(state.clock.elapsedTime)
+    applyTransforms(elapsedRef.current)
   })
 
   return (
