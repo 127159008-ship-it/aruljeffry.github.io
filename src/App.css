@@ -28,12 +28,21 @@
   height: 6px;
   background: var(--accent-bright);
   box-shadow: 0 0 10px 2px rgba(34, 211, 238, 0.8);
+  opacity: 0;
 }
 
 .cursor-ring {
   width: 34px;
   height: 34px;
   border: 1px solid var(--accent);
+  opacity: 0;
+}
+
+.cursor-dot.cursor-ready {
+  opacity: 1;
+}
+
+.cursor-ring.cursor-ready {
   opacity: 0.6;
 }
 
