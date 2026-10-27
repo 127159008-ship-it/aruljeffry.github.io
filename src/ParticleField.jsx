@@ -540,9 +540,11 @@ function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactiv
         } else if (dist < BLACK_HOLE.pullRadius) {
           const intensity = 0.35 + scrollRef.current * 1.1
           const pull = Math.pow(1 - dist / BLACK_HOLE.pullRadius, 2) * BLACK_HOLE.gravityStrength * intensity
-          p.gx += (dx / dist) * pull
-          p.gy += (dy / dist) * pull
-          p.gz += (dz / dist) * pull
+          // Keep the attraction rate independent of monitor refresh rate.
+          const frameScale = delta * 60
+          p.gx += (dx / dist) * pull * frameScale
+          p.gy += (dy / dist) * pull * frameScale
+          p.gz += (dz / dist) * pull * frameScale
         }
       }
 
@@ -790,14 +792,16 @@ function CameraRig({ reduced }) {
     }
   }, [])
 
-  useFrame(() => {
+  useFrame((state, delta) => {
     const targetZ = reduced ? 8 : 8 - scrollProgress.current * CONFIG.scrollTravel
     const targetX = reduced ? 0 : mouse.current.x * 1.1
     const targetY = reduced ? 0 : mouse.current.y * 0.7
+    // Exponential damping makes camera easing consistent at 60/120/144 Hz.
+    const alpha = 1 - Math.exp(-2.2 * Math.min(delta, 0.05))
 
-    camera.position.z += (targetZ - camera.position.z) * 0.035
-    camera.position.x += (targetX - camera.position.x) * 0.04
-    camera.position.y += (targetY - camera.position.y) * 0.04
+    camera.position.z += (targetZ - camera.position.z) * alpha
+    camera.position.x += (targetX - camera.position.x) * alpha
+    camera.position.y += (targetY - camera.position.y) * alpha
     camera.lookAt(camera.position.x * 0.3, camera.position.y * 0.3, camera.position.z - 12)
   })
 
@@ -890,7 +894,7 @@ function useTier() {
 export default function ParticleField() {
   const reduced = usePrefersReducedMotion()
   const tier = useTier()
-  const [visible, setVisible] = useState(!document.hidden)
+  const [visible, setVisible] = useState(() => typeof document === 'undefined' || !document.hidden)
 
   useEffect(() => {
     const onVisibility = () => setVisible(!document.hidden)
