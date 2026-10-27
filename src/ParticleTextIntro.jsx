@@ -42,14 +42,25 @@ export default function ParticleTextIntro({ text, className, as: Tag = 'h1' }) {
 
     let cancelled = false
     let rafId = null
+    setRevealed(false)
+    setCanvasVisible(true)
 
     const initialise = () => {
       if (cancelled) return
       const el = textRef.current
       const canvas = canvasRef.current
-      if (!el || !canvas) {
+      if (!el) {
         setRevealed(true)
         setCanvasVisible(false)
+        return
+      }
+      if (!canvas) {
+        // On a live reduced-motion preference change the canvas is mounted by
+        // state; wait one frame for its ref rather than failing the intro.
+        rafId = requestAnimationFrame(() => {
+          rafId = null
+          initialise()
+        })
         return
       }
 
