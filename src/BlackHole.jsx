@@ -380,8 +380,9 @@ export default function BlackHole({ className = '', style }) {
     let rafId = null
     let disposed = false
     let pageVisible = !document.hidden
+    let inViewport = true
     let startTime = performance.now()
-    let hiddenAt = pageVisible ? null : startTime
+    let pauseStarted = pageVisible ? null : startTime
 
     const drawFrame = (now) => {
       if (disposed || gl.isContextLost()) return
@@ -394,13 +395,13 @@ export default function BlackHole({ className = '', style }) {
 
     const tick = (now) => {
       rafId = null
-      if (disposed || !pageVisible) return
+      if (disposed || !pageVisible || !inViewport) return
       drawFrame(now)
       if (!reducedMotion) rafId = requestAnimationFrame(tick)
     }
 
     const scheduleRender = () => {
-      if (disposed || !pageVisible) return
+      if (disposed || !pageVisible || !inViewport) return
       if (reducedMotion) {
         drawFrame(performance.now())
       } else if (rafId === null) {
@@ -426,22 +427,33 @@ export default function BlackHole({ className = '', style }) {
       scheduleRender()
     }
 
-    const onVisibilityChange = () => {
+    const syncActivity = () => {
       const now = performance.now()
-      pageVisible = !document.hidden
-      if (!pageVisible) {
-        hiddenAt = now
+      const active = pageVisible && inViewport
+      if (!active) {
+        if (pauseStarted === null) pauseStarted = now
         if (rafId !== null) cancelAnimationFrame(rafId)
         rafId = null
-      } else {
-        // Freeze shader time while the tab is hidden so the disk resumes
-        // smoothly instead of jumping forward after a background pause.
-        if (hiddenAt !== null) {
-          startTime += now - hiddenAt
-          hiddenAt = null
-        }
-        scheduleRender()
+        return
       }
+
+      // Freeze shader time whenever the page is hidden or the hero scrolls
+      // out of view, so it resumes smoothly without wasting GPU time.
+      if (pauseStarted !== null) {
+        startTime += now - pauseStarted
+        pauseStarted = null
+      }
+      scheduleRender()
+    }
+
+    const onVisibilityChange = () => {
+      pageVisible = !document.hidden
+      syncActivity()
+    }
+
+    const onIntersectionChange = (entries) => {
+      inViewport = entries.some((entry) => entry.isIntersecting)
+      syncActivity()
     }
 
     const onContextLost = (event) => {
@@ -458,10 +470,15 @@ export default function BlackHole({ className = '', style }) {
       resizeObserver = new ResizeObserver(resize)
       if (canvas.parentElement) resizeObserver.observe(canvas.parentElement)
     }
+    let intersectionObserver = null
+    if (typeof IntersectionObserver !== 'undefined') {
+      intersectionObserver = new IntersectionObserver(onIntersectionChange, { rootMargin: '100px' })
+      intersectionObserver.observe(canvas.parentElement || canvas)
+    }
     window.addEventListener('resize', resize, { passive: true })
     document.addEventListener('visibilitychange', onVisibilityChange)
     canvas.addEventListener('webglcontextlost', onContextLost, false)
-    scheduleRender()
+    syncActivity()
 
     return () => {
       disposed = true
@@ -470,6 +487,7 @@ export default function BlackHole({ className = '', style }) {
       document.removeEventListener('visibilitychange', onVisibilityChange)
       canvas.removeEventListener('webglcontextlost', onContextLost, false)
       if (resizeObserver) resizeObserver.disconnect()
+      if (intersectionObserver) intersectionObserver.disconnect()
       gl.deleteBuffer(positionBuffer)
       gl.deleteProgram(program)
       // Keep the canvas context alive between React effect cleanups. Explicitly
