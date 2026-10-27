@@ -34,15 +34,15 @@ const FRAGMENT_SHADER = `
   // HORIZON_R and PHOTON_R are physical constants of the Schwarzschild
   // solution in these units (r_s = 1), not stylistic knobs.
   // ---------------------------------------------------------------------
-  const float INCLINATION     = 0.34;   // disk tilt off edge-on, radians
+  const float INCLINATION     = 0.16;   // keep the disk nearly edge-on, with a slight diagonal tilt
   const float ROTATION_SPEED  = 0.045;  // camera drift speed
   const float DISK_INNER      = 2.6;    // inner radius, in horizon radii (~ISCO)
-  const float DISK_OUTER      = 9.0;    // outer radius, in horizon radii
-  const float BLOOM_INTENSITY = 2.15;  // stronger visible disk and photon-ring glow
+  const float DISK_OUTER      = 8.4;    // concentrated outer edge for a tighter, brighter disk
+  const float BLOOM_INTENSITY = 2.5;    // strong cyan photon ring and disk glow
   const float HORIZON_R       = 1.0;    // event horizon radius (= r_s)
   const float PHOTON_R        = 1.5;    // photon sphere radius -> the bright ring
-  const vec3  DISK_HOT        = vec3(0.78, 0.98, 1.0);  // near-ISCO: icy cyan-white
-  const vec3  DISK_COOL       = vec3(0.08, 0.52, 0.92);  // outer edge: electric blue
+  const vec3  DISK_HOT        = vec3(0.58, 1.12, 1.38); // inner disk: luminous ice-cyan
+  const vec3  DISK_COOL       = vec3(0.018, 0.24, 1.02); // outer disk: electric blue
   const int   RAY_STEPS       = 120;    // finer integration for cleaner photon-ring detail
   const float MAX_REVOLUTIONS = 2.15;   // retain additional higher-order lensed images
   // ---------------------------------------------------------------------
@@ -148,8 +148,17 @@ const FRAGMENT_SHADER = `
     float filaments = fbm2(vec2(shear * 12.0 + time * 0.08, rn * 22.0));
     float fineGrain = fbm2(vec2(shear * 30.0 - time * 0.035, rn * 46.0));
     float turbulence = clamp(broadFlow * 0.52 + filaments * 0.33 + fineGrain * 0.15, 0.0, 1.0);
-    float density = mix(0.18, 1.35, smoothstep(0.28, 0.76, turbulence));
-    float hotFilament = smoothstep(0.55, 0.88, filaments) * (1.0 - rn);
+
+    // Narrow, nested radial striations recreate the bright multi-band disk
+    // seen in edge-on lensing renders. Noise bends the bands so they feel like
+    // moving plasma filaments, rather than a perfectly regular flat texture.
+    float bandPhase = rad * 7.6 + (broadFlow - 0.5) * 1.7 + fineGrain * 0.75;
+    float radialBands = 0.5 + 0.5 * cos(bandPhase);
+    float bandContrast = mix(0.56, 1.58, smoothstep(0.14, 0.88, radialBands));
+    float filamentContrast = mix(0.62, 1.42, smoothstep(0.20, 0.82, filaments));
+    float density = mix(0.55, 1.72, smoothstep(0.24, 0.68, turbulence));
+    density *= bandContrast * filamentContrast;
+    float hotFilament = smoothstep(0.48, 0.82, filaments) * (1.0 - rn);
 
     // A compact, hotter inner region with thin turbulent filaments instead
     // of a uniformly colored flat ring.
@@ -164,8 +173,8 @@ const FRAGMENT_SHADER = `
     float innerCut = smoothstep(0.0, 0.025, rn);
     float outerCut = 1.0 - smoothstep(0.82, 1.0, rn);
     float edge = innerCut * outerCut;
-    return (diskCol * density + vec3(0.008, 0.09, 0.16) * hotFilament)
-      * beamFactor * edge * BLOOM_INTENSITY * 0.52;
+    return (diskCol * density + vec3(0.012, 0.16, 0.34) * hotFilament)
+      * beamFactor * edge * BLOOM_INTENSITY * 0.68;
   }
 
   vec3 traceRay(vec3 ro, vec3 rd, vec3 diskNormal) {
@@ -246,9 +255,10 @@ const FRAGMENT_SHADER = `
     float ringDist = abs(minApproach - PHOTON_R);
     // Gaussian falloffs avoid reversed smoothstep edges (undefined by GLSL)
     // and keep the photon ring narrow, smooth and high contrast.
-    float ring = exp(-pow(ringDist / 0.055, 2.0))
-               + 0.32 * exp(-pow(ringDist / 0.18, 2.0));
-    color += vec3(0.62, 0.92, 1.0) * ring * BLOOM_INTENSITY;
+    float ring = exp(-pow(ringDist / 0.047, 2.0))
+               + 0.42 * exp(-pow(ringDist / 0.15, 2.0))
+               + 0.12 * exp(-pow(ringDist / 0.30, 2.0));
+    color += vec3(0.40, 1.02, 1.28) * ring * BLOOM_INTENSITY * 1.18;
 
     // Analytic exit direction from the Binet parametrisation — the exact
     // tangent to the geodesic where marching stopped — instead of a noisy
@@ -299,9 +309,9 @@ const FRAGMENT_SHADER = `
 
     // Lift the whole emission before tone mapping so the disk and photon ring
     // stay luminous against the dark space without clipping their highlights.
-    col *= 1.65;
-    col = col / (col + vec3(0.82));
-    col = pow(col, vec3(1.08));
+    col *= 1.8;
+    col = col / (col + vec3(0.78));
+    col = pow(col, vec3(0.98));
 
     gl_FragColor = vec4(col, 1.0);
   }
