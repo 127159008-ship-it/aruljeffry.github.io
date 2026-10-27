@@ -437,12 +437,12 @@ export default function BlackHole({ className = '', style }) {
     // Scroll progress is used only as a camera zoom control; the black hole
     // remains fixed behind the particle network while its apparent size grows.
     const onScroll = () => {
+      if (reducedMotion) {
+        scrollProgress = 0
+        return
+      }
       const maxScroll = document.documentElement.scrollHeight - window.innerHeight
-      // Keep the scroll zoom for normal motion settings, but make the shader
-      // fully static when the visitor asks the OS to reduce motion.
-      scrollProgress = !reducedMotion && maxScroll > 0
-        ? Math.min(Math.max(window.scrollY / maxScroll, 0), 1)
-        : 0
+      scrollProgress = maxScroll > 0 ? Math.min(Math.max(window.scrollY / maxScroll, 0), 1) : 0
       scheduleRender()
     }
 
