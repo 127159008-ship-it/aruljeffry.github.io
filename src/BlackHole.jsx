@@ -380,7 +380,8 @@ export default function BlackHole({ className = '', style }) {
     let rafId = null
     let disposed = false
     let pageVisible = !document.hidden
-    const startTime = performance.now()
+    let startTime = performance.now()
+    let hiddenAt = pageVisible ? null : startTime
 
     const drawFrame = (now) => {
       if (disposed || gl.isContextLost()) return
@@ -426,11 +427,19 @@ export default function BlackHole({ className = '', style }) {
     }
 
     const onVisibilityChange = () => {
+      const now = performance.now()
       pageVisible = !document.hidden
-      if (!pageVisible && rafId !== null) {
-        cancelAnimationFrame(rafId)
+      if (!pageVisible) {
+        hiddenAt = now
+        if (rafId !== null) cancelAnimationFrame(rafId)
         rafId = null
       } else {
+        // Freeze shader time while the tab is hidden so the disk resumes
+        // smoothly instead of jumping forward after a background pause.
+        if (hiddenAt !== null) {
+          startTime += now - hiddenAt
+          hiddenAt = null
+        }
         scheduleRender()
       }
     }
