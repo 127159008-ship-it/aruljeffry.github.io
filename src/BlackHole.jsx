@@ -38,7 +38,7 @@ const FRAGMENT_SHADER = `
   const float ROTATION_SPEED  = 0.045;  // camera drift speed
   const float DISK_INNER      = 2.6;    // inner radius, in horizon radii (~ISCO)
   const float DISK_OUTER      = 9.0;    // outer radius, in horizon radii
-  const float BLOOM_INTENSITY = 1.6;
+  const float BLOOM_INTENSITY = 2.15;  // stronger visible disk and photon-ring glow
   const float HORIZON_R       = 1.0;    // event horizon radius (= r_s)
   const float PHOTON_R        = 1.5;    // photon sphere radius -> the bright ring
   const vec3  DISK_HOT        = vec3(0.78, 0.98, 1.0);  // near-ISCO: icy cyan-white
@@ -297,10 +297,11 @@ const FRAGMENT_SHADER = `
 
     vec3 col = traceRay(camPos, rd, diskNormal);
 
-    // Cheap Reinhard-ish tone mapping so bright highlights glow without
-    // hard-clipping to white.
-    col = col / (col + vec3(1.0));
-    col = pow(col, vec3(1.3));
+    // Lift the whole emission before tone mapping so the disk and photon ring
+    // stay luminous against the dark space without clipping their highlights.
+    col *= 1.65;
+    col = col / (col + vec3(0.82));
+    col = pow(col, vec3(1.08));
 
     gl_FragColor = vec4(col, 1.0);
   }
