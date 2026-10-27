@@ -27,7 +27,6 @@ const FRAGMENT_SHADER = `
 
   uniform vec2 uResolution;
   uniform float uTime;
-  uniform float uScrollProgress;
 
   // ---------------------------------------------------------------------
   // Tunables — adjust the look here without touching the logic below.
@@ -39,11 +38,11 @@ const FRAGMENT_SHADER = `
   const float ROTATION_SPEED  = 0.045;  // camera drift speed
   const float DISK_INNER      = 2.6;    // inner radius, in horizon radii (~ISCO)
   const float DISK_OUTER      = 8.4;    // concentrated outer edge for a tighter, brighter disk
-  const float BLOOM_INTENSITY = 2.5;    // strong cyan photon ring and disk glow
-  const float HORIZON_R       = 1.0;    // event horizon radius (= r_s)
-  const float PHOTON_R        = 1.5;    // photon sphere radius -> the bright ring
-  const vec3  DISK_HOT        = vec3(0.58, 1.12, 1.38); // inner disk: luminous ice-cyan
-  const vec3  DISK_COOL       = vec3(0.018, 0.24, 1.02); // outer disk: electric blue
+  const float BLOOM_INTENSITY = 2.15;   // luminous but color-preserving cyan glow
+  const float HORIZON_R       = 1.0;     // event horizon radius (= r_s)
+  const float PHOTON_R        = 1.5;     // photon sphere radius -> the bright ring
+  const vec3  DISK_HOT        = vec3(0.73, 0.97, 1.00); // ice-cyan highlight: #baf8ff
+  const vec3  DISK_COOL       = vec3(0.13, 0.68, 0.78); // theme cyan/teal: #22d3ee family
   const int   RAY_STEPS       = 120;    // finer integration for cleaner photon-ring detail
   const float MAX_REVOLUTIONS = 2.15;   // retain additional higher-order lensed images
   // ---------------------------------------------------------------------
@@ -163,7 +162,7 @@ const FRAGMENT_SHADER = `
 
     // A compact, hotter inner region with thin turbulent filaments instead
     // of a uniformly colored flat ring.
-    diskCol += vec3(0.015, 0.20, 0.30) * hotFilament;
+    diskCol += vec3(0.015, 0.13, 0.17) * hotFilament;
 
     // Relativistic Doppler beaming: the approaching side appears brighter.
     vec3 rayDir = normalize(b - a);
@@ -174,8 +173,8 @@ const FRAGMENT_SHADER = `
     float innerCut = smoothstep(0.0, 0.025, rn);
     float outerCut = 1.0 - smoothstep(0.82, 1.0, rn);
     float edge = innerCut * outerCut;
-    return (diskCol * density + vec3(0.012, 0.16, 0.34) * hotFilament)
-      * beamFactor * edge * BLOOM_INTENSITY * 0.68;
+    return (diskCol * density + vec3(0.012, 0.12, 0.16) * hotFilament)
+      * beamFactor * edge * BLOOM_INTENSITY * 0.60;
   }
 
   vec3 traceRay(vec3 ro, vec3 rd, vec3 diskNormal) {
@@ -259,7 +258,7 @@ const FRAGMENT_SHADER = `
     float ring = exp(-pow(ringDist / 0.047, 2.0))
                + 0.42 * exp(-pow(ringDist / 0.15, 2.0))
                + 0.12 * exp(-pow(ringDist / 0.30, 2.0));
-    color += vec3(0.40, 1.02, 1.28) * ring * BLOOM_INTENSITY * 1.18;
+    color += vec3(0.58, 0.93, 1.00) * ring * BLOOM_INTENSITY;
 
     // Analytic exit direction from the Binet parametrisation — the exact
     // tangent to the geodesic where marching stopped — instead of a noisy
@@ -302,10 +301,8 @@ const FRAGMENT_SHADER = `
     vec3 right = normalize(cross(forward, worldUp));
     vec3 up = cross(right, forward);
 
-    // As the visitor scrolls through the portfolio, narrow the field of view
-    // to create a real shader-level zoom toward the black hole (not a moving overlay).
-    float zoomProgress = smoothstep(0.0, 1.0, uScrollProgress);
-    float fov = mix(1.15, 0.76, zoomProgress);
+    // Keep a constant field of view: scrolling moves the page, not the black hole.
+    float fov = 1.15;
     vec3 rd = normalize(forward + rolledUv.x * fov * right + rolledUv.y * fov * up);
 
     // The disk sits near the camera's orbital (X-Z) plane, tilted slightly
@@ -316,9 +313,9 @@ const FRAGMENT_SHADER = `
 
     // Lift the whole emission before tone mapping so the disk and photon ring
     // stay luminous against the dark space without clipping their highlights.
-    col *= 1.8;
-    col = col / (col + vec3(0.78));
-    col = pow(col, vec3(0.98));
+    col *= 1.35;
+    col = col / (col + vec3(0.88));
+    col = pow(col, vec3(1.02));
 
     gl_FragColor = vec4(col, 1.0);
   }
@@ -393,7 +390,6 @@ export default function BlackHole({ className = '', style }) {
     const aPosition = gl.getAttribLocation(program, 'aPosition')
     const uResolution = gl.getUniformLocation(program, 'uResolution')
     const uTime = gl.getUniformLocation(program, 'uTime')
-    const uScrollProgress = gl.getUniformLocation(program, 'uScrollProgress')
 
     gl.enableVertexAttribArray(aPosition)
     gl.vertexAttribPointer(aPosition, 2, gl.FLOAT, false, 0, 0)
@@ -406,7 +402,6 @@ export default function BlackHole({ className = '', style }) {
     let inViewport = true
     let startTime = performance.now()
     let pauseStarted = pageVisible ? null : startTime
-    let scrollProgress = 0
 
     const drawFrame = (now) => {
       if (disposed || gl.isContextLost()) return
@@ -414,7 +409,6 @@ export default function BlackHole({ className = '', style }) {
       gl.useProgram(program)
       gl.uniform2f(uResolution, width, height)
       gl.uniform1f(uTime, elapsed)
-      gl.uniform1f(uScrollProgress, scrollProgress)
       gl.drawArrays(gl.TRIANGLES, 0, 3)
     }
 
@@ -434,18 +428,6 @@ export default function BlackHole({ className = '', style }) {
       }
     }
 
-    // Scroll progress is used only as a camera zoom control; the black hole
-    // remains fixed behind the particle network while its apparent size grows.
-    const onScroll = () => {
-      if (reducedMotion) {
-        scrollProgress = 0
-        return
-      }
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight
-      scrollProgress = maxScroll > 0 ? Math.min(Math.max(window.scrollY / maxScroll, 0), 1) : 0
-      scheduleRender()
-    }
-
     const resize = () => {
       const parent = canvas.parentElement
       const cssWidth = parent ? parent.clientWidth : window.innerWidth
@@ -461,9 +443,6 @@ export default function BlackHole({ className = '', style }) {
         canvas.height = height
         gl.viewport(0, 0, width, height)
       }
-      // Layout changes can alter total document height, so refresh progress
-      // before redrawing the scroll-linked camera zoom.
-      onScroll()
       scheduleRender()
     }
 
@@ -516,9 +495,7 @@ export default function BlackHole({ className = '', style }) {
       intersectionObserver.observe(canvas.parentElement || canvas)
     }
     window.addEventListener('resize', resize, { passive: true })
-    window.addEventListener('scroll', onScroll, { passive: true })
     document.addEventListener('visibilitychange', onVisibilityChange)
-    onScroll()
     canvas.addEventListener('webglcontextlost', onContextLost, false)
     syncActivity()
 
@@ -526,7 +503,6 @@ export default function BlackHole({ className = '', style }) {
       disposed = true
       if (rafId !== null) cancelAnimationFrame(rafId)
       window.removeEventListener('resize', resize)
-      window.removeEventListener('scroll', onScroll)
       document.removeEventListener('visibilitychange', onVisibilityChange)
       canvas.removeEventListener('webglcontextlost', onContextLost, false)
       if (resizeObserver) resizeObserver.disconnect()
