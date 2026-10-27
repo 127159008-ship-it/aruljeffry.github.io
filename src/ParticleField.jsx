@@ -541,7 +541,7 @@ function NetworkLayer({ count, zMin, zMax, spread, k, glowTexture, cursorReactiv
           const intensity = 0.35 + scrollRef.current * 1.1
           const pull = Math.pow(1 - dist / BLACK_HOLE.pullRadius, 2) * BLACK_HOLE.gravityStrength * intensity
           // Keep the attraction rate independent of monitor refresh rate.
-          const frameScale = delta * 60
+          const frameScale = Math.min(delta, 0.05) * 60
           p.gx += (dx / dist) * pull * frameScale
           p.gy += (dy / dist) * pull * frameScale
           p.gz += (dz / dist) * pull * frameScale
