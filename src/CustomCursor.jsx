@@ -32,9 +32,9 @@ export default function CustomCursor() {
     const onDown = () => gsap.to(ring, { scale: 0.7, duration: 0.2 })
     const onUp = () => gsap.to(ring, { scale: 1, duration: 0.2 })
 
-    const interactiveSelector = 'a, button, .project-card, .skill-card, .chip'
-    const onEnterInteractive = () => gsap.to(ring, { scale: 1.8, duration: 0.25 })
-    const onLeaveInteractive = () => gsap.to(ring, { scale: 1, duration: 0.25 })
+    const interactiveSelector = 'a, button, .project-row, .spec-row, .spec-tag, .cert-chip'
+    const onEnterInteractive = () => gsap.to(ring, { scale: 1.8, duration: 0.2, overwrite: 'auto' })
+    const onLeaveInteractive = () => gsap.to(ring, { scale: 1, duration: 0.2, overwrite: 'auto' })
 
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mousedown', onDown)
@@ -54,6 +54,8 @@ export default function CustomCursor() {
         el.removeEventListener('mouseenter', onEnterInteractive)
         el.removeEventListener('mouseleave', onLeaveInteractive)
       })
+      gsap.killTweensOf(dot)
+      gsap.killTweensOf(ring)
     }
   }, [active])
 
