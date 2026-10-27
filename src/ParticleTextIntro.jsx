@@ -42,6 +42,19 @@ export default function ParticleTextIntro({ text, className, as: Tag = 'h1' }) {
 
     let cancelled = false
     let rafId = null
+    const onResize = () => {
+      if (cancelled) return
+      // The particle mask is measured from text metrics. If layout changes
+      // mid-intro, finish cleanly with real text instead of animating against
+      // a stale canvas size and leaving the particles misaligned.
+      cancelled = true
+      if (rafId !== null) cancelAnimationFrame(rafId)
+      rafId = null
+      window.removeEventListener('resize', onResize)
+      setRevealed(true)
+      setCanvasVisible(false)
+    }
+    window.addEventListener('resize', onResize, { passive: true })
     setRevealed(false)
     setCanvasVisible(true)
 
@@ -273,6 +286,7 @@ export default function ParticleTextIntro({ text, className, as: Tag = 'h1' }) {
 
     return () => {
       cancelled = true
+      window.removeEventListener('resize', onResize)
       if (rafId !== null) cancelAnimationFrame(rafId)
     }
   }, [prefersReducedMotion, text])
