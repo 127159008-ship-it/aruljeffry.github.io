@@ -663,7 +663,14 @@ function Debris({ enabled }) {
   const meshRefs = useRef([])
 
   useFrame((state, delta) => {
-    if (!enabled) return
+    if (!enabled) {
+      // When reduced motion is enabled mid-flight, remove visible debris
+      // instead of leaving the last moving frame frozen on screen.
+      meshRefs.current.forEach((mesh) => {
+        if (mesh) mesh.visible = false
+      })
+      return
+    }
     const frameDelta = Math.min(Math.max(delta, 0), 0.05)
     slots.forEach((s, i) => {
       const mesh = meshRefs.current[i]
