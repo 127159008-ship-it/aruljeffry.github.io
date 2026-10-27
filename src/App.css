@@ -260,7 +260,8 @@ main section {
      the higher-layer particle network remains visibly in front. */
   opacity: 0.92;
   mix-blend-mode: screen;
-  filter: saturate(1.08) brightness(1.12);
+  /* Keep the shader's cyan-blue palette true to the site's accent colors. */
+  filter: saturate(1) brightness(1);
   mask-image: radial-gradient(circle at 50% 50%, #000 48%, transparent 82%);
   -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 48%, transparent 82%);
 }
