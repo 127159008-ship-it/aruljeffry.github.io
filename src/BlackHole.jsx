@@ -465,6 +465,7 @@ export default function BlackHole({ className = '', style }) {
       gl.deleteProgram(program)
       // Keep the canvas context alive between React effect cleanups. Explicitly
       // losing it here breaks StrictMode re-mounts and preference changes.
+    }
   }, [reducedMotion])
 
   if (!supported) {
