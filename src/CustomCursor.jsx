@@ -29,8 +29,8 @@ export default function CustomCursor() {
       moveRingY(e.clientY)
     }
 
-    const onDown = () => gsap.to(ring, { scale: 0.7, duration: 0.2 })
-    const onUp = () => gsap.to(ring, { scale: 1, duration: 0.2 })
+    const onDown = () => gsap.to(ring, { scale: 0.7, duration: 0.2, overwrite: 'auto' })
+    const onUp = () => gsap.to(ring, { scale: 1, duration: 0.2, overwrite: 'auto' })
 
     const interactiveSelector = 'a, button, .project-row, .spec-row, .spec-tag, .cert-chip'
     const onEnterInteractive = () => gsap.to(ring, { scale: 1.8, duration: 0.2, overwrite: 'auto' })
