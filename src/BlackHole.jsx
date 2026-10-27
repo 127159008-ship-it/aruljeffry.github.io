@@ -42,14 +42,36 @@ const FRAGMENT_SHADER = `
   const float PHOTON_R        = 1.5;    // photon sphere radius -> the bright ring
   const vec3  DISK_HOT        = vec3(0.85, 0.97, 1.0);  // near-ISCO: blue-white
   const vec3  DISK_COOL       = vec3(1.0, 0.55, 0.22);  // outer edge: orange-red
-  const int   RAY_STEPS       = 90;     // integration steps (φ-parametrised)
-  const float MAX_REVOLUTIONS = 1.8;    // max angle swept, in full turns
+  const int   RAY_STEPS       = 120;    // finer integration for cleaner photon-ring detail
+  const float MAX_REVOLUTIONS = 2.15;   // retain additional higher-order lensed images
   // ---------------------------------------------------------------------
 
   float hash21(vec2 p) {
     p = fract(p * vec2(123.34, 456.21));
     p += dot(p, p + 45.32);
     return fract(p.x * p.y);
+  }
+
+  float valueNoise(vec2 p) {
+    vec2 i = floor(p);
+    vec2 f = fract(p);
+    f = f * f * (3.0 - 2.0 * f);
+    float a = hash21(i);
+    float b = hash21(i + vec2(1.0, 0.0));
+    float c = hash21(i + vec2(0.0, 1.0));
+    float d = hash21(i + vec2(1.0, 1.0));
+    return mix(mix(a, b, f.x), mix(c, d, f.x), f.y);
+  }
+
+  float fbm2(vec2 p) {
+    float value = 0.0;
+    float amplitude = 0.5;
+    for (int i = 0; i < 4; i++) {
+      value += amplitude * valueNoise(p);
+      p = p * 2.03 + vec2(7.1, 3.7);
+      amplitude *= 0.5;
+    }
+    return value;
   }
 
   // Procedural starfield sampled straight from a ray direction — no texture.
@@ -63,7 +85,7 @@ const FRAGMENT_SHADER = `
       vec2 starPos = vec2(hash21(cell + 1.0), hash21(cell + 7.0));
       float d = length(f - starPos);
       float size = mix(0.02, 0.09, hash21(cell + 3.0));
-      star = smoothstep(size, 0.0, d) * mix(0.35, 1.0, hash21(cell + 9.0));
+      star = (1.0 - smoothstep(0.0, size, d)) * mix(0.35, 1.0, hash21(cell + 9.0));
     }
     vec3 tint = mix(vec3(0.75, 0.85, 1.0), vec3(1.0, 0.92, 0.82), hash21(cell + 13.0));
     return vec3(star) * tint;
@@ -103,7 +125,7 @@ const FRAGMENT_SHADER = `
   // radii. Factored out so the photon-sphere region can call it several
   // times per step on sub-segments (see below) instead of once on the
   // whole step.
-  vec3 diskCrossingColor(vec3 a, vec3 b, vec3 diskNormal) {
+  vec3 diskCrossingColor(vec3 a, vec3 b, vec3 diskNormal, float time) {
     float d0 = dot(a, diskNormal);
     float d1 = dot(b, diskNormal);
     if (d0 * d1 >= 0.0) return vec3(0.0);
@@ -113,21 +135,36 @@ const FRAGMENT_SHADER = `
     if (rad <= DISK_INNER || rad >= DISK_OUTER) return vec3(0.0);
 
     float rn = clamp((rad - DISK_INNER) / (DISK_OUTER - DISK_INNER), 0.0, 1.0);
-    vec3 diskCol = mix(DISK_HOT, DISK_COOL, rn);
+    vec3 diskCol = mix(DISK_HOT, DISK_COOL, pow(rn, 0.48));
 
-    // Relativistic beaming: brighter where the disk's orbital motion points
-    // toward the camera, dimmer on the receding side.
+    // Coordinates in the tilted disk plane. Differential rotation gives
+    // the inner plasma a faster flow rate than the outer edge.
+    vec3 diskTangent = normalize(cross(diskNormal, vec3(1.0, 0.0, 0.0)));
+    float angle = atan(dot(hit, diskTangent), hit.x);
+    float orbitalSpeed = mix(1.8, 0.28, rn);
+    float shear = angle + rn * 4.2;
+    float broadFlow = fbm2(vec2(shear * 3.2, rn * 6.0 - time * orbitalSpeed));
+    float filaments = fbm2(vec2(shear * 12.0 + time * 0.08, rn * 22.0));
+    float fineGrain = fbm2(vec2(shear * 30.0 - time * 0.035, rn * 46.0));
+    float turbulence = clamp(broadFlow * 0.52 + filaments * 0.33 + fineGrain * 0.15, 0.0, 1.0);
+    float density = mix(0.18, 1.35, smoothstep(0.28, 0.76, turbulence));
+    float hotFilament = smoothstep(0.55, 0.88, filaments) * (1.0 - rn);
+
+    // A compact, hotter inner region with thin turbulent filaments instead
+    // of a uniformly colored flat ring.
+    diskCol += vec3(0.24, 0.09, 0.025) * hotFilament;
+
+    // Relativistic Doppler beaming: the approaching side appears brighter.
     vec3 rayDir = normalize(b - a);
     vec3 tangentAtHit = normalize(cross(diskNormal, hit));
     float beam = dot(tangentAtHit, -rayDir);
-    float beamFactor = pow(clamp(0.65 + beam, 0.0, 2.2), 2.0);
+    float beamFactor = pow(clamp(0.68 + beam * 0.78, 0.08, 2.0), 2.0);
 
-    // Sharper edges (tight inner cutoff, tighter outer taper) instead of a
-    // broad haze, so the disk reads as a crisp streak rather than a soft glow.
-    float innerCut = smoothstep(0.0, 0.03, rn);
-    float outerCut = 1.0 - smoothstep(0.5, 0.72, rn);
-    float density = innerCut * outerCut;
-    return diskCol * beamFactor * density * BLOOM_INTENSITY * 0.4;
+    float innerCut = smoothstep(0.0, 0.025, rn);
+    float outerCut = 1.0 - smoothstep(0.82, 1.0, rn);
+    float edge = innerCut * outerCut;
+    return (diskCol * density + vec3(0.12, 0.035, 0.008) * hotFilament)
+      * beamFactor * edge * BLOOM_INTENSITY * 0.52;
   }
 
   vec3 traceRay(vec3 ro, vec3 rd, vec3 diskNormal) {
@@ -178,6 +215,9 @@ const FRAGMENT_SHADER = `
         break; // swallowed — whatever light was gathered en route, nothing more
       }
 
+      // Avoid reconstructing a position at infinity if a coarse step reaches
+      // the asymptotic escape region; dividing by a near-zero u causes NaNs.
+      if (u <= 1.0 / 34.0) break;
       pos = (cos(phi) * normalVec + sin(phi) * tangentVec) / u;
       minApproach = min(minApproach, 1.0 / u);
 
@@ -192,10 +232,9 @@ const FRAGMENT_SHADER = `
       // step edge, since the flip happens on a whole-step granularity).
       float uGate = smoothstep(1.1 / DISK_OUTER, 1.6 / DISK_OUTER, u);
       if (uGate > 0.0) {
-        color += diskCrossingColor(oldPos, pos, diskNormal) * uGate;
+        color += diskCrossingColor(oldPos, pos, diskNormal, uTime) * uGate;
       }
 
-      if (u < 1.0 / 34.0) break; // escaped far enough — stop marching
     }
 
     if (captured) return color;
@@ -204,7 +243,10 @@ const FRAGMENT_SHADER = `
     // hugs the photon sphere. With a true geodesic this also naturally
     // catches higher-order lensed images that wind close to r = 1.5.
     float ringDist = abs(minApproach - PHOTON_R);
-    float ring = smoothstep(0.14, 0.0, ringDist) + 0.4 * smoothstep(0.4, 0.0, ringDist);
+    // Gaussian falloffs avoid reversed smoothstep edges (undefined by GLSL)
+    // and keep the photon ring narrow, smooth and high contrast.
+    float ring = exp(-pow(ringDist / 0.055, 2.0))
+               + 0.32 * exp(-pow(ringDist / 0.18, 2.0));
     color += vec3(0.95, 0.99, 1.0) * ring * BLOOM_INTENSITY;
 
     // Analytic exit direction from the Binet parametrisation — the exact
@@ -292,7 +334,7 @@ function createProgram(gl, vertexSource, fragmentSource) {
 // Internal render resolution is capped and upscaled via CSS — raymarching
 // every screen pixel at full device resolution is the single biggest cost
 // lever here, so this is the one that keeps it off a laptop GPU's knees.
-const MAX_INTERNAL_LONG_EDGE = 1100
+const MAX_INTERNAL_LONG_EDGE = 1280
 
 export default function BlackHole({ className = '', style }) {
   const canvasRef = useRef(null)
