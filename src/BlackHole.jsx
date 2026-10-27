@@ -40,8 +40,8 @@ const FRAGMENT_SHADER = `
   const float BLOOM_INTENSITY = 1.6;
   const float HORIZON_R       = 1.0;    // event horizon radius (= r_s)
   const float PHOTON_R        = 1.5;    // photon sphere radius -> the bright ring
-  const vec3  DISK_HOT        = vec3(0.85, 0.97, 1.0);  // near-ISCO: blue-white
-  const vec3  DISK_COOL       = vec3(1.0, 0.55, 0.22);  // outer edge: orange-red
+  const vec3  DISK_HOT        = vec3(0.78, 0.98, 1.0);  // near-ISCO: icy cyan-white
+  const vec3  DISK_COOL       = vec3(0.08, 0.52, 0.92);  // outer edge: electric blue
   const int   RAY_STEPS       = 120;    // finer integration for cleaner photon-ring detail
   const float MAX_REVOLUTIONS = 2.15;   // retain additional higher-order lensed images
   // ---------------------------------------------------------------------
@@ -87,7 +87,7 @@ const FRAGMENT_SHADER = `
       float size = mix(0.02, 0.09, hash21(cell + 3.0));
       star = (1.0 - smoothstep(0.0, size, d)) * mix(0.35, 1.0, hash21(cell + 9.0));
     }
-    vec3 tint = mix(vec3(0.75, 0.85, 1.0), vec3(1.0, 0.92, 0.82), hash21(cell + 13.0));
+    vec3 tint = mix(vec3(0.38, 0.75, 1.0), vec3(0.80, 0.98, 1.0), hash21(cell + 13.0));
     return vec3(star) * tint;
   }
 
@@ -152,7 +152,7 @@ const FRAGMENT_SHADER = `
 
     // A compact, hotter inner region with thin turbulent filaments instead
     // of a uniformly colored flat ring.
-    diskCol += vec3(0.24, 0.09, 0.025) * hotFilament;
+    diskCol += vec3(0.015, 0.20, 0.30) * hotFilament;
 
     // Relativistic Doppler beaming: the approaching side appears brighter.
     vec3 rayDir = normalize(b - a);
@@ -163,7 +163,7 @@ const FRAGMENT_SHADER = `
     float innerCut = smoothstep(0.0, 0.025, rn);
     float outerCut = 1.0 - smoothstep(0.82, 1.0, rn);
     float edge = innerCut * outerCut;
-    return (diskCol * density + vec3(0.12, 0.035, 0.008) * hotFilament)
+    return (diskCol * density + vec3(0.008, 0.09, 0.16) * hotFilament)
       * beamFactor * edge * BLOOM_INTENSITY * 0.52;
   }
 
@@ -247,7 +247,7 @@ const FRAGMENT_SHADER = `
     // and keep the photon ring narrow, smooth and high contrast.
     float ring = exp(-pow(ringDist / 0.055, 2.0))
                + 0.32 * exp(-pow(ringDist / 0.18, 2.0));
-    color += vec3(0.95, 0.99, 1.0) * ring * BLOOM_INTENSITY;
+    color += vec3(0.62, 0.92, 1.0) * ring * BLOOM_INTENSITY;
 
     // Analytic exit direction from the Binet parametrisation — the exact
     // tangent to the geodesic where marching stopped — instead of a noisy
