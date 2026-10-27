@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import gsap from 'gsap'
 import useIsDesktop from './useIsDesktop'
 import usePrefersReducedMotion from './usePrefersReducedMotion'
@@ -8,10 +8,14 @@ export default function CustomCursor() {
   const prefersReducedMotion = usePrefersReducedMotion()
   const dotRef = useRef(null)
   const ringRef = useRef(null)
+  const [hasPointer, setHasPointer] = useState(false)
+  const pointerReadyRef = useRef(false)
   const active = isDesktop && !prefersReducedMotion
 
   useEffect(() => {
     if (!active) return
+    pointerReadyRef.current = false
+    setHasPointer(false)
 
     const dot = dotRef.current
     const ring = ringRef.current
@@ -23,6 +27,10 @@ export default function CustomCursor() {
     const moveRingY = gsap.quickTo(ring, 'y', { duration: 0.35, ease: 'power3.out' })
 
     const onMove = (e) => {
+      if (!pointerReadyRef.current) {
+        pointerReadyRef.current = true
+        setHasPointer(true)
+      }
       moveDot(e.clientX)
       moveDotY(e.clientY)
       moveRing(e.clientX)
@@ -63,8 +71,8 @@ export default function CustomCursor() {
 
   return (
     <>
-      <div className="cursor-dot" ref={dotRef} />
-      <div className="cursor-ring" ref={ringRef} />
+      <div className={`cursor-dot${hasPointer ? " cursor-ready" : ""}`} ref={dotRef} />
+      <div className={`cursor-ring${hasPointer ? " cursor-ready" : ""}`} ref={ringRef} />
     </>
   )
 }
