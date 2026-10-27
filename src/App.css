@@ -247,7 +247,12 @@ main section {
   height: min(52vw, 600px);
   pointer-events: none;
   z-index: 0;
-  /* Network canvas is layered above this, so its particles pass in front. */
+  /* Screen blending makes the black hole recede into the dark space while
+     the higher-layer particle network remains visibly in front. */
+  opacity: 0.78;
+  mix-blend-mode: screen;
+  filter: saturate(0.86);
+  will-change: contents;
   mask-image: radial-gradient(circle at 50% 50%, #000 48%, transparent 82%);
   -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 48%, transparent 82%);
 }
