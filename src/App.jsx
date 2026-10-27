@@ -20,15 +20,17 @@ const cornerLabels = [
 ]
 
 function Reveal({ children, delay = 0, className = '', onMouseMove, onMouseLeave }) {
+  const reducedMotion = usePrefersReducedMotion()
+  const visibleState = { opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }
   return (
     <motion.div
       className={className}
       onMouseMove={onMouseMove}
       onMouseLeave={onMouseLeave}
-      initial={{ opacity: 0, y: 36, scale: 0.94, filter: 'blur(4px)' }}
-      whileInView={{ opacity: 1, y: 0, scale: 1, filter: 'blur(0px)' }}
+      initial={reducedMotion ? visibleState : { opacity: 0, y: 36, scale: 0.94, filter: 'blur(4px)' }}
+      whileInView={visibleState}
       viewport={{ once: true, amount: 0.2, margin: '-40px' }}
-      transition={{ duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
+      transition={reducedMotion ? { duration: 0 } : { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
     >
       {children}
     </motion.div>
@@ -36,15 +38,16 @@ function Reveal({ children, delay = 0, className = '', onMouseMove, onMouseLeave
 }
 
 function SplitWords({ text, stagger = 0.05 }) {
+  const reducedMotion = usePrefersReducedMotion()
   const words = String(text).split(' ')
   return words.map((word, i) => (
     <span className="word-mask" key={`${word}-${i}`}>
       <motion.span
         className="word-inner"
-        initial={{ y: '105%', opacity: 0, rotateZ: 6 }}
+        initial={reducedMotion ? { y: '0%', opacity: 1, rotateZ: 0 } : { y: '105%', opacity: 0, rotateZ: 6 }}
         whileInView={{ y: '0%', opacity: 1, rotateZ: 0 }}
         viewport={{ once: true, amount: 0.7 }}
-        transition={{ duration: 0.5, delay: i * stagger, ease: [0.22, 1, 0.36, 1] }}
+        transition={reducedMotion ? { duration: 0 } : { duration: 0.5, delay: i * stagger, ease: [0.22, 1, 0.36, 1] }}
       >
         {word}
         {i < words.length - 1 ? ' ' : ''}
@@ -140,9 +143,9 @@ function App() {
           <motion.div
             key={group.key}
             className={group.className}
-            initial={{ opacity: 0 }}
+            initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0 }}
             animate={{ opacity: 1 }}
-            transition={{ duration: 1, delay: 1 + gi * 0.15 }}
+            transition={prefersReducedMotion ? { duration: 0 } : { duration: 1, delay: 1 + gi * 0.15 }}
           >
             {group.lines.map((line) => (
               <span key={line}>{line}</span>
@@ -153,9 +156,9 @@ function App() {
 
         <motion.p
           className="hero-eyebrow"
-          initial={{ opacity: 0, y: -10 }}
+          initial={prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5 }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.5 }}
         >
           ENGINEER · LEARNER · BUILDER
         </motion.p>
@@ -164,17 +167,17 @@ function App() {
         </h1>
         <motion.p
           className="hero-tagline"
-          initial={{ opacity: 0, y: 20 }}
+          initial={prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.4 }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.6, delay: 0.4 }}
         >
           TURNING IDEAS INTO A SMARTER TOMORROW
         </motion.p>
         <motion.div
           className="hero-row"
-          initial={{ opacity: 0, y: 20 }}
+          initial={prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.55 }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.6, delay: 0.55 }}
         >
           <span className="status-pill">
             <span className="pulse-dot" />
@@ -183,9 +186,9 @@ function App() {
         </motion.div>
         <motion.div
           className="hero-row"
-          initial={{ opacity: 0, y: 20 }}
+          initial={prefersReducedMotion ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.65 }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.6, delay: 0.65 }}
         >
           <MagneticButton className="btn btn-primary" href="#projects">See My Work →</MagneticButton>
           <MagneticButton className="btn btn-secondary" href={resumeUrl} target="_blank" rel="noreferrer">Download Résumé ⬇</MagneticButton>
@@ -194,9 +197,9 @@ function App() {
 
         <motion.div
           className="scroll-indicator"
-          initial={{ opacity: 0 }}
+          initial={prefersReducedMotion ? { opacity: 1 } : { opacity: 0 }}
           animate={{ opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.9 }}
+          transition={prefersReducedMotion ? { duration: 0 } : { duration: 0.6, delay: 0.9 }}
         >
           SCROLL TO EXPLORE
           <span className="scroll-mouse"><span className="scroll-mouse-dot" /></span>
