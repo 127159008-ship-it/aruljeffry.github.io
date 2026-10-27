@@ -37,12 +37,19 @@ export default function CustomCursor() {
       moveRingY(e.clientY)
     }
 
+    let overInteractive = false
     const onDown = () => gsap.to(ring, { scale: 0.7, duration: 0.2, overwrite: 'auto' })
-    const onUp = () => gsap.to(ring, { scale: 1, duration: 0.2, overwrite: 'auto' })
+    const onUp = () => gsap.to(ring, { scale: overInteractive ? 1.8 : 1, duration: 0.2, overwrite: 'auto' })
 
     const interactiveSelector = 'a, button, .project-row, .spec-row, .spec-tag, .cert-chip'
-    const onEnterInteractive = () => gsap.to(ring, { scale: 1.8, duration: 0.2, overwrite: 'auto' })
-    const onLeaveInteractive = () => gsap.to(ring, { scale: 1, duration: 0.2, overwrite: 'auto' })
+    const onEnterInteractive = () => {
+      overInteractive = true
+      gsap.to(ring, { scale: 1.8, duration: 0.2, overwrite: 'auto' })
+    }
+    const onLeaveInteractive = () => {
+      overInteractive = false
+      gsap.to(ring, { scale: 1, duration: 0.2, overwrite: 'auto' })
+    }
 
     window.addEventListener('mousemove', onMove)
     window.addEventListener('mousedown', onDown)
