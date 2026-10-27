@@ -29,6 +29,7 @@ function Reveal({ children, delay = 0, className = '', onMouseMove, onMouseLeave
       onMouseMove={onMouseMove}
       onMouseLeave={onMouseLeave}
       initial={reducedMotion ? visibleState : { opacity: 0, y: 36, scale: 0.94, filter: 'blur(4px)' }}
+      animate={reducedMotion ? visibleState : undefined}
       whileInView={visibleState}
       viewport={{ once: true, amount: 0.2, margin: '-40px' }}
       transition={reducedMotion ? { duration: 0 } : { duration: 0.6, delay, ease: [0.22, 1, 0.36, 1] }}
@@ -46,6 +47,7 @@ function SplitWords({ text, stagger = 0.05 }) {
       <motion.span
         className="word-inner"
         initial={reducedMotion ? { y: '0%', opacity: 1, rotateZ: 0 } : { y: '105%', opacity: 0, rotateZ: 6 }}
+        animate={reducedMotion ? { y: '0%', opacity: 1, rotateZ: 0 } : undefined}
         whileInView={{ y: '0%', opacity: 1, rotateZ: 0 }}
         viewport={{ once: true, amount: 0.7 }}
         transition={reducedMotion ? { duration: 0 } : { duration: 0.5, delay: i * stagger, ease: [0.22, 1, 0.36, 1] }}
