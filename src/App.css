@@ -245,13 +245,18 @@ main section {
   height: min(52vw, 600px);
   pointer-events: none;
   z-index: 0;
-  /* The canvas itself renders opaque (it has its own starfield), so a plain
-     rectangle would hard-clip the network layer behind it. Fade the edges
-     out with a mask so only the hole/disk/halo stays solid and the rest
-     blends into the existing cosmic-network background instead of showing
-     a box. */
+  /* Fade the WebGL canvas edges into the existing particle-network background. */
   mask-image: radial-gradient(circle at 50% 50%, #000 52%, transparent 82%);
   -webkit-mask-image: radial-gradient(circle at 50% 50%, #000 52%, transparent 82%);
+}
+
+.hero > :not(.hero-blackhole):not(.corner-label) {
+  position: relative;
+  z-index: 1;
+}
+
+.corner-label {
+  z-index: 2;
 }
 
 @media (max-width: 760px) {
