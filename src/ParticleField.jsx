@@ -43,7 +43,11 @@ function useScrollProgressRef() {
     }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
-    return () => window.removeEventListener('scroll', onScroll)
+    window.addEventListener('resize', onScroll, { passive: true })
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+    }
   }, [])
   return ref
 }
@@ -785,17 +789,28 @@ function CameraRig({ reduced }) {
     }
     onScroll()
     window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll, { passive: true })
     window.addEventListener('mousemove', onMove, { passive: true })
     return () => {
       window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
       window.removeEventListener('mousemove', onMove)
     }
   }, [])
 
   useFrame((state, delta) => {
-    const targetZ = reduced ? 8 : 8 - scrollProgress.current * CONFIG.scrollTravel
-    const targetX = reduced ? 0 : mouse.current.x * 1.1
-    const targetY = reduced ? 0 : mouse.current.y * 0.7
+    // When reduced motion is enabled, snap to a deterministic resting camera
+    // pose. This also avoids freezing the camera halfway through a transition
+    // when the canvas switches from continuous to demand rendering.
+    if (reduced) {
+      camera.position.set(0, 0, 8)
+      camera.lookAt(0, 0, -4)
+      return
+    }
+
+    const targetZ = 8 - scrollProgress.current * CONFIG.scrollTravel
+    const targetX = mouse.current.x * 1.1
+    const targetY = mouse.current.y * 0.7
     // Exponential damping makes camera easing consistent at 60/120/144 Hz.
     const alpha = 1 - Math.exp(-2.2 * Math.min(delta, 0.05))
 
@@ -911,7 +926,7 @@ export default function ParticleField() {
         camera={{ position: [0, 0, 8], fov: 58, near: 0.1, far: 90 }}
         dpr={[1, tier === 'mobile' ? 1 : 1.3]}
         gl={{ antialias: false, powerPreference: 'high-performance' }}
-        frameloop={visible ? 'always' : 'never'}
+        frameloop={!visible ? 'never' : reduced ? 'demand' : 'always'}
       >
         <Scene tier={tier} reduced={reduced} bloomEnabled={tier !== 'mobile'} />
       </Canvas>
