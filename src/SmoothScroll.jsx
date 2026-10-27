@@ -15,6 +15,10 @@ export default function SmoothScroll({ children }) {
     const lenis = new Lenis({
       duration: 1.1,
       smoothWheel: true,
+      // Let Lenis own in-page anchor navigation instead of competing with
+      // the browser's native CSS smooth-scroll animation. The sticky nav is
+      // accounted for so section headings are not hidden behind it.
+      anchors: { offset: -80 },
     })
     const onScroll = () => ScrollTrigger.update()
     const tick = (time) => lenis.raf(time * 1000)
