@@ -18,12 +18,17 @@ export default function MagneticButton({ as: Tag = 'a', className, strength = 0.
       y: relY * strength,
       duration: 0.4,
       ease: 'power3.out',
+      overwrite: 'auto',
     })
   }
 
   const onMouseLeave = () => {
     if (!ref.current) return
-    gsap.to(ref.current, { x: 0, y: 0, duration: 0.5, ease: 'elastic.out(1, 0.4)' })
+    if (!isDesktop || prefersReducedMotion) {
+      gsap.set(ref.current, { x: 0, y: 0 })
+      return
+    }
+    gsap.to(ref.current, { x: 0, y: 0, duration: 0.35, ease: 'power3.out', overwrite: 'auto' })
   }
 
   return (
